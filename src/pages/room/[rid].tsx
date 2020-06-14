@@ -22,9 +22,10 @@ const Room = (props: Props) => {
 
   React.useEffect(() => {
     if (!isListener) {
-      // setScreenPeer(new Peer({ key: "", debug: 3 }));
+      setScreenPeer(new Peer({ key: process.env.SKYWAY_API_KEY, debug: 3 }));
     }
-    // setPeer(new Peer({ key: "", debug: 3 }));
+    setPeer(new Peer({ key: process.env.SKYWAY_API_KEY, debug: 3 }));
+    joinTriggerClick();
   }, []);
 
   const joinTriggerClick = async () => {
