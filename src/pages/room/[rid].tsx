@@ -134,7 +134,13 @@ const Room = (props: Props) => {
 
   const startShare = () => {
     navigator.mediaDevices
-      .getDisplayMedia({ video: true, audio: true })
+      .getDisplayMedia({
+        video: {
+          width: 3840,
+          height: 2160,
+        },
+        audio: true,
+      })
       .then((stream) => {
         setScreenStream(stream);
 
