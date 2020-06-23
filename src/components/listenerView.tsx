@@ -3,10 +3,12 @@ import EmotionalVideo from "../components/emotionalVideo";
 import { SortablePane, Pane } from "react-sortable-pane";
 import ScreenShareView from "../components/screenShareView";
 import { useWinndowDimensions } from "../lib/customHooks";
+import { Button } from "@material-ui/core";
 
 interface Props {
   videoStream?: MediaStream;
   screenStream?: MediaStream;
+  onClickStartWatch: () => void;
 }
 
 const ListenerView = (props: Props) => {
@@ -59,7 +61,16 @@ const ListenerView = (props: Props) => {
         >
           {!!screenStream ? (
             <ScreenShareView stream={screenStream}></ScreenShareView>
-          ) : null}
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={props.onClickStartWatch}
+              style={{ marginBottom: "32px" }}
+            >
+              Start Share
+            </Button>
+          )}
         </Pane>
         <Pane
           key={1}

@@ -19,32 +19,28 @@ const Room = (props: Props) => {
   const roomId = router.query.rid;
   const isListener = router.query.type === "listener";
 
+  let Peer;
+  if (process.browser) {
+    Peer = require("skyway-js");
+  }
+
   React.useEffect(() => {
-    let Peer;
-    if (process.browser) {
-      Peer = require("skyway-js");
-      if (!isListener) {
-        setScreenPeer(
-          new Peer({
-            key: process.env.SKYWAY_API_KEY,
-            debug: 3,
-          })
-        );
-      }
-      setPeer(
+    if (!isListener) {
+      setScreenPeer(
         new Peer({
           key: process.env.SKYWAY_API_KEY,
           debug: 3,
         })
       );
     }
+    setPeer(
+      new Peer({
+        key: process.env.SKYWAY_API_KEY,
+        debug: 3,
+      })
+    );
   }, []);
-  React.useEffect(() => {
-    console.log(`peer is ${peer}`);
-    if (peer !== null) {
-      joinTriggerClick();
-    }
-  }, [peer]);
+
   React.useEffect(() => {
     console.log(`screen stream is ${screenPeer}`);
     if (screenStream !== null && !isListener) {
@@ -53,11 +49,10 @@ const Room = (props: Props) => {
   }, [screenStream]);
 
   const joinTriggerClick = async () => {
+    console.log("=== prepare peer ===");
     if (!peer.open) {
       return;
     }
-
-    console.log("=== prepare peer ===");
 
     // join room
     const room = peer.joinRoom(roomId, {
@@ -84,12 +79,10 @@ const Room = (props: Props) => {
 
     // stream handling
     room.on("stream", async (stream) => {
-      console.log("======");
-      console.log(stream);
       if (isListener) {
         const peerId = stream.peerId;
         // TODO: if this is screen or speaker video, set element
-        console.log(`=== stream received ===`);
+        console.log(`=== stream received ${peerId} ===`);
         if (!!peerId) {
           // setVideoStream(stream);
           setScreenStream(stream);
@@ -132,6 +125,10 @@ const Room = (props: Props) => {
     room.on("stream", async (stream) => {});
   };
 
+  const startWatch = () => {
+    joinTriggerClick();
+  };
+
   const startShare = () => {
     navigator.mediaDevices
       .getDisplayMedia({
@@ -164,6 +161,7 @@ const Room = (props: Props) => {
     <ListenerView
       videoStream={videoStream}
       screenStream={screenStream}
+      onClickStartWatch={startWatch}
     ></ListenerView>
   ) : (
     <SpeakerView
