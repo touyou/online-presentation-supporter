@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/dist/client/router";
 import ListenerView from "../../components/listenerView";
 import SpeakerView from "../../components/speakerView";
-import Peer from "skyway-js";
 
 interface Props {
   stream: MediaStream;
@@ -21,17 +20,44 @@ const Room = (props: Props) => {
   const isListener = router.query.type === "listener";
 
   React.useEffect(() => {
-    if (!isListener) {
-      setScreenPeer(new Peer({ key: process.env.SKYWAY_API_KEY, debug: 3 }));
+    let Peer;
+    if (process.browser) {
+      Peer = require("skyway-js");
+      if (!isListener) {
+        setScreenPeer(
+          new Peer({
+            key: process.env.SKYWAY_API_KEY,
+            debug: 3,
+          })
+        );
+      }
+      setPeer(
+        new Peer({
+          key: process.env.SKYWAY_API_KEY,
+          debug: 3,
+        })
+      );
     }
-    setPeer(new Peer({ key: process.env.SKYWAY_API_KEY, debug: 3 }));
-    joinTriggerClick();
   }, []);
+  React.useEffect(() => {
+    console.log(`peer is ${peer}`);
+    if (peer !== null) {
+      joinTriggerClick();
+    }
+  }, [peer]);
+  React.useEffect(() => {
+    console.log(`screen stream is ${screenPeer}`);
+    if (screenStream !== null && !isListener) {
+      startScreenSharing();
+    }
+  }, [screenStream]);
 
   const joinTriggerClick = async () => {
     if (!peer.open) {
       return;
     }
+
+    console.log("=== prepare peer ===");
 
     // join room
     const room = peer.joinRoom(roomId, {
@@ -58,11 +84,14 @@ const Room = (props: Props) => {
 
     // stream handling
     room.on("stream", async (stream) => {
+      console.log("======");
+      console.log(stream);
       if (isListener) {
         const peerId = stream.peerId;
         // TODO: if this is screen or speaker video, set element
+        console.log(`=== stream received ===`);
         if (!!peerId) {
-          setVideoStream(stream);
+          // setVideoStream(stream);
           setScreenStream(stream);
         }
       }
@@ -73,6 +102,8 @@ const Room = (props: Props) => {
     if (!screenPeer.open) {
       return;
     }
+
+    console.log("=== prepare scereen peer ==");
 
     // join room
     const room = screenPeer.joinRoom(roomId, {
@@ -106,7 +137,6 @@ const Room = (props: Props) => {
       .getDisplayMedia({ video: true, audio: true })
       .then((stream) => {
         setScreenStream(stream);
-        startScreenSharing();
 
         const [screenVideoTrack] = stream.getVideoTracks();
         screenVideoTrack.addEventListener(
