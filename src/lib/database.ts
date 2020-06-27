@@ -16,6 +16,17 @@ export const selectUserDocument = async (id: string) => {
   return db.collection("users").doc(id);
 };
 
+export const createRoomDocument = async (name: string, password: string) => {
+  const db = firebase.firestore();
+  const newDocId = db.collection("rooms").doc().id;
+  await db.collection("rooms").doc(newDocId).set({
+    name: name,
+    password: password,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+  return newDocId;
+};
+
 export const insertRoomDocument = async (roomDocument: RoomDocument) => {
   const db = firebase.firestore();
   return await db.collection("rooms").add(roomDocument);

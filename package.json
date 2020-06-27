@@ -17,9 +17,11 @@
     "next": "9.4.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-hook-form": "^5.7.2",
     "react-sortable-pane": "^1.1.0",
     "react-webcam": "^5.0.2",
-    "skyway-js": "^3.0.0"
+    "skyway-js": "^3.0.0",
+    "yup": "^0.29.1"
   },
   "devDependencies": {
     "@types/node": "^14.0.5",
