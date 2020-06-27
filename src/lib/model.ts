@@ -9,5 +9,7 @@ export interface RoomDocument {
   name: string;
   adminUid: string;
   admin: string;
+  password: string;
   users: UserDocument[];
+  timestamp: firebase.firestore.FieldValue;
 }
