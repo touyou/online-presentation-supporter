@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/router";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { createRoomDocument, updateIsListener } from "../lib/database";
+import { createRoom, updateIsListener } from "../lib/database";
 import { Close } from "@material-ui/icons";
 
 interface Props {
@@ -79,9 +79,9 @@ const CreateDialog = (props: Props) => {
   const createForm = useForm({
     validationSchema: createRoomSchema,
   });
-  const createRoom = async (values: any) => {
+  const handleCreateRoom = async (values: any) => {
     console.log(values);
-    const roomId = await createRoomDocument(
+    const roomId = await createRoom(
       props.currentUser,
       values.name,
       values.password
@@ -128,7 +128,7 @@ const CreateDialog = (props: Props) => {
         </Button>
         <Button
           variant="contained"
-          onClick={createForm.handleSubmit(createRoom)}
+          onClick={createForm.handleSubmit(handleCreateRoom)}
           color="primary"
         >
           Create

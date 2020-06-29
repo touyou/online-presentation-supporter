@@ -18,7 +18,7 @@ export const handleGoogleLogin = async () => {
   if (!!uid && !(await isCreatedUser(uid))) {
     const userObj = result.user as firebase.User;
     const userDocument: UserDocument = {
-      uid: userObj.uid,
+      id: userObj.uid,
       name: userObj.displayName,
       isListener: false,
     };

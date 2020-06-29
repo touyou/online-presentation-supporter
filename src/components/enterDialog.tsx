@@ -14,7 +14,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import {
   updateIsListener,
-  selectUser,
+  fetchUser,
   updateRoomDocumentWhenJoined,
 } from "../lib/database";
 import { Close } from "@material-ui/icons";
@@ -88,8 +88,8 @@ const EnterDialog = (props: Props) => {
   const enterRoom = async (roomId: string, password: string) => {
     if (props.selectRoom.password === password) {
       await updateIsListener(props.currentUser.uid, false);
-      const user = await selectUser(props.currentUser.uid);
-      await updateRoomDocumentWhenJoined(props.selectRoom.uid, user);
+      const user = await fetchUser(props.currentUser.uid);
+      await updateRoomDocumentWhenJoined(props.selectRoom.id, user);
       router.push(`/room/${roomId}?type=listener`);
     } else {
       enterForm.setError("password", null);
@@ -129,7 +129,7 @@ const EnterDialog = (props: Props) => {
         <Button
           variant="contained"
           onClick={enterForm.handleSubmit((values) => {
-            enterRoom(props.selectRoom.uid, values.password);
+            enterRoom(props.selectRoom.id, values.password);
           })}
           color="primary"
         >

@@ -1,107 +1,89 @@
 import firebase from "../plugins/firebase";
 import { RoomDocument, UserDocument } from "./model";
+import { FirestoreSimple } from "@firestore-simple/web";
+import { isUndefined } from "util";
+
+const firestoreSimple = new FirestoreSimple(firebase.firestore());
+const roomsDao = firestoreSimple.collection<RoomDocument>({ path: `rooms` });
+const usersDao = firestoreSimple.collection<UserDocument>({ path: `users` });
+
+export const fetchRoom = async (id: string) => {
+  return await roomsDao.fetch(id);
+};
+
+export const fetchUser = async (id: string) => {
+  return await usersDao.fetch(id);
+};
+
+export const fetchRoomAll = async () => {
+  return await roomsDao.fetchAll();
+};
 
 export const selectRoomDocuments = async () => {
   const db = firebase.firestore();
   return db.collection("rooms");
 };
 
-export const selectRoomDocument = async (docId: string) => {
-  const db = firebase.firestore();
-  return db.collection("rooms").doc(docId);
-};
-
-export const selectUserDocument = async (id: string) => {
-  const db = firebase.firestore();
-  return db.collection("users").doc(id);
-};
-
-export const createRoomDocument = async (
+export const createRoom = async (
   user: firebase.User,
   name: string,
   password: string
 ) => {
-  const db = firebase.firestore();
-  const newDocId = db.collection("rooms").doc().id;
-  const admin = await selectUser(user.uid);
-  await db
-    .collection("rooms")
-    .doc(newDocId)
-    .set({
-      uid: newDocId,
-      name: name,
-      adminUid: admin.uid,
-      admin: admin.name,
-      password: password,
-      users: [admin],
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  const admin: UserDocument = await fetchUser(user.uid);
+  const newDocId = await roomsDao.add({
+    name: name,
+    adminUid: user.uid,
+    admin: admin.name,
+    password: password,
+    users: [admin],
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  });
   return newDocId;
-};
-
-export const insertRoomDocument = async (roomDocument: RoomDocument) => {
-  const db = firebase.firestore();
-  return await db.collection("rooms").add(roomDocument);
 };
 
 export const updateRoomDocumentWhenJoined = async (
   docId: string,
   userDocument: UserDocument
 ) => {
-  const db = firebase.firestore();
-  await db
-    .collection("rooms")
-    .doc(docId)
-    .update({
-      users: firebase.firestore.FieldValue.arrayUnion(userDocument),
-    });
+  await roomsDao.update({
+    id: docId,
+    users: firebase.firestore.FieldValue.arrayUnion(userDocument),
+  });
 };
 
 export const updateRoomDocumentWhenLeaved = async (
   docId: string,
   userDocument: UserDocument
 ) => {
-  const db = firebase.firestore();
-  await db
-    .collection("rooms")
-    .doc(docId)
-    .update({
-      users: firebase.firestore.FieldValue.arrayRemove(userDocument),
-    });
+  await roomsDao.update({
+    id: docId,
+    users: firebase.firestore.FieldValue.arrayRemove(userDocument),
+  });
 };
 
 export const insertUser = async (userDocument: UserDocument) => {
-  const db = firebase.firestore();
-  await db.collection("users").doc(userDocument.uid).set(userDocument);
+  await usersDao.set(userDocument);
 };
 
 export const isCreatedUser = async (uid: string) => {
-  const db = firebase.firestore();
-  const user = await db.collection("users").doc(uid).get();
-  return user.exists;
-};
-
-export const selectUser = async (uid: string) => {
-  const db = firebase.firestore();
-  const user = await db.collection("users").doc(uid).get();
-  return user.data() as UserDocument;
+  const user = await usersDao.fetch(uid);
+  return !isUndefined(user);
 };
 
 export const updateUsername = async (uid: string, name: string) => {
-  const db = firebase.firestore();
-  await db.collection("users").doc(uid).update({
-    name,
+  await usersDao.update({
+    id: uid,
+    name: name,
   });
 };
 
 export const updateIsListener = async (uid: string, isListener: boolean) => {
-  const db = firebase.firestore();
-  await db.collection("users").doc(uid).update({
-    isListener,
+  await usersDao.update({
+    id: uid,
+    isListener: isListener,
   });
 };
 
 export const deleteRoomDocument = async (roomId: string) => {
-  const db = firebase.firestore();
-  await db.collection("rooms").doc(roomId).delete();
+  await roomsDao.delete(roomId);
 };

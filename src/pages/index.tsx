@@ -9,8 +9,8 @@ import {
   CardActionArea,
 } from "@material-ui/core";
 import firebase from "../plugins/firebase";
-import { handleGoogleLogin } from "../lib/auth";
-import { selectRoomDocuments } from "../lib/database";
+import { handleGoogleLogin, handleLogout } from "../lib/auth";
+import { selectRoomDocuments, fetchRoomAll } from "../lib/database";
 import { RoomDocument } from "../lib/model";
 import CreateDialog from "../components/createDialog";
 import EnterDialog from "../components/enterDialog";
@@ -49,6 +49,10 @@ const Index = (props: AppProps) => {
     handleGoogleLogin();
   };
 
+  const logoutUser = () => {
+    handleLogout();
+  };
+
   return (
     <Container maxWidth="lg" className={classes.container}>
       {!!currentUser ? (
@@ -70,6 +74,13 @@ const Index = (props: AppProps) => {
               style={{ marginRight: "8px" }}
             >
               Create Room
+            </Button>
+            <Button
+              variant="contained"
+              onClick={logoutUser}
+              style={{ marginRight: "8px" }}
+            >
+              Logout
             </Button>
           </div>
           <Grid container>
@@ -129,13 +140,7 @@ const Index = (props: AppProps) => {
 };
 
 Index.getInitialProps = async () => {
-  const roomDocuments = await selectRoomDocuments();
-
-  const datas = await roomDocuments.get();
-  const rooms: RoomDocument[] = [];
-  datas.forEach((room) => {
-    rooms.push(room.data() as RoomDocument);
-  });
+  const rooms: RoomDocument[] = await fetchRoomAll();
   return { rooms };
 };
 

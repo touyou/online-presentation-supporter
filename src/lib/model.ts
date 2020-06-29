@@ -1,11 +1,11 @@
 export interface UserDocument {
-  uid: string;
+  id: string;
   name: string;
   isListener: boolean;
 }
 
 export interface RoomDocument {
-  uid: string;
+  id: string;
   name: string;
   adminUid: string;
   admin: string;

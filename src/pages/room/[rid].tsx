@@ -78,7 +78,7 @@ const Room = (props: Props) => {
     });
 
     // stream handling
-    room.on("stream", async (stream: MediaStream) => {
+    room.on("stream", async (stream) => {
       if (isListener) {
         const peerId = stream.peerId;
         // TODO: if this is screen or speaker video, set element
