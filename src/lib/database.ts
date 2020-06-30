@@ -1,11 +1,27 @@
 import firebase from "../plugins/firebase";
-import { RoomDocument, UserDocument } from "./model";
+import { RoomDocument, UserDocument, AnalysisDataDocument } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 const roomsDao = firestoreSimple.collection<RoomDocument>({ path: `rooms` });
 const usersDao = firestoreSimple.collection<UserDocument>({ path: `users` });
+const analysisFactory = firestoreSimple.collectionFactory<AnalysisDataDocument>(
+  {
+    decode: (doc) => {
+      return {
+        id: doc.id,
+        neutral: doc.neutral,
+        happy: doc.happy,
+        sad: doc.sad,
+        angry: doc.angry,
+        fearful: doc.fearful,
+        disgusted: doc.disgusted,
+        surprised: doc.surprised,
+      };
+    },
+  }
+);
 
 export const fetchRoom = async (id: string) => {
   return await roomsDao.fetch(id);
@@ -22,6 +38,19 @@ export const fetchRoomAll = async () => {
 export const selectRoomDocuments = async () => {
   const db = firebase.firestore();
   return db.collection("rooms");
+};
+
+export const selectRoomAnalysis = async (id: string) => {
+  const analysisDao = analysisFactory.create(`rooms/${id}/analysis`);
+  return await analysisDao.fetchAll();
+};
+
+export const updateOrAddRoomAnalysis = async (
+  roomId: string,
+  analysis: AnalysisDataDocument
+) => {
+  const analysisDao = analysisFactory.create(`rooms/${roomId}/analysis`);
+  await analysisDao.set(analysis);
 };
 
 export const createRoom = async (

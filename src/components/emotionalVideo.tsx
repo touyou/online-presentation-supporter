@@ -3,10 +3,14 @@ import Webcam from "react-webcam";
 import { loadModels, getFaceDescription } from "../lib/face";
 import { useInterval } from "../lib/customHooks";
 import { FaceDetection, FaceExpressions } from "face-api.js";
+import { AnalysisDataDocument } from "../lib/model";
+import { updateOrAddRoomAnalysis } from "../lib/database";
 
 interface Props {
   width: number;
   height: number;
+  roomId: string;
+  userId: string;
 }
 
 const EmotionalVideo = (props: Props) => {
@@ -27,7 +31,21 @@ const EmotionalVideo = (props: Props) => {
         (fullDesc) => {
           if (!!fullDesc) {
             setDetections(fullDesc.map((fd) => fd.detection));
-            setExpressions(fullDesc.map((fd) => fd.expressions));
+            const expressions = fullDesc.map((fd) => fd.expressions);
+            setExpressions(expressions);
+            const expression: FaceExpressions = expressions[0];
+            const doc: AnalysisDataDocument = {
+              id: props.userId,
+              neutral: expression.neutral,
+              happy: expression.happy,
+              sad: expression.sad,
+              angry: expression.angry,
+              fearful: expression.fearful,
+              disgusted: expression.disgusted,
+              surprised: expression.surprised,
+            };
+
+            updateOrAddRoomAnalysis(props.roomId, doc);
           }
         }
       );
@@ -136,6 +154,8 @@ EmotionalVideo.getInitialProps = async () => {
   return {
     width: 1024,
     height: 720,
+    roomId: "",
+    userId: "",
   };
 };
 

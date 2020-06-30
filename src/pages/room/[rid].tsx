@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/dist/client/router";
 import ListenerView from "../../components/listenerView";
 import SpeakerView from "../../components/speakerView";
+import firebase from "../../plugins/firebase";
 
 interface Props {
   stream: MediaStream;
@@ -10,14 +11,23 @@ interface Props {
 
 const Room = (props: Props) => {
   const [peer, setPeer] = useState(null);
+  const [currentUser, setCurrentUser] = React.useState<firebase.User>();
   const [screenPeer, setScreenPeer] = useState(null);
   const [videoStream, setVideoStream] = useState(null);
   const [screenStream, setScreenStream] = useState(null);
 
   // Router
   const router = useRouter();
-  const roomId = router.query.rid;
+  const roomId = router.query.rid as string;
   const isListener = router.query.type === "listener";
+
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      setCurrentUser(user);
+    } else {
+      setCurrentUser(null);
+    }
+  });
 
   let Peer;
   if (process.browser) {
@@ -163,6 +173,8 @@ const Room = (props: Props) => {
       videoStream={videoStream}
       screenStream={screenStream}
       onClickStartWatch={startWatch}
+      roomId={roomId}
+      userId={currentUser != null ? currentUser.uid : ""}
     ></ListenerView>
   ) : (
     <SpeakerView

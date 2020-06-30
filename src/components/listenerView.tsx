@@ -9,6 +9,8 @@ interface Props {
   videoStream?: MediaStream;
   screenStream?: MediaStream;
   onClickStartWatch: () => void;
+  roomId: string;
+  userId: string;
 }
 
 const ListenerView = (props: Props) => {
@@ -99,6 +101,8 @@ const ListenerView = (props: Props) => {
           <EmotionalVideo
             width={videoWidth}
             height={videoHeight()}
+            roomId={props.roomId}
+            userId={props.userId}
           ></EmotionalVideo>
         </Pane>
       </SortablePane>
@@ -112,6 +116,8 @@ ListenerView.getInitialProps = () => {
   return {
     videoStream: null,
     screenStream: null,
+    roomId: "",
+    userId: "",
   };
 };
 

@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import firebase from "../plugins/firebase";
 import { handleGoogleLogin, handleLogout } from "../lib/auth";
-import { selectRoomDocuments, fetchRoomAll } from "../lib/database";
+import { fetchRoomAll } from "../lib/database";
 import { RoomDocument } from "../lib/model";
 import CreateDialog from "../components/createDialog";
 import EnterDialog from "../components/enterDialog";
