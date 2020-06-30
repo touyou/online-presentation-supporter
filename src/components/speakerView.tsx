@@ -1,13 +1,15 @@
 import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
-import { useWinndowDimensions } from "../lib/customHooks";
+import { useWinndowDimensions, useInterval } from "../lib/customHooks";
 import ScreenShareView from "./screenShareView";
 import { Button } from "@material-ui/core";
+import { selectRoomAnalysis } from "../lib/database";
 
 interface Props {
   screenStream?: MediaStream;
   onClickStartShare: () => void;
   onClickStopShare: () => void;
+  roomId: string;
 }
 
 const SpeakerView = (props: Props) => {
@@ -21,6 +23,38 @@ const SpeakerView = (props: Props) => {
     const paneResizeStop = (e, key, dir, ref, d) => {
       setWidth(screenWidth + d.width);
     };
+
+    const delay = 5000;
+
+    const updateAnalysis = async () => {
+      const analysisDatas = await selectRoomAnalysis(props.roomId);
+      const resultObject = {
+        neutral:
+          analysisDatas.reduce((a, x) => (a += x.neutral), 0.0) /
+          analysisDatas.length,
+        happy:
+          analysisDatas.reduce((a, x) => (a += x.happy), 0.0) /
+          analysisDatas.length,
+        sad:
+          analysisDatas.reduce((a, x) => (a += x.sad), 0.0) /
+          analysisDatas.length,
+        angry:
+          analysisDatas.reduce((a, x) => (a += x.angry), 0.0) /
+          analysisDatas.length,
+        fearful:
+          analysisDatas.reduce((a, x) => (a += x.fearful), 0.0) /
+          analysisDatas.length,
+        disgusted:
+          analysisDatas.reduce((a, x) => (a += x.disgusted), 0.0) /
+          analysisDatas.length,
+        surprised:
+          analysisDatas.reduce((a, x) => (a += x.surprised), 0.0) /
+          analysisDatas.length,
+      };
+      console.log(resultObject);
+    };
+
+    useInterval(updateAnalysis, delay);
 
     React.useEffect(() => {
       setScreenStream(props.screenStream);

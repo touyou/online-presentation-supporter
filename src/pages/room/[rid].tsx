@@ -181,6 +181,7 @@ const Room = (props: Props) => {
       screenStream={screenStream}
       onClickStartShare={startShare}
       onClickStopShare={endShare}
+      roomId={roomId}
     ></SpeakerView>
   );
 };
