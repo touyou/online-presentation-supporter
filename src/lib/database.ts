@@ -27,6 +27,11 @@ export const fetchRoom = async (id: string) => {
   return await roomsDao.fetch(id);
 };
 
+export const fetchRoomUserCount = async (id: string) => {
+  const roomDoc = await roomsDao.fetch(id);
+  return roomDoc.users.length;
+};
+
 export const fetchUser = async (id: string) => {
   return await usersDao.fetch(id);
 };

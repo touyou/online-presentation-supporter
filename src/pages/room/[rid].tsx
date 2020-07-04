@@ -3,6 +3,14 @@ import { useRouter } from "next/dist/client/router";
 import ListenerView from "../../components/listenerView";
 import SpeakerView from "../../components/speakerView";
 import firebase from "../../plugins/firebase";
+import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
+import { handleLogout } from "../../lib/auth";
+import {
+  deleteRoomDocument,
+  updateRoomDocumentWhenLeaved,
+  fetchUser,
+  fetchRoomUserCount,
+} from "../../lib/database";
 
 interface Props {
   stream: MediaStream;
@@ -19,7 +27,7 @@ const Room = (props: Props) => {
   // Router
   const router = useRouter();
   const roomId = router.query.rid as string;
-  const isListener = router.query.type === "listener";
+  const isListener = router.query.type !== "speaker";
 
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
@@ -168,21 +176,65 @@ const Room = (props: Props) => {
     setScreenStream(null);
   };
 
-  return isListener ? (
-    <ListenerView
-      videoStream={videoStream}
-      screenStream={screenStream}
-      onClickStartWatch={startWatch}
-      roomId={roomId}
-      userId={currentUser != null ? currentUser.uid : ""}
-    ></ListenerView>
-  ) : (
-    <SpeakerView
-      screenStream={screenStream}
-      onClickStartShare={startShare}
-      onClickStopShare={endShare}
-      roomId={roomId}
-    ></SpeakerView>
+  const leaveRoom = async () => {
+    const userDoc = await fetchUser(currentUser.uid);
+    await updateRoomDocumentWhenLeaved(roomId, userDoc);
+    const userCount = await fetchRoomUserCount(roomId);
+    if (!isListener || userCount === 0) {
+      await deleteRoomDocument(roomId);
+    }
+    router.back();
+  };
+
+  const logout = () => {
+    handleLogout();
+    router.back();
+  };
+
+  if (!currentUser) {
+    return <div></div>;
+  }
+
+  return (
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>
+            Online Lecture System
+          </Typography>
+          <Button
+            color="inherit"
+            onClick={leaveRoom}
+            style={{ marginRight: "8px" }}
+          >
+            Leave Room
+          </Button>
+          <Button
+            color="inherit"
+            onClick={logout}
+            style={{ marginRight: "8px" }}
+          >
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+      {isListener ? (
+        <ListenerView
+          videoStream={videoStream}
+          screenStream={screenStream}
+          onClickStartWatch={startWatch}
+          roomId={roomId}
+          userId={currentUser != null ? currentUser.uid : ""}
+        ></ListenerView>
+      ) : (
+        <SpeakerView
+          screenStream={screenStream}
+          onClickStartShare={startShare}
+          onClickStopShare={endShare}
+          roomId={roomId}
+        ></SpeakerView>
+      )}
+    </>
   );
 };
 

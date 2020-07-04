@@ -7,6 +7,9 @@ import {
   Card,
   CardContent,
   CardActionArea,
+  AppBar,
+  Toolbar,
+  Typography,
 } from "@material-ui/core";
 import firebase from "../plugins/firebase";
 import { handleGoogleLogin, handleLogout } from "../lib/auth";
@@ -19,7 +22,7 @@ interface AppProps {
   rooms: RoomDocument[];
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: "16px",
     marginBottom: "16px",
@@ -28,7 +31,8 @@ const useStyles = makeStyles({
     paddingLeft: "4px",
     paddingRight: "4px",
   },
-});
+  offset: theme.mixins.toolbar,
+}));
 
 const Index = (props: AppProps) => {
   const classes = useStyles();
@@ -54,88 +58,92 @@ const Index = (props: AppProps) => {
   };
 
   return (
-    <Container maxWidth="lg" className={classes.container}>
-      {!!currentUser ? (
-        <div>
-          <p style={{ textAlign: "center" }}>
-            Now logged in as <b>{currentUser.displayName}</b>
-          </p>
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>
+            Online Lecture System
+          </Typography>
+          {!!currentUser ? (
+            <>
+              <Button
+                color="inherit"
+                onClick={() => setCreateModal(true)}
+                style={{ marginRight: "8px" }}
+              >
+                Create Room
+              </Button>
+              <Button
+                color="inherit"
+                onClick={logoutUser}
+                style={{ marginRight: "8px" }}
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button color="inherit" onClick={loginUser}>
+              Login
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="lg" className={classes.container}>
+        {!!currentUser ? (
+          <div>
+            <p style={{ textAlign: "center" }}>
+              Now logged in as <b>{currentUser.displayName}</b>
+            </p>
+            <Grid container spacing={2}>
+              {props.rooms.map((room: RoomDocument, index: number) => {
+                return (
+                  <Grid item xs={6} md={3} lg={3}>
+                    <Card>
+                      <CardActionArea>
+                        <CardContent>
+                          <h3>{room.name}</h3>
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                              setSelectRoom(room);
+                              setEnterModal(true);
+                            }}
+                          >
+                            Enter Room
+                          </Button>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+            <CreateDialog
+              currentUser={currentUser}
+              isOpen={createModal}
+              closeModal={() => setCreateModal(false)}
+            ></CreateDialog>
+            <EnterDialog
+              selectRoom={selectRoom}
+              currentUser={currentUser}
+              isOpen={enterModal}
+              closeModal={() => {
+                setEnterModal(false);
+                setSelectRoom(null);
+              }}
+            ></EnterDialog>
+          </div>
+        ) : (
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              marginBottom: "32px",
             }}
-          >
-            <Button
-              variant="contained"
-              onClick={() => setCreateModal(true)}
-              style={{ marginRight: "8px" }}
-            >
-              Create Room
-            </Button>
-            <Button
-              variant="contained"
-              onClick={logoutUser}
-              style={{ marginRight: "8px" }}
-            >
-              Logout
-            </Button>
-          </div>
-          <Grid container>
-            {props.rooms.map((room: RoomDocument, index: number) => {
-              return (
-                <Grid item xs={6} md={3} lg={3}>
-                  <Card>
-                    <CardActionArea>
-                      <CardContent>
-                        <h3>{room.name}</h3>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            setSelectRoom(room);
-                            setEnterModal(true);
-                          }}
-                        >
-                          Enter Room
-                        </Button>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
-          <CreateDialog
-            currentUser={currentUser}
-            isOpen={createModal}
-            closeModal={() => setCreateModal(false)}
-          ></CreateDialog>
-          <EnterDialog
-            selectRoom={selectRoom}
-            currentUser={currentUser}
-            isOpen={enterModal}
-            closeModal={() => {
-              setEnterModal(false);
-              setSelectRoom(null);
-            }}
-          ></EnterDialog>
-        </div>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Button variant="contained" onClick={loginUser}>
-            Login
-          </Button>
-        </div>
-      )}
-    </Container>
+          ></div>
+        )}
+      </Container>
+    </>
   );
 };
 
