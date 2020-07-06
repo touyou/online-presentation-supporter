@@ -54,6 +54,10 @@ export const selectRoomAnalysis = async (id: string) => {
   return await analysisDao.fetchAll();
 };
 
+export const getAnalysis = (id: string) => {
+  return analysisFactory.create(`rooms/${id}/analysis`);
+};
+
 export const updateOrAddRoomAnalysis = async (
   roomId: string,
   analysis: AnalysisDataDocument

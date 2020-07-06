@@ -9,7 +9,6 @@ import {
   deleteRoomDocument,
   updateRoomDocumentWhenLeaved,
   fetchUser,
-  fetchRoomUserCount,
 } from "../../lib/database";
 
 interface Props {

@@ -21,6 +21,7 @@
     "react-hook-form": "^5.7.2",
     "react-sortable-pane": "^1.1.0",
     "react-webcam": "^5.0.2",
+    "recharts": "^1.8.5",
     "skyway-js": "^3.0.0",
     "yup": "^0.29.1"
   },
