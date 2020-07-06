@@ -179,8 +179,7 @@ const Room = (props: Props) => {
   const leaveRoom = async () => {
     const userDoc = await fetchUser(currentUser.uid);
     await updateRoomDocumentWhenLeaved(roomId, userDoc);
-    const userCount = await fetchRoomUserCount(roomId);
-    if (!isListener || userCount === 0) {
+    if (!isListener) {
       await deleteRoomDocument(roomId);
     }
     router.back();
