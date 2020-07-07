@@ -41,11 +41,9 @@ const Index = (props: AppProps) => {
   const [selectRoom, setSelectRoom] = React.useState(null);
   const [rooms, setRooms] = React.useState(Array<RoomDocument>());
 
-  let unsubscribed: Function;
-
   React.useEffect(() => {
     const roomDao = getRoomDao();
-    unsubscribed = roomDao.onSnapshot((snapshot, toObject) => {
+    const unsubscribed = roomDao.onSnapshot((snapshot, toObject) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const addedRoom = toObject(change.doc);
@@ -64,6 +62,7 @@ const Index = (props: AppProps) => {
         }
       });
     });
+    return () => unsubscribed();
   }, []);
 
   firebase.auth().onAuthStateChanged((user) => {
@@ -79,7 +78,6 @@ const Index = (props: AppProps) => {
   };
 
   const logoutUser = () => {
-    unsubscribed();
     handleLogout();
   };
 

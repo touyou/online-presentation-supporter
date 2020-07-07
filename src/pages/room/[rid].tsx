@@ -10,6 +10,7 @@ import {
   updateRoomDocumentWhenLeaved,
   fetchUser,
 } from "../../lib/database";
+import * as Tone from "tone";
 
 interface Props {
   stream: MediaStream;
@@ -22,6 +23,7 @@ const Room = (props: Props) => {
   const [screenPeer, setScreenPeer] = useState(null);
   const [videoStream, setVideoStream] = useState(null);
   const [screenStream, setScreenStream] = useState(null);
+  const micAudio = new Tone.UserMedia();
 
   // Router
   const router = useRouter();
@@ -34,6 +36,15 @@ const Room = (props: Props) => {
     } else {
       setCurrentUser(null);
     }
+  });
+
+  micAudio.open().then(() => {
+    const reverb = new Tone.Freeverb();
+    const effectedDest = Tone.context.createMediaStreamDestination();
+    micAudio.connect(reverb);
+    reverb.connect(effectedDest);
+
+    const effectedTrack = effectedDest.stream.getAudioTracks()[0];
   });
 
   let Peer;
