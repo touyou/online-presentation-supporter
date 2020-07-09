@@ -23,7 +23,6 @@ const Room = (props: Props) => {
   const [screenPeer, setScreenPeer] = useState(null);
   const [videoStream, setVideoStream] = useState(null);
   const [screenStream, setScreenStream] = useState(null);
-  const micAudio = new Tone.UserMedia();
 
   // Router
   const router = useRouter();
@@ -38,14 +37,17 @@ const Room = (props: Props) => {
     }
   });
 
-  micAudio.open().then(() => {
-    const reverb = new Tone.Freeverb();
-    const effectedDest = Tone.context.createMediaStreamDestination();
-    micAudio.connect(reverb);
-    reverb.connect(effectedDest);
+  React.useEffect(() => {
+    const micAudio = new Tone.UserMedia();
+    micAudio.open().then(() => {
+      const reverb = new Tone.Freeverb();
+      const effectedDest = Tone.context.createMediaStreamDestination();
+      micAudio.connect(reverb);
+      reverb.connect(effectedDest);
 
-    const effectedTrack = effectedDest.stream.getAudioTracks()[0];
-  });
+      const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+    });
+  }, []);
 
   let Peer;
   if (process.browser) {
