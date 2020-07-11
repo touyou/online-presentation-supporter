@@ -4,7 +4,15 @@ import { useWinndowDimensions, useInterval } from "../lib/customHooks";
 import ScreenShareView from "./screenShareView";
 import { selectRoomAnalysis } from "../lib/database";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
-import { Button, Flex, Box, Alert, AlertIcon } from "@chakra-ui/core";
+import {
+  Button,
+  Flex,
+  Box,
+  Alert,
+  AlertIcon,
+  FormLabel,
+  Switch,
+} from "@chakra-ui/core";
 
 interface Props {
   screenStream?: MediaStream;
@@ -44,6 +52,7 @@ const SpeakerView = (props: Props) => {
       surprised: 0.0,
     });
     const [lastPush, setLastPush] = React.useState(null);
+    const [canPush, setCanPush] = React.useState(false);
 
     const delay = 5000;
 
@@ -133,15 +142,16 @@ const SpeakerView = (props: Props) => {
     React.useEffect(() => {
       let now = new Date();
       if (
+        canPush &&
         getMajorEmotionType() == -1 &&
-        (!lastPush || lastPush - 20000 > now.getTime())
+        (!lastPush || lastPush + 20000 < now.getTime())
       ) {
         let Push = require("push.js");
         Push.create("Oops!", {
           body: "もう少し丁寧に解説してみましょう。",
-          timeout: 2000,
+          timeout: 5000,
         });
-        setLastPush(now);
+        setLastPush(now.getTime());
       }
     }, [emotion]);
 
@@ -200,6 +210,16 @@ const SpeakerView = (props: Props) => {
               <AlertIcon />
               {getMessage(getMajorEmotionType())}
             </Alert>
+            <Flex justify="center" align="center">
+              <FormLabel htmlFor="push-notify">
+                Enable Push Notification
+              </FormLabel>
+              <Switch
+                id="push-notify"
+                isChecked={canPush}
+                onChange={() => setCanPush(!canPush)}
+              />
+            </Flex>
           </Box>
 
           <Box m="4" p="4" borderWidth="2px" rounded="lg">
