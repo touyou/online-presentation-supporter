@@ -57,7 +57,7 @@ const CreateDialog = (props: Props) => {
     >
       <AlertDialogOverlay />
 
-      <AlertDialogContent>
+      <AlertDialogContent rounded="lg">
         <AlertDialogHeader fontSize="lg" fontWeight="bold">
           Create Room
         </AlertDialogHeader>

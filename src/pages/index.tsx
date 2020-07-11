@@ -1,40 +1,21 @@
 import React from "react";
-import {
-  Container,
-  makeStyles,
-  Button,
-  Grid,
-  Card,
-  CardContent,
-  CardActionArea,
-  AppBar,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
 import firebase from "../plugins/firebase";
 import { handleGoogleLogin, handleLogout } from "../lib/auth";
 import { getRoomDao } from "../lib/database";
 import { RoomDocument } from "../lib/model";
 import CreateDialog from "../components/createDialog";
 import EnterDialog from "../components/enterDialog";
-import { Collection } from "@firestore-simple/web";
+import {
+  SimpleGrid,
+  Box,
+  Button,
+  Heading,
+  Stack,
+  Text,
+  Flex,
+} from "@chakra-ui/core";
 
-interface AppProps {}
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    marginTop: "16px",
-    marginBottom: "16px",
-    marginLeft: "0px",
-    marginRight: "0px",
-    paddingLeft: "4px",
-    paddingRight: "4px",
-  },
-  offset: theme.mixins.toolbar,
-}));
-
-const Index = (props: AppProps) => {
-  const classes = useStyles();
+const Index = () => {
   const [currentUser, setCurrentUser] = React.useState<firebase.User>();
   const [createModal, setCreateModal] = React.useState(false);
   const [enterModal, setEnterModal] = React.useState(false);
@@ -83,65 +64,65 @@ const Index = (props: AppProps) => {
 
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>
-            Online Lecture System
-          </Typography>
+      <Box
+        pos="fixed"
+        w="100%"
+        h="80px"
+        bg="blue.800"
+        p="4"
+        boxShadow="md"
+        zIndex={2}
+      >
+        <Flex align="flex-end" justifyContent="space-between">
+          <Heading color="gray.100">Online Lecture System</Heading>
           {!!currentUser ? (
-            <>
-              <Button
-                color="inherit"
-                onClick={() => setCreateModal(true)}
-                style={{ marginRight: "8px" }}
-              >
+            <Stack isInline>
+              <Button onClick={() => setCreateModal(true)} mr="2">
                 Create Room
               </Button>
-              <Button
-                color="inherit"
-                onClick={logoutUser}
-                style={{ marginRight: "8px" }}
-              >
+              <Button color="inherit" onClick={logoutUser} mr="2">
                 Logout
               </Button>
-            </>
+            </Stack>
           ) : (
-            <Button color="inherit" onClick={loginUser}>
-              Login
-            </Button>
+            <Button onClick={loginUser}>Login</Button>
           )}
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="lg" className={classes.container}>
+        </Flex>
+      </Box>
+      <Box w="100%" h="200vh" bg="gray.100" pt="80px">
         {!!currentUser ? (
-          <div>
-            <p style={{ textAlign: "center" }}>
+          <Stack p="4">
+            <Text>
               Now logged in as <b>{currentUser.displayName}</b>
-            </p>
-            <Grid container spacing={2}>
+            </Text>
+            <SimpleGrid columns={[2, null, 4]} spacing="20px" p="4">
               {rooms.map((room: RoomDocument, index: number) => {
                 return (
-                  <Grid item xs={6} md={3} lg={3} key={room.id}>
-                    <Card>
-                      <CardActionArea>
-                        <CardContent>
-                          <h3>{room.name}</h3>
-                          <Button
-                            variant="contained"
-                            onClick={() => {
-                              setSelectRoom(room);
-                              setEnterModal(true);
-                            }}
-                          >
-                            Enter Room
-                          </Button>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
+                  <Box
+                    borderWidth="1px"
+                    rounded="lg"
+                    overflow="hidden"
+                    bg="white"
+                  >
+                    <Box p="6">
+                      <Heading size="lg" mb="8">
+                        {room.name}
+                      </Heading>
+                      <Button
+                        width="100%"
+                        variantColor="teal"
+                        onClick={() => {
+                          setSelectRoom(room);
+                          setEnterModal(true);
+                        }}
+                      >
+                        Enter
+                      </Button>
+                    </Box>
+                  </Box>
                 );
               })}
-            </Grid>
+            </SimpleGrid>
             <CreateDialog
               currentUser={currentUser}
               isOpen={createModal}
@@ -156,17 +137,11 @@ const Index = (props: AppProps) => {
                 setSelectRoom(null);
               }}
             ></EnterDialog>
-          </div>
+          </Stack>
         ) : (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          ></div>
+          <div></div>
         )}
-      </Container>
+      </Box>
     </>
   );
 };

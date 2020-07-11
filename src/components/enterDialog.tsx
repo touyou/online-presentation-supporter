@@ -63,7 +63,7 @@ const EnterDialog = (props: Props) => {
       onClose={props.closeModal}
     >
       <AlertDialogOverlay />
-      <AlertDialogContent>
+      <AlertDialogContent rounded="lg">
         <AlertDialogHeader fontSize="lg" fontWeight="bold">
           Enter {props.selectRoom !== null ? props.selectRoom.name : "the room"}
         </AlertDialogHeader>
