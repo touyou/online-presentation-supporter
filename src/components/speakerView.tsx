@@ -210,7 +210,7 @@ const SpeakerView = (props: Props) => {
               <AlertIcon />
               {getMessage(getMajorEmotionType())}
             </Alert>
-            <Flex justify="center" align="center">
+            <Flex mt="1" justify="center" align="center">
               <FormLabel htmlFor="push-notify">
                 Enable Push Notification
               </FormLabel>

@@ -1,9 +1,8 @@
 import React from "react";
 import EmotionalVideo from "../components/emotionalVideo";
-import { SortablePane, Pane } from "react-sortable-pane";
 import ScreenShareView from "../components/screenShareView";
 import { useWinndowDimensions } from "../lib/customHooks";
-import { Button } from "@chakra-ui/core";
+import { Button, Box, Flex } from "@chakra-ui/core";
 
 interface Props {
   videoStream?: MediaStream;
@@ -19,15 +18,8 @@ const ListenerView = (props: Props) => {
     const [videoStream, setVideoStream] = React.useState(null);
     const [screenStream, setScreenStream] = React.useState(null);
     const videoRef = React.useRef(null);
-    const contentsWidth = () => {
-      return width - 12;
-    };
-    const [videoWidth, setWidth] = React.useState(contentsWidth() * 0.2);
     const videoHeight = () => {
-      return (videoWidth * 9) / 16;
-    };
-    const paneResizeStop = (e, key, dir, ref, d) => {
-      setWidth(videoWidth - d.width);
+      return (width * 9) / 16;
     };
 
     React.useEffect(() => {
@@ -42,69 +34,43 @@ const ListenerView = (props: Props) => {
     }, [props.screenStream]);
 
     return (
-      <SortablePane
-        direction="horizontal"
-        margin={4}
-        defaultOrder={["0", "1"]}
-        onResizeStop={paneResizeStop}
-        style={{ margin: "0px" }}
-        isSortable={false}
-      >
-        <Pane
-          key={0}
-          size={{ width: width - videoWidth, height: height - 32 }}
-          style={{
-            margin: "0px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          resizable={{ x: true, y: false, xy: false }}
-        >
-          {!!screenStream ? (
-            <ScreenShareView stream={screenStream}></ScreenShareView>
-          ) : (
-            <Button
-              variantColor="teal"
-              onClick={props.onClickStartWatch}
-              style={{ marginBottom: "32px" }}
-            >
-              Start Share
-            </Button>
-          )}
-        </Pane>
-        <Pane
-          key={1}
-          size={{ width: videoWidth, height: height - 32 }}
-          style={{
-            margin: "0px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          resizable={{ x: false, y: false, xy: false }}
-        >
-          {!!videoStream ? (
-            <video
-              ref={videoRef}
-              width={videoWidth}
-              height={videoHeight()}
-              style={{
-                backgroundColor: "white",
-              }}
-              autoPlay
-              playsInline
-            ></video>
-          ) : null}
-          <EmotionalVideo
+      <>
+        {/* {!!videoStream ? (
+          <video
+            ref={videoRef}
             width={videoWidth}
+            height={videoHeight()}
+            style={{
+              backgroundColor: "white",
+            }}
+            autoPlay
+            playsInline
+          ></video>
+        ) : null} */}
+        <Box pos="fixed" zIndex={0} w={width} h={height} bg="tomato">
+          <EmotionalVideo
+            width={width}
             height={videoHeight()}
             roomId={props.roomId}
             userId={props.userId}
           ></EmotionalVideo>
-        </Pane>
-      </SortablePane>
+        </Box>
+        <Box pos="fixed" mt="80px" zIndex={1} w={width} h={height} bg="white">
+          {!!screenStream ? (
+            <ScreenShareView stream={screenStream}></ScreenShareView>
+          ) : (
+            <Flex justify="center" align="center" h="100%">
+              <Button
+                variantColor="teal"
+                onClick={props.onClickStartWatch}
+                style={{ marginBottom: "32px" }}
+              >
+                Start Watch
+              </Button>
+            </Flex>
+          )}
+        </Box>
+      </>
     );
   } else {
     return <div></div>;
