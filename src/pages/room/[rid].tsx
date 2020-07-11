@@ -3,7 +3,6 @@ import { useRouter } from "next/dist/client/router";
 import ListenerView from "../../components/listenerView";
 import SpeakerView from "../../components/speakerView";
 import firebase from "../../plugins/firebase";
-import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { handleLogout } from "../../lib/auth";
 import {
   deleteRoomDocument,
@@ -11,6 +10,7 @@ import {
   fetchUser,
 } from "../../lib/database";
 import * as Tone from "tone";
+import { Box, Button, Flex, Heading, Stack } from "@chakra-ui/core";
 
 interface Props {
   stream: MediaStream;
@@ -208,27 +208,27 @@ const Room = (props: Props) => {
 
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>
-            Online Lecture System
-          </Typography>
-          <Button
-            color="inherit"
-            onClick={leaveRoom}
-            style={{ marginRight: "8px" }}
-          >
-            Leave Room
-          </Button>
-          <Button
-            color="inherit"
-            onClick={logout}
-            style={{ marginRight: "8px" }}
-          >
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <Box
+        pos="fixed"
+        w="100%"
+        h="80px"
+        bg="blue.800"
+        p="4"
+        boxShadow="md"
+        zIndex={2}
+      >
+        <Flex align="flex-end" justifyContent="space-between">
+          <Heading color="gray.100">Online Lecture System</Heading>
+          <Stack isInline>
+            <Button onClick={leaveRoom} mr="2">
+              Leave Room
+            </Button>
+            <Button onClick={logout} mr="2">
+              Logout
+            </Button>
+          </Stack>
+        </Flex>
+      </Box>
       {isListener ? (
         <ListenerView
           videoStream={videoStream}

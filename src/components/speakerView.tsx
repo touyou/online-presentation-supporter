@@ -2,9 +2,9 @@ import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
 import { useWinndowDimensions, useInterval } from "../lib/customHooks";
 import ScreenShareView from "./screenShareView";
-import { Button, Card, CardContent } from "@material-ui/core";
 import { selectRoomAnalysis } from "../lib/database";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
+import { Button, Flex, Box, Alert, AlertIcon } from "@chakra-ui/core";
 
 interface Props {
   screenStream?: MediaStream;
@@ -56,6 +56,47 @@ const SpeakerView = (props: Props) => {
         { label: "😫", value: emotion.disgusted },
         { label: "😮", value: emotion.surprised },
       ];
+    };
+
+    const getMajorEmotionType = () => {
+      const positiveAvg = (emotion.happy + emotion.surprised) / 2;
+      const negativeAvg =
+        (emotion.sad + emotion.angry + emotion.fearful + emotion.disgusted) / 4;
+      if (emotion.neutral >= positiveAvg + negativeAvg) {
+        return 0;
+      } else if (negativeAvg >= positiveAvg) {
+        return -1;
+      } else {
+        return 1;
+      }
+    };
+
+    const getMessage = (type: number) => {
+      switch (type) {
+        case 1:
+          return "順調です！";
+          break;
+        case -1:
+          return "理解できていないかもしれません。";
+          break;
+        default:
+          return "感情グラフです。";
+          break;
+      }
+    };
+
+    const getStatus = (type: number) => {
+      switch (type) {
+        case 1:
+          return "success";
+          break;
+        case -1:
+          return "error";
+          break;
+        default:
+          return "info";
+          break;
+      }
     };
 
     const updateAnalysis = async () => {
@@ -128,48 +169,41 @@ const SpeakerView = (props: Props) => {
           }}
           resizable={{ x: false, y: false, xy: false }}
         >
-          <Card style={{ margin: "4px" }}>
-            <CardContent>
-              <RadarChart height={250} width={250} data={getEmotionArray()}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="label" />
-                <Radar
-                  dataKey="value"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                  fillOpacity={0.6}
-                />
-              </RadarChart>
-            </CardContent>
-          </Card>
+          <Box m="4" p="4" borderWidth="2px" rounded="lg">
+            <RadarChart height={250} width={250} data={getEmotionArray()}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="label" />
+              <Radar
+                dataKey="value"
+                stroke="#8884d8"
+                fill="#8884d8"
+                fillOpacity={0.6}
+              />
+            </RadarChart>
+            <Alert status={getStatus(getMajorEmotionType())}>
+              <AlertIcon />
+              {getMessage(getMajorEmotionType())}
+            </Alert>
+          </Box>
 
-          <Card style={{ margin: "4px" }}>
-            <CardContent
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+          <Box m="4" p="4" borderWidth="2px" rounded="lg">
+            <Flex>
               <Button
-                variant="contained"
-                color="primary"
+                variantColor="teal"
                 style={{ margin: "4px" }}
                 onClick={props.onClickStartShare}
               >
                 Start Share
               </Button>
               <Button
-                variant="contained"
-                color="secondary"
+                variantColor="red"
                 style={{ margin: "4px" }}
                 onClick={props.onClickStopShare}
               >
                 Stop Share
               </Button>
-            </CardContent>
-          </Card>
+            </Flex>
+          </Box>
         </Pane>
       </SortablePane>
     );

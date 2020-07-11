@@ -3,7 +3,7 @@ import EmotionalVideo from "../components/emotionalVideo";
 import { SortablePane, Pane } from "react-sortable-pane";
 import ScreenShareView from "../components/screenShareView";
 import { useWinndowDimensions } from "../lib/customHooks";
-import { Button } from "@material-ui/core";
+import { Button } from "@chakra-ui/core";
 
 interface Props {
   videoStream?: MediaStream;
@@ -65,8 +65,7 @@ const ListenerView = (props: Props) => {
             <ScreenShareView stream={screenStream}></ScreenShareView>
           ) : (
             <Button
-              variant="contained"
-              color="primary"
+              variantColor="teal"
               onClick={props.onClickStartWatch}
               style={{ marginBottom: "32px" }}
             >

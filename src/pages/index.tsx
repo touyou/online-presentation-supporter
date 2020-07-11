@@ -80,7 +80,7 @@ const Index = () => {
               <Button onClick={() => setCreateModal(true)} mr="2">
                 Create Room
               </Button>
-              <Button color="inherit" onClick={logoutUser} mr="2">
+              <Button onClick={logoutUser} mr="2">
                 Logout
               </Button>
             </Stack>
