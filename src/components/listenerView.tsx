@@ -22,7 +22,7 @@ const ListenerView = (props: Props) => {
     const contentsWidth = () => {
       return width - 12;
     };
-    const [videoWidth, setWidth] = React.useState(contentsWidth() * 0.4);
+    const [videoWidth, setWidth] = React.useState(contentsWidth() * 0.2);
     const videoHeight = () => {
       return (videoWidth * 9) / 16;
     };

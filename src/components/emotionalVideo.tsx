@@ -34,6 +34,7 @@ const EmotionalVideo = (props: Props) => {
             const expressions = fullDesc.map((fd) => fd.expressions);
             setExpressions(expressions);
             const expression: FaceExpressions = expressions[0];
+            if (!expression) return;
             const doc: AnalysisDataDocument = {
               id: props.userId,
               neutral: expression.neutral,
