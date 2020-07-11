@@ -43,6 +43,7 @@ const SpeakerView = (props: Props) => {
       disgusted: 0.0,
       surprised: 0.0,
     });
+    const [lastPush, setLastPush] = React.useState(null);
 
     const delay = 5000;
 
@@ -128,6 +129,21 @@ const SpeakerView = (props: Props) => {
     };
 
     useInterval(updateAnalysis, delay);
+
+    React.useEffect(() => {
+      let now = new Date();
+      if (
+        getMajorEmotionType() == -1 &&
+        (!lastPush || lastPush - 20000 > now.getTime())
+      ) {
+        let Push = require("push.js");
+        Push.create("Oops!", {
+          body: "もう少し丁寧に解説してみましょう。",
+          timeout: 2000,
+        });
+        setLastPush(now);
+      }
+    }, [emotion]);
 
     React.useEffect(() => {
       setScreenStream(props.screenStream);
