@@ -8,6 +8,7 @@ import {
   deleteRoomDocument,
   updateRoomDocumentWhenLeaved,
   fetchUser,
+  deleteSelfAnalysis,
 } from "../../lib/database";
 import * as Tone from "tone";
 import { Box, Button, Flex, Heading, Stack } from "@chakra-ui/core";
@@ -193,6 +194,8 @@ const Room = (props: Props) => {
     await updateRoomDocumentWhenLeaved(roomId, userDoc);
     if (!isListener) {
       await deleteRoomDocument(roomId);
+    } else {
+      await deleteSelfAnalysis(roomId, currentUser.uid);
     }
     router.back();
   };

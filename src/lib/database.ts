@@ -129,3 +129,8 @@ export const updateIsListener = async (uid: string, isListener: boolean) => {
 export const deleteRoomDocument = async (roomId: string) => {
   await roomsDao.delete(roomId);
 };
+
+export const deleteSelfAnalysis = async (roomId: string, userId: string) => {
+  const analysisDao = getAnalysis(roomId);
+  await analysisDao.delete(userId);
+};

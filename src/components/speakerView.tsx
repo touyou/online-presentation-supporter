@@ -12,6 +12,10 @@ import {
   AlertIcon,
   FormLabel,
   Switch,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Stack,
 } from "@chakra-ui/core";
 
 interface Props {
@@ -53,6 +57,7 @@ const SpeakerView = (props: Props) => {
     });
     const [lastPush, setLastPush] = React.useState(null);
     const [canPush, setCanPush] = React.useState(false);
+    const [countOfAttendees, setAttendees] = React.useState(0);
 
     const delay = 5000;
 
@@ -135,6 +140,7 @@ const SpeakerView = (props: Props) => {
           analysisDatas.length,
       };
       setEmotion(resultObject);
+      setAttendees(analysisDatas.length);
     };
 
     useInterval(updateAnalysis, delay);
@@ -186,60 +192,58 @@ const SpeakerView = (props: Props) => {
         <Pane
           key={1}
           size={{ width: width - screenWidth, height: height - 32 }}
-          style={{
-            margin: "0px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
           resizable={{ x: false, y: false, xy: false }}
         >
-          <Box m="4" p="4" borderWidth="2px" rounded="lg">
-            <RadarChart height={250} width={250} data={getEmotionArray()}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="label" />
-              <Radar
-                dataKey="value"
-                stroke="#8884d8"
-                fill="#8884d8"
-                fillOpacity={0.6}
-              />
-            </RadarChart>
-            <Alert status={getStatus(getMajorEmotionType())}>
-              <AlertIcon />
-              {getMessage(getMajorEmotionType())}
-            </Alert>
-            <Flex mt="1" justify="center" align="center">
-              <FormLabel htmlFor="push-notify">
-                Enable Push Notification
-              </FormLabel>
-              <Switch
-                id="push-notify"
-                isChecked={canPush}
-                onChange={() => setCanPush(!canPush)}
-              />
-            </Flex>
-          </Box>
-
-          <Box m="4" p="4" borderWidth="2px" rounded="lg">
-            <Flex>
-              <Button
-                variantColor="teal"
-                style={{ margin: "4px" }}
-                onClick={props.onClickStartShare}
-              >
-                Start Share
-              </Button>
-              <Button
-                variantColor="red"
-                style={{ margin: "4px" }}
-                onClick={props.onClickStopShare}
-              >
-                Stop Share
-              </Button>
-            </Flex>
-          </Box>
+          <Stack justify="center" mt="80px">
+            <Stat borderWidth="2px" rounded="lg" m="4" p="4">
+              <StatLabel>Attendees</StatLabel>
+              <StatNumber>{countOfAttendees}</StatNumber>
+            </Stat>
+            <Stack m="4" p="4" borderWidth="2px" rounded="lg" align="center">
+              <RadarChart height={250} width={250} data={getEmotionArray()}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="label" />
+                <Radar
+                  dataKey="value"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                  fillOpacity={0.6}
+                />
+              </RadarChart>
+              <Alert status={getStatus(getMajorEmotionType())}>
+                <AlertIcon />
+                {getMessage(getMajorEmotionType())}
+              </Alert>
+              <Flex mt="1" justify="center" align="center">
+                <FormLabel htmlFor="push-notify">
+                  Enable Push Notification
+                </FormLabel>
+                <Switch
+                  id="push-notify"
+                  isChecked={canPush}
+                  onChange={() => setCanPush(!canPush)}
+                />
+              </Flex>
+            </Stack>
+            <Box m="4" p="4" borderWidth="2px" rounded="lg">
+              <Flex>
+                <Button
+                  variantColor="teal"
+                  style={{ margin: "4px" }}
+                  onClick={props.onClickStartShare}
+                >
+                  Start Share
+                </Button>
+                <Button
+                  variantColor="red"
+                  style={{ margin: "4px" }}
+                  onClick={props.onClickStopShare}
+                >
+                  Stop Share
+                </Button>
+              </Flex>
+            </Box>
+          </Stack>
         </Pane>
       </SortablePane>
     );
