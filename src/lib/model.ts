@@ -24,3 +24,16 @@ export interface AnalysisDataDocument {
   disgusted: number;
   surprised: number;
 }
+
+export interface AnalysisLogDocument {
+  id: string;
+  neutral: number;
+  happy: number;
+  sad: number;
+  angry: number;
+  fearful: number;
+  disgusted: number;
+  surprised: number;
+  count: number;
+  timestamp: firebase.firestore.FieldValue;
+}

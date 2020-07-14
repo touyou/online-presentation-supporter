@@ -1,27 +1,23 @@
 import firebase from "../plugins/firebase";
-import { RoomDocument, UserDocument, AnalysisDataDocument } from "./model";
+import {
+  RoomDocument,
+  UserDocument,
+  AnalysisDataDocument,
+  AnalysisLogDocument,
+} from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
+
+export const getTimestamp = () => {
+  return firebase.firestore.FieldValue.serverTimestamp();
+};
+
+/**
+ * Room API
+ */
 const roomsDao = firestoreSimple.collection<RoomDocument>({ path: `rooms` });
-const usersDao = firestoreSimple.collection<UserDocument>({ path: `users` });
-const analysisFactory = firestoreSimple.collectionFactory<AnalysisDataDocument>(
-  {
-    decode: (doc) => {
-      return {
-        id: doc.id,
-        neutral: doc.neutral,
-        happy: doc.happy,
-        sad: doc.sad,
-        angry: doc.angry,
-        fearful: doc.fearful,
-        disgusted: doc.disgusted,
-        surprised: doc.surprised,
-      };
-    },
-  }
-);
 
 export const fetchRoom = async (id: string) => {
   return await roomsDao.fetch(id);
@@ -36,34 +32,8 @@ export const fetchRoomUserCount = async (id: string) => {
   return roomDoc.users.length;
 };
 
-export const fetchUser = async (id: string) => {
-  return await usersDao.fetch(id);
-};
-
 export const fetchRoomAll = async () => {
   return await roomsDao.fetchAll();
-};
-
-export const selectRoomDocuments = async () => {
-  const db = firebase.firestore();
-  return db.collection("rooms");
-};
-
-export const selectRoomAnalysis = async (id: string) => {
-  const analysisDao = analysisFactory.create(`rooms/${id}/analysis`);
-  return await analysisDao.fetchAll();
-};
-
-export const getAnalysis = (id: string) => {
-  return analysisFactory.create(`rooms/${id}/analysis`);
-};
-
-export const updateOrAddRoomAnalysis = async (
-  roomId: string,
-  analysis: AnalysisDataDocument
-) => {
-  const analysisDao = analysisFactory.create(`rooms/${roomId}/analysis`);
-  await analysisDao.set(analysis);
 };
 
 export const createRoom = async (
@@ -78,7 +48,7 @@ export const createRoom = async (
     admin: admin.name,
     password: password,
     users: [admin],
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    timestamp: getTimestamp(),
   });
   return newDocId;
 };
@@ -103,6 +73,98 @@ export const updateRoomDocumentWhenLeaved = async (
   });
 };
 
+export const deleteRoomDocument = async (roomId: string) => {
+  await roomsDao.delete(roomId);
+};
+
+/**
+ * Room Analysis API
+ */
+
+const analysisFactory = firestoreSimple.collectionFactory<AnalysisDataDocument>(
+  {
+    decode: (doc) => {
+      return {
+        id: doc.id,
+        neutral: doc.neutral,
+        happy: doc.happy,
+        sad: doc.sad,
+        angry: doc.angry,
+        fearful: doc.fearful,
+        disgusted: doc.disgusted,
+        surprised: doc.surprised,
+      };
+    },
+  }
+);
+
+export const selectRoomAnalysis = async (id: string) => {
+  const analysisDao = analysisFactory.create(`rooms/${id}/analysis`);
+  return await analysisDao.fetchAll();
+};
+
+export const getAnalysis = (id: string) => {
+  return analysisFactory.create(`rooms/${id}/analysis`);
+};
+
+export const updateOrAddRoomAnalysis = async (
+  roomId: string,
+  analysis: AnalysisDataDocument
+) => {
+  const analysisDao = analysisFactory.create(`rooms/${roomId}/analysis`);
+  await analysisDao.set(analysis);
+};
+
+export const deleteSelfAnalysis = async (roomId: string, userId: string) => {
+  const analysisDao = getAnalysis(roomId);
+  await analysisDao.delete(userId);
+};
+
+/**
+ * Room Log API
+ */
+
+const analysisLogFactory = firestoreSimple.collectionFactory<
+  AnalysisLogDocument
+>({
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      neutral: doc.neutral,
+      happy: doc.happy,
+      sad: doc.sad,
+      angry: doc.angry,
+      fearful: doc.fearful,
+      disgusted: doc.disgusted,
+      surprised: doc.surprised,
+      count: doc.count,
+      timestamp: doc.timestamp,
+    };
+  },
+});
+
+export const fetchLogAutoId = async (roomId: string) => {
+  return firebase.firestore().collection(`rooms/${roomId}/analysis-log`).doc()
+    .id;
+};
+
+export const updateOrAddRoomAnalysisLog = async (
+  roomId: string,
+  analysis: AnalysisLogDocument
+) => {
+  const analysisDao = analysisLogFactory.create(`rooms/${roomId}/analysis-log`);
+  await analysisDao.set(analysis);
+};
+
+/**
+ * User API
+ */
+const usersDao = firestoreSimple.collection<UserDocument>({ path: `users` });
+
+export const fetchUser = async (id: string) => {
+  return await usersDao.fetch(id);
+};
+
 export const insertUser = async (userDocument: UserDocument) => {
   await usersDao.set(userDocument);
 };
@@ -124,13 +186,4 @@ export const updateIsListener = async (uid: string, isListener: boolean) => {
     id: uid,
     isListener: isListener,
   });
-};
-
-export const deleteRoomDocument = async (roomId: string) => {
-  await roomsDao.delete(roomId);
-};
-
-export const deleteSelfAnalysis = async (roomId: string, userId: string) => {
-  const analysisDao = getAnalysis(roomId);
-  await analysisDao.delete(userId);
 };

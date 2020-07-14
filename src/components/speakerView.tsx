@@ -2,7 +2,12 @@ import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
 import { useWinndowDimensions, useInterval } from "../lib/customHooks";
 import ScreenShareView from "./screenShareView";
-import { selectRoomAnalysis } from "../lib/database";
+import {
+  selectRoomAnalysis,
+  updateOrAddRoomAnalysisLog,
+  getTimestamp,
+  fetchLogAutoId,
+} from "../lib/database";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
 import {
   Button,
@@ -17,6 +22,7 @@ import {
   StatNumber,
   Stack,
 } from "@chakra-ui/core";
+import { AnalysisDataDocument } from "../lib/model";
 
 interface Props {
   screenStream?: MediaStream;
@@ -114,33 +120,36 @@ const SpeakerView = (props: Props) => {
       }
     };
 
+    const calcAvgEmotion = (key: string, datas: AnalysisDataDocument[]) => {
+      if (datas.length === 0) {
+        return 0;
+      }
+      return datas.reduce((a, x) => (a += a[key]), 0.0) / datas.length;
+    };
+
     const updateAnalysis = async () => {
       const analysisDatas = await selectRoomAnalysis(props.roomId);
       const resultObject: Emotion = {
-        neutral:
-          analysisDatas.reduce((a, x) => (a += x.neutral), 0.0) /
-          analysisDatas.length,
-        happy:
-          analysisDatas.reduce((a, x) => (a += x.happy), 0.0) /
-          analysisDatas.length,
-        sad:
-          analysisDatas.reduce((a, x) => (a += x.sad), 0.0) /
-          analysisDatas.length,
-        angry:
-          analysisDatas.reduce((a, x) => (a += x.angry), 0.0) /
-          analysisDatas.length,
-        fearful:
-          analysisDatas.reduce((a, x) => (a += x.fearful), 0.0) /
-          analysisDatas.length,
-        disgusted:
-          analysisDatas.reduce((a, x) => (a += x.disgusted), 0.0) /
-          analysisDatas.length,
-        surprised:
-          analysisDatas.reduce((a, x) => (a += x.surprised), 0.0) /
-          analysisDatas.length,
+        neutral: calcAvgEmotion("neutral", analysisDatas),
+        happy: calcAvgEmotion("happy", analysisDatas),
+        sad: calcAvgEmotion("sad", analysisDatas),
+        angry: calcAvgEmotion("angry", analysisDatas),
+        fearful: calcAvgEmotion("fearful", analysisDatas),
+        disgusted: calcAvgEmotion("disgusted", analysisDatas),
+        surprised: calcAvgEmotion("surprised", analysisDatas),
       };
+      console.log(resultObject);
       setEmotion(resultObject);
       setAttendees(analysisDatas.length);
+      if (analysisDatas.length !== 0) {
+        const docId = await fetchLogAutoId(props.roomId);
+        await updateOrAddRoomAnalysisLog(props.roomId, {
+          id: docId,
+          ...resultObject,
+          count: analysisDatas.length,
+          timestamp: getTimestamp(),
+        });
+      }
     };
 
     useInterval(updateAnalysis, delay);
