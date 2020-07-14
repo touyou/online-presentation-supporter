@@ -38,18 +38,6 @@ const Room = (props: Props) => {
     }
   });
 
-  React.useEffect(() => {
-    const micAudio = new Tone.UserMedia();
-    micAudio.open().then(() => {
-      const reverb = new Tone.Freeverb();
-      const effectedDest = Tone.context.createMediaStreamDestination();
-      micAudio.connect(reverb);
-      reverb.connect(effectedDest);
-
-      const effectedTrack = effectedDest.stream.getAudioTracks()[0];
-    });
-  }, []);
-
   let Peer;
   if (process.browser) {
     Peer = require("skyway-js");
@@ -162,30 +150,41 @@ const Room = (props: Props) => {
   };
 
   const startShare = () => {
-    navigator.mediaDevices
-      .getDisplayMedia({
-        video: {
-          width: 3840,
-          height: 2160,
-        },
-        audio: true,
-      })
-      .then((stream) => {
-        setScreenStream(stream);
+    const micAudio = new Tone.UserMedia();
 
-        const [screenVideoTrack] = stream.getVideoTracks();
-        screenVideoTrack.addEventListener(
-          "ended",
-          () => {
-            setScreenStream(null);
+    micAudio.open().then(() => {
+      const reverb = new Tone.Freeverb();
+      const effectedDest = Tone.context.createMediaStreamDestination();
+      micAudio.connect(reverb);
+      reverb.connect(effectedDest);
+      navigator.mediaDevices
+        .getDisplayMedia({
+          video: {
+            width: 3840,
+            height: 2160,
           },
-          { once: true }
-        );
-      });
+          audio: true,
+        })
+        .then((stream) => {
+          const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+          stream.addTrack(effectedTrack);
+
+          setScreenStream(stream);
+
+          const [screenVideoTrack] = stream.getVideoTracks();
+          screenVideoTrack.addEventListener(
+            "ended",
+            () => {
+              setScreenStream(null);
+            },
+            { once: true }
+          );
+        });
+    });
   };
 
   const endShare = () => {
-    (screenStream as MediaStream).getTracks().forEach((track) => track.stop());
+    (screenStream as MediaStream)?.getTracks().forEach((track) => track.stop());
     setScreenStream(null);
   };
 
