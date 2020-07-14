@@ -37,3 +37,10 @@ export interface AnalysisLogDocument {
   count: number;
   timestamp: firebase.firestore.FieldValue;
 }
+
+export interface LogDocument {
+  id: string;
+  type: string;
+  value: string;
+  timestamp: firebase.firestore.FieldValue;
+}
