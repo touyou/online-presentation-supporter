@@ -186,7 +186,10 @@ const SpeakerView = (props: Props) => {
           resizable={{ x: true, y: false, xy: false }}
         >
           {!!screenStream ? (
-            <ScreenShareView stream={screenStream}></ScreenShareView>
+            <ScreenShareView
+              stream={screenStream}
+              audio="off"
+            ></ScreenShareView>
           ) : null}
         </Pane>
         <Pane
