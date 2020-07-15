@@ -6,7 +6,7 @@ import {
   selectRoomAnalysis,
   updateOrAddRoomAnalysisLog,
   getTimestamp,
-  fetchLogAutoId,
+  fetchAnalysisLogAutoId,
 } from "../lib/database";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
 import {
@@ -142,7 +142,7 @@ const SpeakerView = (props: Props) => {
       setEmotion(resultObject);
       setAttendees(analysisDatas.length);
       if (analysisDatas.length !== 0) {
-        const docId = await fetchLogAutoId(props.roomId);
+        const docId = await fetchAnalysisLogAutoId(props.roomId);
         await updateOrAddRoomAnalysisLog(props.roomId, {
           id: docId,
           ...resultObject,
