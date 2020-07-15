@@ -4,9 +4,11 @@ import {
   UserDocument,
   AnalysisDataDocument,
   AnalysisLogDocument,
+  LogDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
+import { timeStamp } from "console";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 
@@ -143,7 +145,7 @@ const analysisLogFactory = firestoreSimple.collectionFactory<
   },
 });
 
-export const fetchLogAutoId = async (roomId: string) => {
+export const fetchAnalysisLogAutoId = async (roomId: string) => {
   return firebase.firestore().collection(`rooms/${roomId}/analysis-log`).doc()
     .id;
 };
@@ -154,6 +156,28 @@ export const updateOrAddRoomAnalysisLog = async (
 ) => {
   const analysisDao = analysisLogFactory.create(`rooms/${roomId}/analysis-log`);
   await analysisDao.set(analysis);
+};
+
+const logFactory = firestoreSimple.collectionFactory<LogDocument>({
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      type: doc.type,
+      value: doc.value,
+      timestamp: doc.timestamp,
+    };
+  },
+});
+
+export const addLog = async (roomId: string, type: string, value: string) => {
+  const logDao = logFactory.create(`rooms/${roomId}/log`);
+  const id = firebase.firestore().collection(`rooms/${roomId}/log`).doc().id;
+  await logDao.set({
+    id: id,
+    type: type,
+    value: value,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  });
 };
 
 /**
