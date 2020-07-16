@@ -9,6 +9,7 @@ import {
   updateRoomDocumentWhenLeaved,
   fetchUser,
   deleteSelfAnalysis,
+  addLog,
 } from "../../lib/database";
 import * as Tone from "tone";
 import { Box, Button, Flex, Heading, Stack } from "@chakra-ui/core";
@@ -170,12 +171,14 @@ const Room = (props: Props) => {
           stream.addTrack(effectedTrack);
 
           setScreenStream(stream);
+          addLog(roomId, "screen_status", "start");
 
           const [screenVideoTrack] = stream.getVideoTracks();
           screenVideoTrack.addEventListener(
             "ended",
             () => {
               setScreenStream(null);
+              addLog(roomId, "screen_status", "stop");
             },
             { once: true }
           );
@@ -186,6 +189,7 @@ const Room = (props: Props) => {
   const endShare = () => {
     (screenStream as MediaStream)?.getTracks().forEach((track) => track.stop());
     setScreenStream(null);
+    addLog(roomId, "screen_status", "stop");
   };
 
   const leaveRoom = async () => {

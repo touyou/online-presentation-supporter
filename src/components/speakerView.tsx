@@ -7,6 +7,7 @@ import {
   updateOrAddRoomAnalysisLog,
   getTimestamp,
   fetchAnalysisLogAutoId,
+  addLog,
 } from "../lib/database";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
 import {
@@ -233,7 +234,10 @@ const SpeakerView = (props: Props) => {
                 <Switch
                   id="push-notify"
                   isChecked={canPush}
-                  onChange={() => setCanPush(!canPush)}
+                  onChange={() => {
+                    addLog(props.roomId, "push_status", canPush ? "off" : "on");
+                    setCanPush(!canPush);
+                  }}
                 />
               </Flex>
             </Stack>
