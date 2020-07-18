@@ -36,13 +36,16 @@ const EnterDialog = (props: Props) => {
   const router = useRouter();
   const cancelRef = React.useRef();
   const [show, setShow] = React.useState(false);
+  const [isLoading, setLoading] = React.useState(false);
 
   const enterForm = useForm();
 
   const enterRoom = async (roomId: string, password: string) => {
+    setLoading(true);
     await updateIsListener(props.currentUser.uid, false);
     const user = await fetchUser(props.currentUser.uid);
     await updateRoomDocumentWhenJoined(props.selectRoom.id, user);
+    setLoading(false);
     router.push(`/room/${roomId}?type=listener`);
   };
 
@@ -99,7 +102,13 @@ const EnterDialog = (props: Props) => {
             <Button ref={cancelRef} onClick={props.closeModal}>
               Cancel
             </Button>
-            <Button variantColor="teal" type="submit" ml={3}>
+            <Button
+              isLoading={isLoading}
+              loadingText="Entering"
+              variantColor="teal"
+              type="submit"
+              ml={3}
+            >
               Enter
             </Button>
           </AlertDialogFooter>

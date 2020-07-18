@@ -185,6 +185,10 @@ export const addLog = async (roomId: string, type: string, value: string) => {
  */
 const usersDao = firestoreSimple.collection<UserDocument>({ path: `users` });
 
+export const getUserDao = () => {
+  return usersDao;
+};
+
 export const fetchUser = async (id: string) => {
   return await usersDao.fetch(id);
 };
@@ -202,6 +206,13 @@ export const updateUsername = async (uid: string, name: string) => {
   await usersDao.update({
     id: uid,
     name: name,
+  });
+};
+
+export const updateNickname = async (uid: string, name: string) => {
+  await usersDao.update({
+    id: uid,
+    nickname: name,
   });
 };
 

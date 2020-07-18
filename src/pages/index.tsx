@@ -1,7 +1,7 @@
 import React from "react";
 import firebase from "../plugins/firebase";
 import { handleGoogleLogin, handleLogout } from "../lib/auth";
-import { getRoomDao } from "../lib/database";
+import { getRoomDao, getUserDao, updateNickname } from "../lib/database";
 import { RoomDocument } from "../lib/model";
 import CreateDialog from "../components/createDialog";
 import EnterDialog from "../components/enterDialog";
@@ -11,16 +11,23 @@ import {
   Button,
   Heading,
   Stack,
-  Text,
+  Input,
   Flex,
+  Text,
 } from "@chakra-ui/core";
+import { useForm } from "react-hook-form";
+import { setLogLevel } from "firebase";
 
 const Index = () => {
   const [currentUser, setCurrentUser] = React.useState<firebase.User>();
+  const [currentNickname, setNickname] = React.useState("");
   const [createModal, setCreateModal] = React.useState(false);
   const [enterModal, setEnterModal] = React.useState(false);
   const [selectRoom, setSelectRoom] = React.useState(null);
   const [rooms, setRooms] = React.useState(Array<RoomDocument>());
+  const [isLoading, setLoading] = React.useState(false);
+
+  const nicknameForm = useForm();
 
   React.useEffect(() => {
     const roomDao = getRoomDao();
@@ -45,6 +52,23 @@ const Index = () => {
     });
     return () => unsubscribed();
   }, []);
+
+  React.useEffect(() => {
+    if (currentUser !== null) {
+      const userDao = getUserDao();
+      const unsubscribed = userDao.onSnapshot((snapshot, toObject) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added" || change.type === "modified") {
+            const changedRoom = toObject(change.doc);
+            if (changedRoom.email === currentUser.email) {
+              setNickname(changedRoom.nickname);
+            }
+          }
+        });
+      });
+      return () => unsubscribed();
+    }
+  }, [currentUser]);
 
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
@@ -92,9 +116,34 @@ const Index = () => {
       <Box w="100%" h="200vh" bg="gray.100" pt="80px">
         {!!currentUser ? (
           <Stack p="4">
-            <Text>
-              Now logged in as <b>{currentUser.displayName}</b>
-            </Text>
+            <form
+              onSubmit={nicknameForm.handleSubmit(async (values) => {
+                setLoading(true);
+                await updateNickname(currentUser.uid, values.name);
+                setLoading(false);
+              })}
+            >
+              <Stack isInline justify="center">
+                <Text pt={2} width="13rem" fontSize="md" fontWeight="bold">
+                  Now logged in as
+                </Text>
+                <Input
+                  name="name"
+                  ref={nicknameForm.register()}
+                  value={currentNickname}
+                  onChange={(event) => setNickname(event.target.value)}
+                />
+                <Button
+                  isLoading={isLoading}
+                  loadingText="Changing"
+                  variantColor="teal"
+                  type="submit"
+                  width="15rem"
+                >
+                  Change Nickname
+                </Button>
+              </Stack>
+            </form>
             <SimpleGrid columns={[2, null, 4]} spacing="20px" p="4">
               {rooms.map((room: RoomDocument, index: number) => {
                 return (

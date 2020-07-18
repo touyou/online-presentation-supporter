@@ -20,7 +20,9 @@ export const handleGoogleLogin = async () => {
     const userDocument: UserDocument = {
       id: userObj.uid,
       name: userObj.displayName,
+      nickname: userObj.displayName,
       isListener: false,
+      email: userObj.email,
     };
     await insertUser(userDocument);
   }

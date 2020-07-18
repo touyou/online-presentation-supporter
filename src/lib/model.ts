@@ -1,7 +1,9 @@
 export interface UserDocument {
   id: string;
   name: string;
+  nickname: string;
   isListener: boolean;
+  email: string;
 }
 
 export interface RoomDocument {
