@@ -13,7 +13,7 @@ export interface RoomDocument {
   admin: string;
   password: string;
   users: UserDocument[];
-  timestamp: firebase.firestore.FieldValue;
+  timestamp: firebase.firestore.Timestamp;
 }
 
 export interface AnalysisDataDocument {
@@ -37,12 +37,20 @@ export interface AnalysisLogDocument {
   disgusted: number;
   surprised: number;
   count: number;
-  timestamp: firebase.firestore.FieldValue;
+  timestamp: firebase.firestore.Timestamp;
 }
 
 export interface LogDocument {
   id: string;
   type: string;
   value: string;
-  timestamp: firebase.firestore.FieldValue;
+  timestamp: firebase.firestore.Timestamp;
+}
+
+export interface ChatDocument {
+  id: string;
+  uid: string;
+  nickname: string;
+  content: string;
+  timestamp: firebase.firestore.Timestamp;
 }

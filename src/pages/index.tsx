@@ -16,7 +16,6 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { useForm } from "react-hook-form";
-import { setLogLevel } from "firebase";
 
 const Index = () => {
   const [currentUser, setCurrentUser] = React.useState<firebase.User>();
@@ -32,23 +31,13 @@ const Index = () => {
   React.useEffect(() => {
     const roomDao = getRoomDao();
     const unsubscribed = roomDao.onSnapshot((snapshot, toObject) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const addedRoom = toObject(change.doc);
-          console.log(`added ${addedRoom.id}`);
-          setRooms(rooms.concat([addedRoom]));
-        }
-        if (change.type === "modified") {
-          console.log(`modify ${change.doc.data()}`);
-        }
-        if (change.type === "removed") {
-          const deletedRoom = toObject(change.doc);
-          console.log(`remove ${deletedRoom.id}`);
-          setRooms(
-            rooms.filter((val, _index, _array) => val.id !== deletedRoom.id)
-          );
-        }
+      const newRooms: RoomDocument[] = [];
+      snapshot.docs.forEach((element) => {
+        const object = toObject(element);
+        newRooms.push(object);
       });
+      console.log(newRooms);
+      setRooms(newRooms);
     });
     return () => unsubscribed();
   }, []);

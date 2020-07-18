@@ -5,15 +5,15 @@ import {
   AnalysisDataDocument,
   AnalysisLogDocument,
   LogDocument,
+  ChatDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
-import { timeStamp } from "console";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 
 export const getTimestamp = () => {
-  return firebase.firestore.FieldValue.serverTimestamp();
+  return firebase.firestore.FieldValue.serverTimestamp() as firebase.firestore.Timestamp;
 };
 
 /**
@@ -120,6 +120,42 @@ export const updateOrAddRoomAnalysis = async (
 export const deleteSelfAnalysis = async (roomId: string, userId: string) => {
   const analysisDao = getAnalysis(roomId);
   await analysisDao.delete(userId);
+};
+
+/**
+ * Chat API
+ */
+
+const chatFactory = firestoreSimple.collectionFactory<ChatDocument>({
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      uid: doc.uid,
+      nickname: doc.nickname,
+      content: doc.content,
+      timestamp: doc.timestamp,
+    };
+  },
+});
+
+export const addNewChat = async (
+  roomId: string,
+  user: UserDocument,
+  content: string
+) => {
+  const chatDao = chatFactory.create(`rooms/${roomId}/chat`);
+  const id = firebase.firestore().collection(`rooms/${roomId}/chat`).doc().id;
+  await chatDao.set({
+    id: id,
+    uid: user.id,
+    nickname: user.nickname,
+    content: content,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+};
+
+export const getChatDao = (roomId: string) => {
+  return chatFactory.create(`rooms/${roomId}/chat`);
 };
 
 /**

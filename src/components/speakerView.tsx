@@ -139,7 +139,6 @@ const SpeakerView = (props: Props) => {
         disgusted: calcAvgEmotion("disgusted", analysisDatas),
         surprised: calcAvgEmotion("surprised", analysisDatas),
       };
-      console.log(resultObject);
       setEmotion(resultObject);
       setAttendees(analysisDatas.length);
       if (analysisDatas.length !== 0) {
@@ -207,7 +206,12 @@ const SpeakerView = (props: Props) => {
           size={{ width: width - screenWidth, height: height - 32 }}
           resizable={{ x: false, y: false, xy: false }}
         >
-          <Stack justify="center" mt="80px">
+          <Stack
+            justify="center"
+            mt="80px"
+            maxH={height - 32}
+            overflowY="scroll"
+          >
             <Stat borderWidth="2px" rounded="lg" m="4" p="4">
               <StatLabel>Attendees</StatLabel>
               <StatNumber>{countOfAttendees}</StatNumber>
