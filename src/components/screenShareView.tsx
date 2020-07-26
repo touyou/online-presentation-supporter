@@ -5,7 +5,7 @@ interface Props {
   audio?: string;
 }
 
-const ScreenShareView = (props: Props) => {
+const StreamPreview = (props: Props) => {
   const videoRef = React.useRef(null);
   React.useEffect(() => {
     if (!!videoRef.current && !!props.stream) {
@@ -34,10 +34,10 @@ const ScreenShareView = (props: Props) => {
   );
 };
 
-ScreenShareView.getInitialProps = async () => {
+StreamPreview.getInitialProps = async () => {
   return {
     stream: null,
   };
 };
 
-export default ScreenShareView;
+export default StreamPreview;

@@ -47,6 +47,7 @@ const Room = (props: Props) => {
     const [currentUser, setCurrentUser] = React.useState<firebase.User>();
     const [screenPeer, setScreenPeer] = useState(null);
     const [videoStream, setVideoStream] = useState(null);
+    const [cameraStream, setCameraStream] = useState(null);
     const [screenStream, setScreenStream] = useState(null);
     const [chat, setChat] = React.useState(Array<ChatDocument>());
     const [chatContent, setChatContent] = React.useState("");
@@ -124,18 +125,14 @@ const Room = (props: Props) => {
       }
     }, [screenStream]);
 
-    const joinTriggerClick = async () => {
-      console.log("=== prepare peer ===");
-      if (!peer.open) {
-        return;
+    React.useEffect(() => {
+      console.log(`camera stream is ${screenPeer}`);
+      if (cameraStream !== null && !isListener) {
+        startCameraSharing();
       }
+    }, [cameraStream]);
 
-      // join room
-      const room = peer.joinRoom(roomId, {
-        mode: "sfu",
-        stream: props.stream,
-      });
-
+    const roomLogs = (room) => {
       // logging
       room.once("open", () => {
         console.log(`=== You joined ===\n`);
@@ -152,9 +149,25 @@ const Room = (props: Props) => {
       room.once("close", () => {
         console.log(`=== You left ===\n`);
       });
+    };
+
+    const joinTriggerClick = async () => {
+      console.log("=== prepare peer ===");
+      if (!peer.open) {
+        return;
+      }
+
+      // join room
+      const room = peer.joinRoom(roomId, {
+        mode: "sfu",
+        stream: props.stream,
+      });
+
+      roomLogs(room);
 
       // stream handling
       room.on("stream", async (stream) => {
+        console.log("stream changed");
         if (isListener) {
           const peerId = stream.peerId;
           // TODO: if this is screen or speaker video, set element
@@ -181,22 +194,28 @@ const Room = (props: Props) => {
         stream: screenStream,
       });
 
-      // logging
-      room.once("open", () => {
-        console.log(`=== You joined ===\n`);
+      roomLogs(room);
+
+      // stream handling
+      room.on("stream", async (stream) => {
+        console.log(stream);
       });
-      room.once("peerJoin", (peerId) => {
-        console.log(`=== ${peerId} joined ===\n`);
+    };
+
+    const startCameraSharing = async () => {
+      if (!screenPeer.open) {
+        return;
+      }
+
+      console.log("=== prepare camera peer ==");
+
+      // join room
+      const room = screenPeer.joinRoom(roomId, {
+        mode: "sfu",
+        stream: cameraStream,
       });
-      room.on("data", ({ data, src }) => {
-        console.log(`${src}: ${data}\n`);
-      });
-      room.on("peerLeave", (peerId) => {
-        console.log(`=== ${peerId} left ===\n`);
-      });
-      room.once("close", () => {
-        console.log(`=== You left ===\n`);
-      });
+
+      roomLogs(room);
 
       // stream handling
       room.on("stream", async (stream) => {});
@@ -207,6 +226,7 @@ const Room = (props: Props) => {
     };
 
     const startShare = () => {
+      if (cameraStream !== null) stopSpeakerCamera();
       const micAudio = new Tone.UserMedia();
 
       micAudio.open().then(() => {
@@ -243,11 +263,43 @@ const Room = (props: Props) => {
     };
 
     const endShare = () => {
-      (screenStream as MediaStream)
-        ?.getTracks()
+      (screenStream as MediaStream)?.getTracks()
         .forEach((track) => track.stop());
       setScreenStream(null);
       addLog(roomId, "screen_status", "stop");
+    };
+
+    const startSpeakerCamera = (deviceId: string) => {
+      if (screenStream !== null) endShare();
+      const micAudio = new Tone.UserMedia();
+
+      micAudio.open().then(() => {
+        const reverb = new Tone.Freeverb();
+        const effectedDest = Tone.context.createMediaStreamDestination();
+        micAudio.connect(reverb);
+        reverb.connect(effectedDest);
+        navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: {
+              exact: deviceId,
+            },
+          },
+          audio: true,
+        }).then((stream) => {
+          const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+          stream.addTrack(effectedTrack);
+
+          setCameraStream(stream);
+          addLog(roomId, "camera_status", "start");
+        });
+      });
+    };
+
+    const stopSpeakerCamera = () => {
+      (cameraStream as MediaStream)?.getTracks()
+        .forEach((track) => track.stop());
+      setCameraStream(null);
+      addLog(roomId, "camera_status", "stop");
     };
 
     const leaveRoom = async () => {
@@ -315,8 +367,11 @@ const Room = (props: Props) => {
           : (
             <SpeakerView
               screenStream={screenStream}
+              cameraStream={cameraStream}
               onClickStartShare={startShare}
               onClickStopShare={endShare}
+              onClickStartCamera={startSpeakerCamera}
+              onClickStopCamera={stopSpeakerCamera}
               roomId={roomId}
             />
           )}

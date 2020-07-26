@@ -1,7 +1,7 @@
 import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
 import { useWinndowDimensions, useInterval } from "../lib/customHooks";
-import ScreenShareView from "./screenShareView";
+import StreamPreview from "./screenShareView";
 import {
   selectRoomAnalysis,
   updateOrAddRoomAnalysisLog,
@@ -22,13 +22,17 @@ import {
   StatLabel,
   StatNumber,
   Stack,
+  Select,
 } from "@chakra-ui/core";
 import { AnalysisDataDocument } from "../lib/model";
 
 interface Props {
   screenStream?: MediaStream;
+  cameraStream?: MediaStream;
   onClickStartShare: () => void;
   onClickStopShare: () => void;
+  onClickStartCamera: (deviceId: string) => void;
+  onClickStopCamera: () => void;
   roomId: string;
 }
 
@@ -46,6 +50,7 @@ const SpeakerView = (props: Props) => {
   if (process.browser) {
     const { width, height } = useWinndowDimensions();
     const [screenStream, setScreenStream] = React.useState(null);
+    const [cameraStream, setCameraStream] = React.useState(null);
     const contentsWidth = () => {
       return width - 12;
     };
@@ -65,6 +70,10 @@ const SpeakerView = (props: Props) => {
     const [lastPush, setLastPush] = React.useState(null);
     const [canPush, setCanPush] = React.useState(false);
     const [countOfAttendees, setAttendees] = React.useState(0);
+    const [mediaDevices, setMediaDevices] = React.useState(
+      Array<MediaDeviceInfo>(),
+    );
+    const [camera, setCamera] = React.useState(null);
 
     const delay = 5000;
 
@@ -154,6 +163,23 @@ const SpeakerView = (props: Props) => {
 
     useInterval(updateAnalysis, delay);
 
+    const getDevices = (mediaDevices: MediaDeviceInfo[]) => {
+      console.log(mediaDevices);
+      const cameraDevices = mediaDevices.filter((media, _, __) => {
+        return media.kind === "videoinput";
+      });
+      console.log(cameraDevices);
+      setMediaDevices(cameraDevices);
+    };
+
+    const changeDevice = (event: React.ChangeEvent<HTMLSelectElement>) => {
+      setCamera(event.target.value);
+    };
+
+    React.useEffect(() => {
+      navigator.mediaDevices.enumerateDevices().then(getDevices);
+    }, []);
+
     React.useEffect(() => {
       let now = new Date();
       if (
@@ -173,6 +199,10 @@ const SpeakerView = (props: Props) => {
     React.useEffect(() => {
       setScreenStream(props.screenStream);
     }, [props.screenStream]);
+
+    React.useEffect(() => {
+      setCameraStream(props.cameraStream);
+    }, [props.cameraStream]);
 
     return (
       <SortablePane
@@ -196,12 +226,11 @@ const SpeakerView = (props: Props) => {
         >
           {!!screenStream
             ? (
-              <ScreenShareView
-                stream={screenStream}
-                audio="off"
-              />
+              <StreamPreview stream={screenStream} audio="off" />
             )
-            : null}
+            : (!!cameraStream
+              ? (<StreamPreview stream={cameraStream} audio="off" />)
+              : null)}
         </Pane>
         <Pane
           key={1}
@@ -264,6 +293,36 @@ const SpeakerView = (props: Props) => {
                   Stop Share
                 </Button>
               </Flex>
+            </Box>
+            <Box m="4" p="4" borderWidth="2px" rounded="lg">
+              <Stack>
+                <Select placeholder="Select camera" onChange={changeDevice}>
+                  {mediaDevices.map((value, _, __) => {
+                    return (<option key={value.deviceId} value={value.deviceId}>
+                      {value.label}
+                    </option>);
+                  })}
+                </Select>
+                <Flex>
+                  <Button
+                    variantColor="teal"
+                    style={{ margin: "4px" }}
+                    onClick={() => {
+                      if (!camera) return;
+                      props.onClickStartCamera(camera);
+                    }}
+                  >
+                    Start Camera
+                  </Button>
+                  <Button
+                    variantColor="red"
+                    style={{ margin: "4px" }}
+                    onClick={props.onClickStopCamera}
+                  >
+                    Stop Camera
+                  </Button>
+                </Flex>
+              </Stack>
             </Box>
           </Stack>
         </Pane>

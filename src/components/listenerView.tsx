@@ -1,6 +1,6 @@
 import React from "react";
 import EmotionalVideo from "../components/emotionalVideo";
-import ScreenShareView from "../components/screenShareView";
+import StreamPreview from "../components/screenShareView";
 import { useWinndowDimensions } from "../lib/customHooks";
 import { Button, Box, Flex } from "@chakra-ui/core";
 
@@ -58,7 +58,7 @@ const ListenerView = (props: Props) => {
         <Box pos="fixed" mt="80px" zIndex={1} w={width} h={height} bg="white">
           {!!screenStream
             ? (
-              <ScreenShareView stream={screenStream}></ScreenShareView>
+              <StreamPreview stream={screenStream}></StreamPreview>
             )
             : (
               <Flex justify="center" align="center" h="100%">
