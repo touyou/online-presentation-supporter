@@ -32,7 +32,7 @@ export const useWinndowDimensions = () => {
   };
 
   const [windowDimensions, setWindowDimensions] = React.useState(
-    getWindowDimensions()
+    getWindowDimensions(),
   );
   React.useEffect(() => {
     const onResize = () => {

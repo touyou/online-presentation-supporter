@@ -13,7 +13,8 @@ import { isUndefined } from "util";
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 
 export const getTimestamp = () => {
-  return firebase.firestore.FieldValue.serverTimestamp() as firebase.firestore.Timestamp;
+  return firebase.firestore.FieldValue
+    .serverTimestamp() as firebase.firestore.Timestamp;
 };
 
 /**
@@ -41,7 +42,7 @@ export const fetchRoomAll = async () => {
 export const createRoom = async (
   user: firebase.User,
   name: string,
-  password: string
+  password: string,
 ) => {
   const admin: UserDocument = await fetchUser(user.uid);
   const newDocId = await roomsDao.add({
@@ -57,7 +58,7 @@ export const createRoom = async (
 
 export const updateRoomDocumentWhenJoined = async (
   docId: string,
-  userDocument: UserDocument
+  userDocument: UserDocument,
 ) => {
   await roomsDao.update({
     id: docId,
@@ -67,7 +68,7 @@ export const updateRoomDocumentWhenJoined = async (
 
 export const updateRoomDocumentWhenLeaved = async (
   docId: string,
-  userDocument: UserDocument
+  userDocument: UserDocument,
 ) => {
   await roomsDao.update({
     id: docId,
@@ -97,7 +98,7 @@ const analysisFactory = firestoreSimple.collectionFactory<AnalysisDataDocument>(
         surprised: doc.surprised,
       };
     },
-  }
+  },
 );
 
 export const selectRoomAnalysis = async (id: string) => {
@@ -111,7 +112,7 @@ export const getAnalysis = (id: string) => {
 
 export const updateOrAddRoomAnalysis = async (
   roomId: string,
-  analysis: AnalysisDataDocument
+  analysis: AnalysisDataDocument,
 ) => {
   const analysisDao = analysisFactory.create(`rooms/${roomId}/analysis`);
   await analysisDao.set(analysis);
@@ -141,7 +142,7 @@ const chatFactory = firestoreSimple.collectionFactory<ChatDocument>({
 export const addNewChat = async (
   roomId: string,
   user: UserDocument,
-  content: string
+  content: string,
 ) => {
   const chatDao = chatFactory.create(`rooms/${roomId}/chat`);
   const id = firebase.firestore().collection(`rooms/${roomId}/chat`).doc().id;
@@ -188,7 +189,7 @@ export const fetchAnalysisLogAutoId = async (roomId: string) => {
 
 export const updateOrAddRoomAnalysisLog = async (
   roomId: string,
-  analysis: AnalysisLogDocument
+  analysis: AnalysisLogDocument,
 ) => {
   const analysisDao = analysisLogFactory.create(`rooms/${roomId}/analysis-log`);
   await analysisDao.set(analysis);

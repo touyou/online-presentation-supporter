@@ -78,14 +78,14 @@ const Room = (props: Props) => {
           new Peer({
             key: process.env.SKYWAY_API_KEY,
             debug: 3,
-          })
+          }),
         );
       }
       setPeer(
         new Peer({
           key: process.env.SKYWAY_API_KEY,
           debug: 3,
-        })
+        }),
       );
 
       const chatDao = getChatDao(roomId);
@@ -236,7 +236,7 @@ const Room = (props: Props) => {
                 setScreenStream(null);
                 addLog(roomId, "screen_status", "stop");
               },
-              { once: true }
+              { once: true },
             );
           });
       });
@@ -302,22 +302,24 @@ const Room = (props: Props) => {
             </Stack>
           </Flex>
         </Box>
-        {isListener ? (
-          <ListenerView
-            videoStream={videoStream}
-            screenStream={screenStream}
-            onClickStartWatch={startWatch}
-            roomId={roomId}
-            userId={currentUser != null ? currentUser.uid : ""}
-          ></ListenerView>
-        ) : (
-          <SpeakerView
-            screenStream={screenStream}
-            onClickStartShare={startShare}
-            onClickStopShare={endShare}
-            roomId={roomId}
-          ></SpeakerView>
-        )}
+        {isListener
+          ? (
+            <ListenerView
+              videoStream={videoStream}
+              screenStream={screenStream}
+              onClickStartWatch={startWatch}
+              roomId={roomId}
+              userId={currentUser != null ? currentUser.uid : ""}
+            />
+          )
+          : (
+            <SpeakerView
+              screenStream={screenStream}
+              onClickStartShare={startShare}
+              onClickStopShare={endShare}
+              roomId={roomId}
+            />
+          )}
         <IconButton
           pos="fixed"
           right={4}

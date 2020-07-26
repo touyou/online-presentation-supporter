@@ -17,7 +17,7 @@ const EmotionalVideo = (props: Props) => {
   const webcamRef = React.useRef(null);
   const [detections, setDetections] = React.useState(Array<FaceDetection>());
   const [expressions, setExpressions] = React.useState(
-    Array<FaceExpressions>()
+    Array<FaceExpressions>(),
   );
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [width, setWidth] = React.useState(props.width);
@@ -48,7 +48,7 @@ const EmotionalVideo = (props: Props) => {
 
             updateOrAddRoomAnalysis(props.roomId, doc);
           }
-        }
+        },
       );
     }
   };
@@ -78,21 +78,23 @@ const EmotionalVideo = (props: Props) => {
               transform: `translate(${_X}px,${_Y}px)`,
             }}
           >
-            {!!expressions && !!expressions[i] ? (
-              <p
-                style={{
-                  backgroundColor: "blue",
-                  border: "solid",
-                  borderColor: "blue",
-                  width: _W,
-                  marginTop: 0,
-                  color: "#fff",
-                  transform: `translate(-3px, ${_H}px)`,
-                }}
-              >
-                {convertExpression(expressions[i])}
-              </p>
-            ) : null}
+            {!!expressions && !!expressions[i]
+              ? (
+                <p
+                  style={{
+                    backgroundColor: "blue",
+                    border: "solid",
+                    borderColor: "blue",
+                    width: _W,
+                    marginTop: 0,
+                    color: "#fff",
+                    transform: `translate(-3px, ${_H}px)`,
+                  }}
+                >
+                  {convertExpression(expressions[i])}
+                </p>
+              )
+              : null}
           </div>
         </div>
       );

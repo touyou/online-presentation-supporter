@@ -28,7 +28,8 @@ const ScreenShareView = (props: Props) => {
         height="100%"
         autoPlay
         playsInline
-      ></video>
+      >
+      </video>
     </div>
   );
 };

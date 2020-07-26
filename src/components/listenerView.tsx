@@ -53,22 +53,24 @@ const ListenerView = (props: Props) => {
             height={videoHeight()}
             roomId={props.roomId}
             userId={props.userId}
-          ></EmotionalVideo>
+          />
         </Box>
         <Box pos="fixed" mt="80px" zIndex={1} w={width} h={height} bg="white">
-          {!!screenStream ? (
-            <ScreenShareView stream={screenStream}></ScreenShareView>
-          ) : (
-            <Flex justify="center" align="center" h="100%">
-              <Button
-                variantColor="teal"
-                onClick={props.onClickStartWatch}
-                style={{ marginBottom: "32px" }}
-              >
-                Start Watch
-              </Button>
-            </Flex>
-          )}
+          {!!screenStream
+            ? (
+              <ScreenShareView stream={screenStream}></ScreenShareView>
+            )
+            : (
+              <Flex justify="center" align="center" h="100%">
+                <Button
+                  variantColor="teal"
+                  onClick={props.onClickStartWatch}
+                  style={{ marginBottom: "32px" }}
+                >
+                  Start Watch
+                </Button>
+              </Flex>
+            )}
         </Box>
       </>
     );

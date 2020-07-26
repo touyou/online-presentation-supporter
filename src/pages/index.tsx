@@ -88,97 +88,101 @@ const Index = () => {
       >
         <Flex align="flex-end" justifyContent="space-between">
           <Heading color="gray.100">Online Lecture System</Heading>
-          {!!currentUser ? (
-            <Stack isInline>
-              <Button onClick={() => setCreateModal(true)} mr="2">
-                Create Room
-              </Button>
-              <Button onClick={logoutUser} mr="2">
-                Logout
-              </Button>
-            </Stack>
-          ) : (
-            <Button onClick={loginUser}>Login</Button>
-          )}
+          {!!currentUser
+            ? (
+              <Stack isInline>
+                <Button onClick={() => setCreateModal(true)} mr="2">
+                  Create Room
+                </Button>
+                <Button onClick={logoutUser} mr="2">
+                  Logout
+                </Button>
+              </Stack>
+            )
+            : (
+              <Button onClick={loginUser}>Login</Button>
+            )}
         </Flex>
       </Box>
       <Box w="100%" h="200vh" bg="gray.100" pt="80px">
-        {!!currentUser ? (
-          <Stack p="4">
-            <form
-              onSubmit={nicknameForm.handleSubmit(async (values) => {
-                setLoading(true);
-                await updateNickname(currentUser.uid, values.name);
-                setLoading(false);
-              })}
-            >
-              <Stack isInline justify="center">
-                <Text pt={2} width="13rem" fontSize="md" fontWeight="bold">
-                  Now logged in as
-                </Text>
-                <Input
-                  name="name"
-                  ref={nicknameForm.register()}
-                  value={currentNickname}
-                  onChange={(event) => setNickname(event.target.value)}
-                />
-                <Button
-                  isLoading={isLoading}
-                  loadingText="Changing"
-                  variantColor="teal"
-                  type="submit"
-                  width="15rem"
-                >
-                  Change Nickname
-                </Button>
-              </Stack>
-            </form>
-            <SimpleGrid columns={[2, null, 4]} spacing="20px" p="4">
-              {rooms.map((room: RoomDocument, index: number) => {
-                return (
-                  <Box
-                    borderWidth="1px"
-                    rounded="lg"
-                    overflow="hidden"
-                    bg="white"
+        {!!currentUser
+          ? (
+            <Stack p="4">
+              <form
+                onSubmit={nicknameForm.handleSubmit(async (values) => {
+                  setLoading(true);
+                  await updateNickname(currentUser.uid, values.name);
+                  setLoading(false);
+                })}
+              >
+                <Stack isInline justify="center">
+                  <Text pt={2} width="13rem" fontSize="md" fontWeight="bold">
+                    Now logged in as
+                  </Text>
+                  <Input
+                    name="name"
+                    ref={nicknameForm.register()}
+                    value={currentNickname}
+                    onChange={(event) => setNickname(event.target.value)}
+                  />
+                  <Button
+                    isLoading={isLoading}
+                    loadingText="Changing"
+                    variantColor="teal"
+                    type="submit"
+                    width="15rem"
                   >
-                    <Box p="6">
-                      <Heading size="lg" mb="8">
-                        {room.name}
-                      </Heading>
-                      <Button
-                        width="100%"
-                        variantColor="teal"
-                        onClick={() => {
-                          setSelectRoom(room);
-                          setEnterModal(true);
-                        }}
-                      >
-                        Enter
-                      </Button>
+                    Change Nickname
+                  </Button>
+                </Stack>
+              </form>
+              <SimpleGrid columns={[2, null, 4]} spacing="20px" p="4">
+                {rooms.map((room: RoomDocument, index: number) => {
+                  return (
+                    <Box
+                      borderWidth="1px"
+                      rounded="lg"
+                      overflow="hidden"
+                      bg="white"
+                    >
+                      <Box p="6">
+                        <Heading size="lg" mb="8">
+                          {room.name}
+                        </Heading>
+                        <Button
+                          width="100%"
+                          variantColor="teal"
+                          onClick={() => {
+                            setSelectRoom(room);
+                            setEnterModal(true);
+                          }}
+                        >
+                          Enter
+                        </Button>
+                      </Box>
                     </Box>
-                  </Box>
-                );
-              })}
-            </SimpleGrid>
-            <CreateDialog
-              currentUser={currentUser}
-              isOpen={createModal}
-              closeModal={() => setCreateModal(false)}
-            ></CreateDialog>
-            <EnterDialog
-              selectRoom={selectRoom}
-              currentUser={currentUser}
-              isOpen={enterModal}
-              closeModal={() => {
-                setEnterModal(false);
-                setSelectRoom(null);
-              }}
-            ></EnterDialog>
-          </Stack>
-        ) : (
-          <div></div>
-        )}
+                  );
+                })}
+              </SimpleGrid>
+              <CreateDialog
+                currentUser={currentUser}
+                isOpen={createModal}
+                closeModal={() => setCreateModal(false)}
+              />
+              <EnterDialog
+                selectRoom={selectRoom}
+                currentUser={currentUser}
+                isOpen={enterModal}
+                closeModal={() => {
+                  setEnterModal(false);
+                  setSelectRoom(null);
+                }}
+              />
+            </Stack>
+          )
+          : (
+            <div></div>
+          )}
       </Box>
     </>
   );

@@ -44,7 +44,7 @@ const CreateDialog = (props: Props) => {
     const roomId = await createRoom(
       props.currentUser,
       values.name,
-      values.password
+      values.password,
     );
     await updateIsListener(props.currentUser.uid, true);
     setLoading(false);
@@ -75,7 +75,8 @@ const CreateDialog = (props: Props) => {
                 ref={createForm.register}
                 placeholder="name"
                 mb={2}
-              ></Input>
+              >
+              </Input>
               <FormErrorMessage>
                 {createForm.errors.name && createForm.errors.name.message}
               </FormErrorMessage>
