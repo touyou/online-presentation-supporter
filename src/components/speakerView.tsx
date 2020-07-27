@@ -164,11 +164,9 @@ const SpeakerView = (props: Props) => {
     useInterval(updateAnalysis, delay);
 
     const getDevices = (mediaDevices: MediaDeviceInfo[]) => {
-      console.log(mediaDevices);
       const cameraDevices = mediaDevices.filter((media, _, __) => {
         return media.kind === "videoinput";
       });
-      console.log(cameraDevices);
       setMediaDevices(cameraDevices);
     };
 

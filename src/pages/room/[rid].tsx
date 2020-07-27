@@ -45,6 +45,7 @@ const Room = (props: Props) => {
   if (process.browser) {
     const [peer, setPeer] = useState(null);
     const [currentUser, setCurrentUser] = React.useState<firebase.User>();
+    const [room, setRoom] = useState(null);
     const [screenPeer, setScreenPeer] = useState(null);
     const [videoStream, setVideoStream] = useState(null);
     const [cameraStream, setCameraStream] = useState(null);
@@ -81,13 +82,14 @@ const Room = (props: Props) => {
             debug: 3,
           }),
         );
+      } else {
+        setPeer(
+          new Peer({
+            key: process.env.SKYWAY_API_KEY,
+            debug: 3,
+          }),
+        );
       }
-      setPeer(
-        new Peer({
-          key: process.env.SKYWAY_API_KEY,
-          debug: 3,
-        }),
-      );
 
       const chatDao = getChatDao(roomId);
       const unsubscribed = chatDao
@@ -119,25 +121,32 @@ const Room = (props: Props) => {
     }, []);
 
     React.useEffect(() => {
-      console.log(`screen stream is ${screenPeer}`);
+      console.log(`screen stream is ${screenStream} ===`);
       if (screenStream !== null && !isListener) {
         startScreenSharing();
       }
     }, [screenStream]);
 
     React.useEffect(() => {
-      console.log(`camera stream is ${screenPeer}`);
+      console.log(`camera stream is ${cameraStream} ===`);
       if (cameraStream !== null && !isListener) {
         startCameraSharing();
       }
     }, [cameraStream]);
+
+    React.useEffect(() => {
+      console.log(peer);
+      if (peer !== null && isListener) {
+        joinTriggerClick();
+      }
+    }, [peer]);
 
     const roomLogs = (room) => {
       // logging
       room.once("open", () => {
         console.log(`=== You joined ===\n`);
       });
-      room.once("peerJoin", (peerId) => {
+      room.on("peerJoin", (peerId) => {
         console.log(`=== ${peerId} joined ===\n`);
       });
       room.on("data", ({ data, src }) => {
@@ -152,36 +161,45 @@ const Room = (props: Props) => {
     };
 
     const joinTriggerClick = async () => {
-      console.log("=== prepare peer ===");
       if (!peer.open) {
         return;
       }
 
+      console.log("=== prepare peer ===");
+
       // join room
-      const room = peer.joinRoom(roomId, {
+      const newRoom = peer.joinRoom(roomId, {
         mode: "sfu",
         stream: props.stream,
       });
 
-      roomLogs(room);
+      console.log(newRoom);
+
+      roomLogs(newRoom);
 
       // stream handling
-      room.on("stream", async (stream) => {
-        console.log("stream changed");
+      newRoom.on("stream", async (stream) => {
         if (isListener) {
           const peerId = stream.peerId;
           // TODO: if this is screen or speaker video, set element
           console.log(`=== stream received ${peerId} ===`);
           console.log(stream);
-          if (!!peerId) {
-            // setVideoStream(stream);
-            setScreenStream(stream);
-          }
+          setScreenStream(stream);
         }
       });
+
+      peer.on("error", console.error);
+
+      setRoom(newRoom);
     };
 
     const startScreenSharing = async () => {
+      if (cameraStream !== null) {
+        room.replaceStream(screenStream);
+        stopSpeakerCamera();
+        return;
+      }
+
       if (!screenPeer.open) {
         return;
       }
@@ -189,20 +207,32 @@ const Room = (props: Props) => {
       console.log("=== prepare scereen peer ==");
 
       // join room
-      const room = screenPeer.joinRoom(roomId, {
+      const newRoom = screenPeer.joinRoom(roomId, {
         mode: "sfu",
         stream: screenStream,
       });
 
-      roomLogs(room);
+      console.log(newRoom);
+
+      roomLogs(newRoom);
 
       // stream handling
-      room.on("stream", async (stream) => {
+      newRoom.on("stream", async (stream) => {
         console.log(stream);
       });
+
+      screenPeer.on("error", console.error);
+
+      setRoom(newRoom);
     };
 
     const startCameraSharing = async () => {
+      if (screenStream !== null) {
+        room.replaceStream(cameraStream);
+        endShare();
+        return;
+      }
+
       if (!screenPeer.open) {
         return;
       }
@@ -210,15 +240,21 @@ const Room = (props: Props) => {
       console.log("=== prepare camera peer ==");
 
       // join room
-      const room = screenPeer.joinRoom(roomId, {
+      const newRoom = screenPeer.joinRoom(roomId, {
         mode: "sfu",
         stream: cameraStream,
       });
 
-      roomLogs(room);
+      console.log(newRoom);
+
+      roomLogs(newRoom);
 
       // stream handling
-      room.on("stream", async (stream) => {});
+      newRoom.on("stream", async (stream) => {});
+
+      screenPeer.on("error", console.error);
+
+      setRoom(newRoom);
     };
 
     const startWatch = () => {
@@ -226,7 +262,6 @@ const Room = (props: Props) => {
     };
 
     const startShare = () => {
-      if (cameraStream !== null) stopSpeakerCamera();
       const micAudio = new Tone.UserMedia();
 
       micAudio.open().then(() => {
@@ -270,7 +305,6 @@ const Room = (props: Props) => {
     };
 
     const startSpeakerCamera = (deviceId: string) => {
-      if (screenStream !== null) endShare();
       const micAudio = new Tone.UserMedia();
 
       micAudio.open().then(() => {
