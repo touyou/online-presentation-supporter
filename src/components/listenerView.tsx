@@ -2,12 +2,11 @@ import React from "react";
 import EmotionalVideo from "../components/emotionalVideo";
 import StreamPreview from "../components/screenShareView";
 import { useWinndowDimensions } from "../lib/customHooks";
-import { Button, Box, Flex } from "@chakra-ui/core";
+import { Button, Box, Flex, Heading } from "@chakra-ui/core";
 
 interface Props {
   videoStream?: MediaStream;
   screenStream?: MediaStream;
-  onClickStartWatch: () => void;
   roomId: string;
   userId: string;
 }
@@ -35,18 +34,6 @@ const ListenerView = (props: Props) => {
 
     return (
       <>
-        {/* {!!videoStream ? (
-          <video
-            ref={videoRef}
-            width={videoWidth}
-            height={videoHeight()}
-            style={{
-              backgroundColor: "white",
-            }}
-            autoPlay
-            playsInline
-          ></video>
-        ) : null} */}
         <Box pos="fixed" zIndex={0} w={width} h={height} bg="tomato">
           <EmotionalVideo
             width={width}
@@ -62,13 +49,7 @@ const ListenerView = (props: Props) => {
             )
             : (
               <Flex justify="center" align="center" h="100%">
-                <Button
-                  variantColor="teal"
-                  onClick={props.onClickStartWatch}
-                  style={{ marginBottom: "32px" }}
-                >
-                  Start Watch
-                </Button>
+                <Heading>Please wait until the start.</Heading>
               </Flex>
             )}
         </Box>
