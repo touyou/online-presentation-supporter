@@ -22,7 +22,7 @@ const EmotionalVideo = (props: Props) => {
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [width, setWidth] = React.useState(props.width);
   const [height, setHeight] = React.useState(props.height);
-  const delay = 5000;
+  const delay = 10000;
 
   const capture = async () => {
     if (!!webcamRef.current && isLoaded) {

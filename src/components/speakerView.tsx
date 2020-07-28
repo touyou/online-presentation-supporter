@@ -71,7 +71,7 @@ const SpeakerView = (props: Props) => {
     const [canPush, setCanPush] = React.useState(false);
     const [countOfAttendees, setAttendees] = React.useState(0);
     const [mediaDevices, setMediaDevices] = React.useState(
-      Array<MediaDeviceInfo>(),
+      Array<MediaDeviceInfo>()
     );
     const [camera, setCamera] = React.useState(null);
 
@@ -222,13 +222,11 @@ const SpeakerView = (props: Props) => {
           }}
           resizable={{ x: true, y: false, xy: false }}
         >
-          {!!screenStream
-            ? (
-              <StreamPreview stream={screenStream} audio="off" />
-            )
-            : (!!cameraStream
-              ? (<StreamPreview stream={cameraStream} audio="off" />)
-              : null)}
+          {!!screenStream ? (
+            <StreamPreview stream={screenStream} isSpeaker="off" />
+          ) : !!cameraStream ? (
+            <StreamPreview stream={cameraStream} isSpeaker="off" />
+          ) : null}
         </Pane>
         <Pane
           key={1}
@@ -296,9 +294,11 @@ const SpeakerView = (props: Props) => {
               <Stack>
                 <Select placeholder="Select camera" onChange={changeDevice}>
                   {mediaDevices.map((value, _, __) => {
-                    return (<option key={value.deviceId} value={value.deviceId}>
-                      {value.label}
-                    </option>);
+                    return (
+                      <option key={value.deviceId} value={value.deviceId}>
+                        {value.label}
+                      </option>
+                    );
                   })}
                 </Select>
                 <Flex>
