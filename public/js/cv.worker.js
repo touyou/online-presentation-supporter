@@ -25,11 +25,11 @@ function imageComplexity({
   msg,
   payload
 }) {
-  const img = cv.matFromImageData(payload);
+  const img = cv.matFromImageData(payload.img);
   let grayscale = new cv.Mat();
   cv.cvtColor(img, grayscale, cv.COLOR_RGB2GRAY, 0);
   let dst = new cv.Mat();
-  cv.Canny(grayscale, dst, 50, 100, 3, false);
+  cv.Canny(grayscale, dst, payload.th1, payload.th2, payload.apSize, payload.l2flag);
   postMessage({
     msg,
     payload: analyzeCannyImage(dst)
