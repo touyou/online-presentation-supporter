@@ -54,7 +54,7 @@ onmessage = function (e) {
   switch (e.data.msg) {
     case 'load': {
       // Import Webassembly script
-      self.importScripts('./opencv_webtutorial.js')
+      self.importScripts('./opencv_wasm.js')
       waitForOpencv(function (success) {
         if (success) postMessage({
           msg: e.data.msg
