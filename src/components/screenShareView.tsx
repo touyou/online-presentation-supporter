@@ -5,12 +5,13 @@ import { useInterval } from "../lib/customHooks";
 interface Props {
   stream?: MediaStream;
   isSpeaker?: string;
+  onChangeComplexity?: (number) => void;
 }
 
 const StreamPreview = (props: Props) => {
   const videoRef = React.useRef(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
-  const delay = 10000;
+  const delay = 1000;
 
   React.useEffect(() => {
     console.log("loading");
@@ -56,7 +57,7 @@ const StreamPreview = (props: Props) => {
         apSize: 3,
         l2flag: false,
       });
-      console.log(result);
+      props.onChangeComplexity(result.data.payload);
     }
   };
 

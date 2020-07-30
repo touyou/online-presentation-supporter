@@ -56,7 +56,7 @@ const Room = (props: Props) => {
     // Ref
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = React.useRef();
-    const { height } = useWinndowDimensions();
+    const { width, height } = useWinndowDimensions();
     // Router
     const router = useRouter();
     // Props
@@ -81,14 +81,14 @@ const Room = (props: Props) => {
           new Peer({
             key: process.env.SKYWAY_API_KEY,
             debug: 3,
-          }),
+          })
         );
       } else {
         setPeer(
           new Peer({
             key: process.env.SKYWAY_API_KEY,
             debug: 3,
-          }),
+          })
         );
       }
 
@@ -232,17 +232,19 @@ const Room = (props: Props) => {
         const effectedDest = Tone.context.createMediaStreamDestination();
         micAudio.connect(reverb);
         reverb.connect(effectedDest);
-        navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        }).then((stream) => {
-          const effectedTrack = effectedDest.stream.getAudioTracks()[0];
-          stream.addTrack(effectedTrack);
-          joinSpeakerStream(stream);
-          setVideoStream(stream);
+        navigator.mediaDevices
+          .getUserMedia({
+            video: true,
+            audio: false,
+          })
+          .then((stream) => {
+            const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+            stream.addTrack(effectedTrack);
+            joinSpeakerStream(stream);
+            setVideoStream(stream);
 
-          addLog(roomId, "speaker", "start");
-        });
+            addLog(roomId, "speaker", "start");
+          });
       });
     };
 
@@ -268,8 +270,8 @@ const Room = (props: Props) => {
         navigator.mediaDevices
           .getDisplayMedia({
             video: {
-              width: 3840,
-              height: 2160,
+              width: screen.width,
+              height: screen.height,
             },
             audio: false,
           })
@@ -287,17 +289,16 @@ const Room = (props: Props) => {
                 setScreenStream(null);
                 addLog(roomId, "screen_status", "stop");
               },
-              { once: true },
+              { once: true }
             );
           });
       });
     };
 
     const stopScreenShare = () => {
-      (screenStream as MediaStream)?.getTracks()
-        .forEach((track) => {
-          track.stop();
-        });
+      (screenStream as MediaStream)?.getTracks().forEach((track) => {
+        track.stop();
+      });
       currentRoom.replaceStream(videoStream);
       setScreenStream(null);
       addLog(roomId, "screen_status", "stop");
@@ -311,28 +312,29 @@ const Room = (props: Props) => {
         const effectedDest = Tone.context.createMediaStreamDestination();
         micAudio.connect(reverb);
         reverb.connect(effectedDest);
-        navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: {
-              exact: deviceId,
+        navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              deviceId: {
+                exact: deviceId,
+              },
             },
-          },
-          audio: false,
-        }).then((stream) => {
-          const effectedTrack = effectedDest.stream.getAudioTracks()[0];
-          stream.addTrack(effectedTrack);
+            audio: false,
+          })
+          .then((stream) => {
+            const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+            stream.addTrack(effectedTrack);
 
-          setCameraStream(stream);
-          addLog(roomId, "camera_status", "start");
-        });
+            setCameraStream(stream);
+            addLog(roomId, "camera_status", "start");
+          });
       });
     };
 
     const stopSpeakerCamera = () => {
-      (cameraStream as MediaStream)?.getTracks()
-        .forEach((track) => {
-          track.stop();
-        });
+      (cameraStream as MediaStream)?.getTracks().forEach((track) => {
+        track.stop();
+      });
       currentRoom.replaceStream(videoStream);
       setCameraStream(null);
       addLog(roomId, "camera_status", "stop");
@@ -390,26 +392,24 @@ const Room = (props: Props) => {
             </Stack>
           </Flex>
         </Box>
-        {isListener
-          ? (
-            <ListenerView
-              videoStream={videoStream}
-              screenStream={screenStream}
-              roomId={roomId}
-              userId={currentUser != null ? currentUser.uid : ""}
-            />
-          )
-          : (
-            <SpeakerView
-              screenStream={screenStream}
-              cameraStream={cameraStream}
-              onClickStartShare={startScreenShare}
-              onClickStopShare={stopScreenShare}
-              onClickStartCamera={startSpeakerCamera}
-              onClickStopCamera={stopSpeakerCamera}
-              roomId={roomId}
-            />
-          )}
+        {isListener ? (
+          <ListenerView
+            videoStream={videoStream}
+            screenStream={screenStream}
+            roomId={roomId}
+            userId={currentUser != null ? currentUser.uid : ""}
+          />
+        ) : (
+          <SpeakerView
+            screenStream={screenStream}
+            cameraStream={cameraStream}
+            onClickStartShare={startScreenShare}
+            onClickStopShare={stopScreenShare}
+            onClickStartCamera={startSpeakerCamera}
+            onClickStopCamera={stopSpeakerCamera}
+            roomId={roomId}
+          />
+        )}
         <IconButton
           pos="fixed"
           right={4}

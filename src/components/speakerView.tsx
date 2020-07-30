@@ -74,6 +74,7 @@ const SpeakerView = (props: Props) => {
       Array<MediaDeviceInfo>()
     );
     const [camera, setCamera] = React.useState(null);
+    const [complexity, setComplexity] = React.useState(0);
 
     const delay = 5000;
 
@@ -111,7 +112,7 @@ const SpeakerView = (props: Props) => {
           return "理解できていないかもしれません。";
           break;
         default:
-          return "感情グラフです。";
+          return "通常値です。";
           break;
       }
     };
@@ -174,6 +175,10 @@ const SpeakerView = (props: Props) => {
       setCamera(event.target.value);
     };
 
+    const getScreenshotComplexity = (value) => {
+      setComplexity(value);
+    };
+
     React.useEffect(() => {
       navigator.mediaDevices.enumerateDevices().then(getDevices);
     }, []);
@@ -223,9 +228,17 @@ const SpeakerView = (props: Props) => {
           resizable={{ x: true, y: false, xy: false }}
         >
           {!!screenStream ? (
-            <StreamPreview stream={screenStream} isSpeaker="off" />
+            <StreamPreview
+              stream={screenStream}
+              isSpeaker="off"
+              onChangeComplexity={getScreenshotComplexity}
+            />
           ) : !!cameraStream ? (
-            <StreamPreview stream={cameraStream} isSpeaker="off" />
+            <StreamPreview
+              stream={cameraStream}
+              isSpeaker="off"
+              onChangeComplexity={getScreenshotComplexity}
+            />
           ) : null}
         </Pane>
         <Pane
@@ -243,8 +256,12 @@ const SpeakerView = (props: Props) => {
               <StatLabel>Attendees</StatLabel>
               <StatNumber>{countOfAttendees}</StatNumber>
             </Stat>
+            <Stat borderWidth="2px" rounded="lg" m="4" p="4">
+              <StatLabel>Complexity</StatLabel>
+              <StatNumber>{complexity}</StatNumber>
+            </Stat>
             <Stack m="4" p="4" borderWidth="2px" rounded="lg" align="center">
-              <RadarChart height={250} width={250} data={getEmotionArray()}>
+              {/* <RadarChart height={250} width={250} data={getEmotionArray()}>
                 <PolarGrid />
                 <PolarAngleAxis dataKey="label" />
                 <Radar
@@ -253,14 +270,14 @@ const SpeakerView = (props: Props) => {
                   fill="#8884d8"
                   fillOpacity={0.6}
                 />
-              </RadarChart>
+              </RadarChart> */}
               <Alert status={getStatus(getMajorEmotionType())}>
                 <AlertIcon />
                 {getMessage(getMajorEmotionType())}
               </Alert>
               <Flex mt="1" justify="center" align="center">
                 <FormLabel htmlFor="push-notify">
-                  Enable Push Notification
+                  Enable Emotion Push Notification
                 </FormLabel>
                 <Switch
                   id="push-notify"
@@ -284,7 +301,10 @@ const SpeakerView = (props: Props) => {
                 <Button
                   variantColor="red"
                   style={{ margin: "4px" }}
-                  onClick={props.onClickStopShare}
+                  onClick={() => {
+                    setComplexity(0);
+                    props.onClickStopShare();
+                  }}
                 >
                   Stop Share
                 </Button>
@@ -315,7 +335,10 @@ const SpeakerView = (props: Props) => {
                   <Button
                     variantColor="red"
                     style={{ margin: "4px" }}
-                    onClick={props.onClickStopCamera}
+                    onClick={() => {
+                      setComplexity(0);
+                      props.onClickStopCamera();
+                    }}
                   >
                     Stop Camera
                   </Button>
