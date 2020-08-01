@@ -37,12 +37,20 @@ const EnterDialog = (props: Props) => {
   const cancelRef = React.useRef();
   const [show, setShow] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
-
   const enterForm = useForm();
 
+  const isAdmin = () => {
+    return props.selectRoom.adminUid === props.currentUser.uid;
+  };
+
   const enterRoom = async (roomId: string, password: string) => {
+    if (isAdmin()) {
+      await updateIsListener(props.currentUser.uid, false);
+      router.push(`/room/${roomId}?type=speaker`);
+      return;
+    }
     setLoading(true);
-    await updateIsListener(props.currentUser.uid, false);
+    await updateIsListener(props.currentUser.uid, true);
     const user = await fetchUser(props.currentUser.uid);
     await updateRoomDocumentWhenJoined(props.selectRoom.id, user);
     setLoading(false);
