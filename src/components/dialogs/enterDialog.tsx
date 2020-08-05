@@ -6,8 +6,8 @@ import {
   updateIsListener,
   fetchUser,
   updateRoomDocumentWhenJoined,
-} from "../lib/database";
-import { RoomDocument } from "../lib/model";
+} from "../../lib/database";
+import { RoomDocument } from "../../lib/model";
 import {
   AlertDialog,
   AlertDialogOverlay,

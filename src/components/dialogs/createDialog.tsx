@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { createRoom, updateIsListener } from "../lib/database";
+import { createRoom, updateIsListener } from "../../lib/database";
 import {
   AlertDialog,
   AlertDialogOverlay,

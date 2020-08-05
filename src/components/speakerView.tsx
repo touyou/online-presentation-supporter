@@ -23,8 +23,11 @@ import {
   StatNumber,
   Stack,
   Select,
+  Collapse,
 } from "@chakra-ui/core";
 import { AnalysisDataDocument } from "../lib/model";
+import Attendees from "./speakerItems/attendees";
+import Complexity from "./speakerItems/complexity";
 
 interface Props {
   screenStream?: MediaStream;
@@ -252,14 +255,8 @@ const SpeakerView = (props: Props) => {
             maxH={height - 32}
             overflowY="scroll"
           >
-            <Stat borderWidth="2px" rounded="lg" m="4" p="4">
-              <StatLabel>Attendees</StatLabel>
-              <StatNumber>{countOfAttendees}</StatNumber>
-            </Stat>
-            <Stat borderWidth="2px" rounded="lg" m="4" p="4">
-              <StatLabel>Complexity</StatLabel>
-              <StatNumber>{complexity}</StatNumber>
-            </Stat>
+            <Attendees countOfAttendees={countOfAttendees} />
+            <Complexity complexity={complexity} screenStream={screenStream} />
             <Stack m="4" p="4" borderWidth="2px" rounded="lg" align="center">
               {/* <RadarChart height={250} width={250} data={getEmotionArray()}>
                 <PolarGrid />

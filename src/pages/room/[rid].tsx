@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter } from "next/dist/client/router";
+import { useRouter } from "next/router";
 import ListenerView from "../../components/listenerView";
 import SpeakerView from "../../components/speakerView";
 import firebase from "../../plugins/firebase";
@@ -77,12 +77,11 @@ const Room = (props: Props) => {
     /* useEffect */
     React.useEffect(() => {
       if (!isListener) {
-        setScreenPeer(
-          new Peer({
-            key: process.env.SKYWAY_API_KEY,
-            debug: 3,
-          })
-        );
+        const _screenPeer = new Peer({
+          key: process.env.SKYWAY_API_KEY,
+          debug: 3,
+        });
+        setScreenPeer(_screenPeer);
       } else {
         setPeer(
           new Peer({
@@ -118,7 +117,9 @@ const Room = (props: Props) => {
             });
           }
         });
-      return () => unsubscribed();
+      return () => {
+        unsubscribed();
+      };
     }, []);
 
     React.useEffect(() => {
@@ -484,7 +485,10 @@ const Room = (props: Props) => {
 };
 
 Room.getInitialProps = async () => {
-  return {};
+  return {
+    stream: null,
+    screenStream: null,
+  };
 };
 
 export default Room;
