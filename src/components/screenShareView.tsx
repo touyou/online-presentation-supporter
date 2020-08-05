@@ -57,7 +57,7 @@ const StreamPreview = (props: Props) => {
         apSize: 3,
         l2flag: false,
       });
-      props.onChangeComplexity(result.data.payload);
+      if (props.isSpeaker) props.onChangeComplexity(result.data.payload);
     }
   };
 
@@ -79,6 +79,8 @@ const StreamPreview = (props: Props) => {
 StreamPreview.getInitialProps = async () => {
   return {
     stream: null,
+    isSpeaker: null,
+    onChangeComplexity: null,
   };
 };
 
