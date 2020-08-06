@@ -31,10 +31,12 @@ import {
   DrawerBody,
   Text,
   Input,
+  Icon,
 } from "@chakra-ui/core";
 import { useWinndowDimensions } from "../../lib/customHooks";
 import { ChatDocument } from "../../lib/model";
 import { formatDate } from "../../lib/utils";
+import { MdMicOff, MdMic } from "react-icons/md";
 
 interface Props {
   stream: MediaStream;
@@ -51,6 +53,7 @@ const Room = (props: Props) => {
     const [videoStream, setVideoStream] = useState(null);
     const [cameraStream, setCameraStream] = useState(null);
     const [screenStream, setScreenStream] = useState(null);
+    const [muted, setMuted] = useState(true);
     const [chat, setChat] = React.useState(Array<ChatDocument>());
     const [chatContent, setChatContent] = React.useState("");
     // Ref
@@ -243,6 +246,7 @@ const Room = (props: Props) => {
             stream.addTrack(effectedTrack);
             joinSpeakerStream(stream);
             setVideoStream(stream);
+            setMuted(false);
 
             addLog(roomId, "speaker", "start");
           });
@@ -366,6 +370,13 @@ const Room = (props: Props) => {
       setChatContent("");
     };
 
+    const toggleMute = () => {
+      if (currentRoom === null) return;
+      const nowTrack = currentRoom._localStream.getAudioTracks()[0];
+      nowTrack.enabled = muted;
+      setMuted(!muted);
+    };
+
     if (!currentUser) {
       return <div></div>;
     }
@@ -411,12 +422,24 @@ const Room = (props: Props) => {
             roomId={roomId}
           />
         )}
+        {isListener ? null : (
+          <IconButton
+            pos="fixed"
+            left={4}
+            bottom={4}
+            zIndex={2}
+            aria-label="Mute"
+            as={muted ? MdMicOff : MdMic}
+            p={2}
+            onClick={toggleMute}
+          />
+        )}
         <IconButton
           pos="fixed"
           right={4}
           bottom={4}
           zIndex={2}
-          aria-label="Opne chat"
+          aria-label="Open chat"
           icon="chat"
           ref={btnRef}
           onClick={onOpen}
