@@ -32,7 +32,7 @@ export const useWinndowDimensions = () => {
   };
 
   const [windowDimensions, setWindowDimensions] = React.useState(
-    getWindowDimensions(),
+    getWindowDimensions()
   );
   React.useEffect(() => {
     const onResize = () => {
@@ -42,4 +42,21 @@ export const useWinndowDimensions = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
   return windowDimensions;
+};
+
+/// useScript
+/// ref: https://stackoverflow.com/questions/34424845/adding-script-tag-to-react-jsx
+export const useScript = (url) => {
+  React.useEffect(() => {
+    const script = document.createElement("script");
+
+    script.src = url;
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [url]);
 };

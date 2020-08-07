@@ -1,6 +1,10 @@
 import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
-import { useWinndowDimensions, useInterval } from "../lib/customHooks";
+import {
+  useWinndowDimensions,
+  useInterval,
+  useScript,
+} from "../lib/customHooks";
 import StreamPreview from "./screenShareView";
 import {
   selectRoomAnalysis,
@@ -8,11 +12,12 @@ import {
   getTimestamp,
   fetchAnalysisLogAutoId,
 } from "../lib/database";
-import { Button, Flex, Box, Stack, Select } from "@chakra-ui/core";
+import { Button, Flex, Box, Stack, Select, Text, Input } from "@chakra-ui/core";
 import { AnalysisDataDocument } from "../lib/model";
 import Attendees from "./speakerItems/attendees";
 import Complexity from "./speakerItems/complexity";
 import EmotionBox from "./speakerItems/emotionBox";
+import SlideSetting from "./speakerItems/slideSetting";
 
 interface Props {
   screenStream?: MediaStream;
@@ -61,6 +66,7 @@ const SpeakerView = (props: Props) => {
     );
     const [camera, setCamera] = React.useState(null);
     const [complexity, setComplexity] = React.useState(0);
+    useScript("https://apis.google.com/js/api.js");
 
     const delay = 5000;
 
@@ -167,6 +173,7 @@ const SpeakerView = (props: Props) => {
             <Attendees countOfAttendees={countOfAttendees} />
             <Complexity complexity={complexity} screenStream={screenStream} />
             <EmotionBox emotion={emotion} roomId={props.roomId} />
+            <SlideSetting />
             <Box m="4" p="4" borderWidth="2px" rounded="lg">
               <Flex>
                 <Button
