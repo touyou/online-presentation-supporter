@@ -16,6 +16,7 @@ const SlideSetting = (props: Props) => {
         path: `https://slides.googleapis.com/v1/presentations/${slideId}`,
       })
       .then((res) => {
+        // @ts-ignore
         const httpBatch = gapi.client.newBatch();
         for (const slide of res.result.slides) {
           const request = gapi.client.request({
