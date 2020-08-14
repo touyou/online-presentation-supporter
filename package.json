@@ -25,6 +25,7 @@
     "push.js": "^1.0.12",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-firebaseui": "^4.1.0",
     "react-hook-form": "^5.7.2",
     "react-icons": "^3.10.0",
     "react-sortable-pane": "^1.1.0",

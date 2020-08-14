@@ -1,8 +1,13 @@
 import React from "react";
 import firebase from "../plugins/firebase";
 import { handleGoogleLogin, handleLogout } from "../lib/auth";
-import { getRoomDao, getUserDao, updateNickname } from "../lib/database";
-import { RoomDocument } from "../lib/model";
+import {
+  getRoomDao,
+  getUserDao,
+  updateNickname,
+  insertUser,
+} from "../lib/database";
+import { RoomDocument, UserDocument } from "../lib/model";
 import CreateDialog from "../components/dialogs/createDialog";
 import EnterDialog from "../components/dialogs/enterDialog";
 import {
@@ -16,6 +21,7 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { useForm } from "react-hook-form";
+import SignInScreen from "../components/signInScreen";
 
 const Index = () => {
   const [currentUser, setCurrentUser] = React.useState<firebase.User>();
@@ -60,15 +66,21 @@ const Index = () => {
 
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
+      const userDocument: UserDocument = {
+        id: user.uid,
+        name: user.displayName,
+        nickname: user.displayName,
+        isListener: false,
+        email: user.email,
+      };
+      (async () => {
+        await insertUser(userDocument);
+      })();
       setCurrentUser(user);
     } else {
       setCurrentUser(null);
     }
   });
-
-  const loginUser = () => {
-    handleGoogleLogin();
-  };
 
   const logoutUser = () => {
     handleLogout();
@@ -96,9 +108,7 @@ const Index = () => {
                 Logout
               </Button>
             </Stack>
-          ) : (
-            <Button onClick={loginUser}>Login</Button>
-          )}
+          ) : null}
         </Flex>
       </Box>
       <Box w="100%" h="200vh" bg="gray.100" pt="80px">
@@ -177,7 +187,7 @@ const Index = () => {
             />
           </Stack>
         ) : (
-          <div></div>
+          <SignInScreen />
         )}
       </Box>
     </>
