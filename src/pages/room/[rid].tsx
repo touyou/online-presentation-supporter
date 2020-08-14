@@ -36,7 +36,7 @@ import {
 import { useWinndowDimensions } from "../../lib/customHooks";
 import { ChatDocument } from "../../lib/model";
 import { formatDate } from "../../lib/utils";
-import { MdMicOff, MdMic } from "react-icons/md";
+import { MdMicOff, MdMic, MdVideocam, MdVideocamOff } from "react-icons/md";
 
 interface Props {
   stream: MediaStream;
@@ -54,6 +54,7 @@ const Room = (props: Props) => {
     const [cameraStream, setCameraStream] = useState(null);
     const [screenStream, setScreenStream] = useState(null);
     const [muted, setMuted] = useState(true);
+    const [hided, setHided] = useState(true);
     const [chat, setChat] = React.useState(Array<ChatDocument>());
     const [chatContent, setChatContent] = React.useState("");
     // Ref
@@ -246,7 +247,8 @@ const Room = (props: Props) => {
             stream.addTrack(effectedTrack);
             joinSpeakerStream(stream);
             setVideoStream(stream);
-            setMuted(false);
+            stream.getAudioTracks()[0].enabled = false;
+            stream.getVideoTracks()[0].enabled = false;
 
             addLog(roomId, "speaker", "start");
           });
@@ -285,6 +287,8 @@ const Room = (props: Props) => {
             stream.addTrack(effectedTrack);
 
             setScreenStream(stream);
+            setHided(false);
+            setMuted(false);
             addLog(roomId, "screen_status", "start");
 
             const [screenVideoTrack] = stream.getVideoTracks();
@@ -306,6 +310,8 @@ const Room = (props: Props) => {
       });
       currentRoom.replaceStream(videoStream);
       setScreenStream(null);
+      setHided(!videoStream.getVideoTracks()[0].enabled);
+      setMuted(!videoStream.getAudioTracks()[0].enabled);
       addLog(roomId, "screen_status", "stop");
     };
 
@@ -329,6 +335,8 @@ const Room = (props: Props) => {
           .then((stream) => {
             const effectedTrack = effectedDest.stream.getAudioTracks()[0];
             stream.addTrack(effectedTrack);
+            setHided(false);
+            setMuted(false);
 
             setCameraStream(stream);
             addLog(roomId, "camera_status", "start");
@@ -342,6 +350,8 @@ const Room = (props: Props) => {
       });
       currentRoom.replaceStream(videoStream);
       setCameraStream(null);
+      setHided(!videoStream.getVideoTracks()[0].enabled);
+      setMuted(!videoStream.getAudioTracks()[0].enabled);
       addLog(roomId, "camera_status", "stop");
     };
 
@@ -375,6 +385,13 @@ const Room = (props: Props) => {
       const nowTrack = currentRoom._localStream.getAudioTracks()[0];
       nowTrack.enabled = muted;
       setMuted(!muted);
+    };
+
+    const toggleHide = () => {
+      if (currentRoom === null) return;
+      const nowTrack = currentRoom._localStream.getVideoTracks()[0];
+      nowTrack.enabled = hided;
+      setHided(!hided);
     };
 
     if (!currentUser) {
@@ -423,16 +440,21 @@ const Room = (props: Props) => {
           />
         )}
         {isListener ? null : (
-          <IconButton
-            pos="fixed"
-            left={4}
-            bottom={4}
-            zIndex={2}
-            aria-label="Mute"
-            as={muted ? MdMicOff : MdMic}
-            p={2}
-            onClick={toggleMute}
-          />
+          <Flex pos="fixed" left={4} bottom={4} zIndex={2}>
+            <IconButton
+              aria-label="Mute"
+              as={muted ? MdMicOff : MdMic}
+              p={2}
+              onClick={toggleMute}
+            />
+            <IconButton
+              aria-label="Hide"
+              as={hided ? MdVideocamOff : MdVideocam}
+              p={2}
+              ml={2}
+              onClick={toggleHide}
+            />
+          </Flex>
         )}
         <IconButton
           pos="fixed"
