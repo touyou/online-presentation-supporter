@@ -12,6 +12,8 @@ import {
   addLog,
   getChatDao,
   addNewChat,
+  getRoomDao,
+  fetchRoom,
 } from "../../lib/database";
 import * as Tone from "tone";
 import {
@@ -31,12 +33,18 @@ import {
   DrawerBody,
   Text,
   Input,
-  Icon,
 } from "@chakra-ui/core";
 import { useWinndowDimensions } from "../../lib/customHooks";
-import { ChatDocument } from "../../lib/model";
+import { ChatDocument, UserDocument } from "../../lib/model";
 import { formatDate } from "../../lib/utils";
-import { MdMicOff, MdMic, MdVideocam, MdVideocamOff } from "react-icons/md";
+import {
+  MdMicOff,
+  MdMic,
+  MdVideocam,
+  MdVideocamOff,
+  MdPeople,
+} from "react-icons/md";
+import { User } from "firebase";
 
 interface Props {
   stream: MediaStream;
@@ -56,7 +64,9 @@ const Room = (props: Props) => {
     const [muted, setMuted] = useState(true);
     const [hided, setHided] = useState(true);
     const [chat, setChat] = React.useState(Array<ChatDocument>());
+    const [attendee, setAttendee] = React.useState(Array<UserDocument>());
     const [chatContent, setChatContent] = React.useState("");
+    const [isAttendee, setIsAttendee] = useState(false);
     // Ref
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = React.useRef();
@@ -95,6 +105,18 @@ const Room = (props: Props) => {
         );
       }
 
+      const roomDao = getRoomDao();
+      const unsubscribedRoom = roomDao.onSnapshot((snapshot, toObject) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added" || change.type === "modified") {
+            const modifiedRoom = toObject(change.doc);
+            if (modifiedRoom.id === roomId) {
+              setAttendee(modifiedRoom.users);
+            }
+          }
+        });
+      });
+
       const chatDao = getChatDao(roomId);
       const unsubscribed = chatDao
         .orderBy("timestamp")
@@ -123,6 +145,7 @@ const Room = (props: Props) => {
         });
       return () => {
         unsubscribed();
+        unsubscribedRoom();
       };
     }, []);
 
@@ -357,16 +380,17 @@ const Room = (props: Props) => {
 
     const leaveRoom = async () => {
       const userDoc = await fetchUser(currentUser.uid);
-      await updateRoomDocumentWhenLeaved(roomId, userDoc);
-      if (!isListener) {
-        deleteRoomDocument(roomId).then(() => {
-          router.back();
-        });
-      } else {
-        deleteSelfAnalysis(roomId, currentUser.uid).then(() => {
-          router.back();
-        });
-      }
+      updateRoomDocumentWhenLeaved(roomId, userDoc).then(() => {
+        if (!isListener) {
+          deleteRoomDocument(roomId).then(() => {
+            router.back();
+          });
+        } else {
+          deleteSelfAnalysis(roomId, currentUser.uid).then(() => {
+            router.back();
+          });
+        }
+      });
     };
 
     const logout = () => {
@@ -446,6 +470,7 @@ const Room = (props: Props) => {
               as={muted ? MdMicOff : MdMic}
               p={2}
               onClick={toggleMute}
+              boxShadow="lg"
             />
             <IconButton
               aria-label="Hide"
@@ -453,19 +478,58 @@ const Room = (props: Props) => {
               p={2}
               ml={2}
               onClick={toggleHide}
+              boxShadow="lg"
             />
           </Flex>
         )}
-        <IconButton
-          pos="fixed"
-          right={4}
-          bottom={4}
-          zIndex={2}
-          aria-label="Open chat"
-          icon="chat"
-          ref={btnRef}
-          onClick={onOpen}
-        />
+        <Flex pos="fixed" right={4} bottom={4} zIndex={2}>
+          <IconButton
+            aria-label="Open People"
+            as={MdPeople}
+            p={2}
+            mr={2}
+            onClick={() => {
+              setIsAttendee(true);
+            }}
+            boxShadow="lg"
+          />
+          <IconButton
+            aria-label="Open chat"
+            icon="chat"
+            ref={btnRef}
+            onClick={onOpen}
+            boxShadow="lg"
+          />
+        </Flex>
+        <Drawer
+          isOpen={isAttendee}
+          placement="right"
+          onClose={() => {
+            setIsAttendee(false);
+          }}
+        >
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerHeader>Attendees</DrawerHeader>
+            <DrawerBody pr={0}>
+              <Stack
+                height={height - 160}
+                maxH={height - 160}
+                overflowY="scroll"
+              >
+                {attendee.map((person: UserDocument, _: number) => {
+                  return (
+                    <Box key={person.id}>
+                      <Text fontWeight="bold" fontSize="md">
+                        {person.nickname}
+                      </Text>
+                    </Box>
+                  );
+                })}
+              </Stack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
         <Drawer
           isOpen={isOpen}
           placement="right"
