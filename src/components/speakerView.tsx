@@ -66,6 +66,7 @@ const SpeakerView = (props: Props) => {
     );
     const [camera, setCamera] = React.useState(null);
     const [complexity, setComplexity] = React.useState(0);
+    const [slideDatas, setSlideData] = React.useState(null);
     useScript("https://apis.google.com/js/api.js");
 
     const delay = 5000;
@@ -162,6 +163,13 @@ const SpeakerView = (props: Props) => {
               isSpeaker="off"
               onChangeComplexity={getScreenshotComplexity}
             />
+          ) : !!slideDatas ? (
+            <Box>
+              {slideDatas.map((slideData) => {
+                console.log(slideData.contentUrl);
+                return <a href={slideData.contentUrl}>slide</a>;
+              })}
+            </Box>
           ) : null}
         </Pane>
         <Pane
@@ -173,7 +181,14 @@ const SpeakerView = (props: Props) => {
             <Attendees countOfAttendees={countOfAttendees} />
             <Complexity complexity={complexity} screenStream={screenStream} />
             <EmotionBox emotion={emotion} roomId={props.roomId} />
-            <SlideSetting />
+            <SlideSetting
+              onFetchSlides={(resp) => {
+                setSlideData(resp);
+              }}
+              onResetSlides={() => {
+                setSlideData(null);
+              }}
+            />
             <Box m="4" p="4" borderWidth="2px" rounded="lg">
               <Flex>
                 <Button

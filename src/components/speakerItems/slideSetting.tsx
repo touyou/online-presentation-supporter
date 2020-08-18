@@ -1,7 +1,9 @@
 import React from "react";
 import { Box, Stack, Text, Flex, Input, Button } from "@chakra-ui/core";
 
-interface Props {}
+interface Props {
+  onFetchSlides: (resp: any) => void;
+}
 
 const SlideSetting = (props: Props) => {
   const [isAuth, setAuth] = React.useState(false);
@@ -26,8 +28,12 @@ const SlideSetting = (props: Props) => {
             id: slide.objectId,
           });
         }
-        httpBatch.execute((resp, rawResp) => {
-          console.log(resp);
+        httpBatch.execute((resp, _) => {
+          let results = [];
+          for (const slide of res.result.slides) {
+            results.push(resp[slide.objectId].result);
+          }
+          props.onFetchSlides(results);
         });
       });
   }, [slideId]);
