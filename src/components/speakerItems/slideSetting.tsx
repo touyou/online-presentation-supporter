@@ -3,6 +3,7 @@ import { Box, Stack, Text, Flex, Input, Button } from "@chakra-ui/core";
 
 interface Props {
   onFetchSlides: (resp: any) => void;
+  onResetSlides: () => void;
 }
 
 const SlideSetting = (props: Props) => {
@@ -31,7 +32,9 @@ const SlideSetting = (props: Props) => {
         httpBatch.execute((resp, _) => {
           let results = [];
           for (const slide of res.result.slides) {
-            results.push(resp[slide.objectId].result);
+            let result = resp[slide.objectId].result;
+            result.id = slide.objectId;
+            results.push(result);
           }
           props.onFetchSlides(results);
         });
@@ -50,6 +53,7 @@ const SlideSetting = (props: Props) => {
   const resetSlide = () => {
     setSlideUrl("");
     setSlideId(null);
+    props.onResetSlides();
   };
 
   return (

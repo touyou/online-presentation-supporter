@@ -12,7 +12,16 @@ import {
   getTimestamp,
   fetchAnalysisLogAutoId,
 } from "../lib/database";
-import { Button, Flex, Box, Stack, Select, Text, Input } from "@chakra-ui/core";
+import {
+  Button,
+  Flex,
+  Box,
+  Stack,
+  Select,
+  Text,
+  Input,
+  IconButton,
+} from "@chakra-ui/core";
 import { AnalysisDataDocument } from "../lib/model";
 import Attendees from "./speakerItems/attendees";
 import Complexity from "./speakerItems/complexity";
@@ -67,6 +76,7 @@ const SpeakerView = (props: Props) => {
     const [camera, setCamera] = React.useState(null);
     const [complexity, setComplexity] = React.useState(0);
     const [slideDatas, setSlideData] = React.useState(null);
+    const [currentSlide, setCurrentSlide] = React.useState(null);
     useScript("https://apis.google.com/js/api.js");
 
     const delay = 5000;
@@ -165,10 +175,27 @@ const SpeakerView = (props: Props) => {
             />
           ) : !!slideDatas ? (
             <Box>
-              {slideDatas.map((slideData) => {
-                console.log(slideData.contentUrl);
-                return <a href={slideData.contentUrl}>slide</a>;
-              })}
+              <img src={slideDatas[currentSlide].contentUrl} />
+              <Stack isInline justify="space-between" ml={2} mr={2}>
+                <IconButton
+                  aria-label="back slide"
+                  icon="arrow-back"
+                  onClick={() => {
+                    if (currentSlide > 0) {
+                      setCurrentSlide(currentSlide - 1);
+                    }
+                  }}
+                />
+                <IconButton
+                  aria-label="forward slide"
+                  icon="arrow-forward"
+                  onClick={() => {
+                    if (currentSlide < slideDatas.length - 1) {
+                      setCurrentSlide(currentSlide + 1);
+                    }
+                  }}
+                />
+              </Stack>
             </Box>
           ) : null}
         </Pane>
@@ -183,10 +210,12 @@ const SpeakerView = (props: Props) => {
             <EmotionBox emotion={emotion} roomId={props.roomId} />
             <SlideSetting
               onFetchSlides={(resp) => {
+                setCurrentSlide(0);
                 setSlideData(resp);
               }}
               onResetSlides={() => {
                 setSlideData(null);
+                setCurrentSlide(null);
               }}
             />
             <Box m="4" p="4" borderWidth="2px" rounded="lg">
