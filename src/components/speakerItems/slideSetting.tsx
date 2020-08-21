@@ -13,7 +13,6 @@ const SlideSetting = (props: Props) => {
 
   React.useEffect(() => {
     if (slideId === null) return;
-    console.log(slideId);
     gapi.client
       .request({
         path: `https://slides.googleapis.com/v1/presentations/${slideId}`,
@@ -21,6 +20,7 @@ const SlideSetting = (props: Props) => {
       .then((res) => {
         // @ts-ignore
         const httpBatch = gapi.client.newBatch();
+        let videoDict = {};
         for (const slide of res.result.slides) {
           const request = gapi.client.request({
             path: `https://slides.googleapis.com/v1/presentations/${slideId}/pages/${slide.objectId}/thumbnail`,
@@ -28,12 +28,20 @@ const SlideSetting = (props: Props) => {
           httpBatch.add(request, {
             id: slide.objectId,
           });
+          videoDict[slide.objectId] = slide.pageElements
+            .filter((element) => "video" in element)
+            .map((element) => {
+              let video = element.video;
+              video.title = element.title;
+              return element.video;
+            });
         }
         httpBatch.execute((resp, _) => {
           let results = [];
           for (const slide of res.result.slides) {
             let result = resp[slide.objectId].result;
             result.id = slide.objectId;
+            result.video = videoDict[slide.objectId];
             results.push(result);
           }
           props.onFetchSlides(results);

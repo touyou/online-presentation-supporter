@@ -210,6 +210,7 @@ const SpeakerView = (props: Props) => {
             <EmotionBox emotion={emotion} roomId={props.roomId} />
             <SlideSetting
               onFetchSlides={(resp) => {
+                console.log(resp);
                 setCurrentSlide(0);
                 setSlideData(resp);
               }}
