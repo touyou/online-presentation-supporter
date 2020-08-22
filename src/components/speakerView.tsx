@@ -18,8 +18,6 @@ import {
   Box,
   Stack,
   Select,
-  Text,
-  Input,
   IconButton,
   Menu,
   MenuButton,
@@ -31,7 +29,6 @@ import Attendees from "./speakerItems/attendees";
 import Complexity from "./speakerItems/complexity";
 import EmotionBox from "./speakerItems/emotionBox";
 import SlideSetting from "./speakerItems/slideSetting";
-import { MdMovie } from "react-icons/md";
 
 interface Props {
   screenStream?: MediaStream;
@@ -82,6 +79,7 @@ const SpeakerView = (props: Props) => {
     const [complexity, setComplexity] = React.useState(0);
     const [slideDatas, setSlideData] = React.useState(null);
     const [currentSlide, setCurrentSlide] = React.useState(null);
+    const [playingVideo, setPlayingVideo] = React.useState(null);
     useScript("https://apis.google.com/js/api.js");
 
     const delay = 5000;
@@ -142,7 +140,7 @@ const SpeakerView = (props: Props) => {
             ml={2}
             size="sm"
             onClick={() => {
-              console.log(videos[0].url);
+              setPlayingVideo(videos[0]);
             }}
           >
             Video
@@ -150,7 +148,7 @@ const SpeakerView = (props: Props) => {
         );
       return (
         <Menu>
-          <MenuButton ml={2} size="sm">
+          <MenuButton as={Button} ml={2} size="sm">
             Video
           </MenuButton>
           <MenuList>
@@ -158,7 +156,7 @@ const SpeakerView = (props: Props) => {
               return (
                 <MenuItem
                   onClick={() => {
-                    console.log(video.url);
+                    setPlayingVideo(video);
                   }}
                 >
                   {video.title}
@@ -167,6 +165,33 @@ const SpeakerView = (props: Props) => {
             })}
           </MenuList>
         </Menu>
+      );
+    };
+
+    const currentVideoPlayer = () => {
+      const slideWidth = screenWidth;
+      const slideHeight = (slideWidth * 9) / 16;
+      if (playingVideo.source === "YOUTUBE") {
+        const url =
+          "https://www.youtube.com/embed/" + playingVideo.id + "?autoplay=1";
+        return (
+          <iframe
+            src={url}
+            width={slideWidth}
+            height={slideHeight}
+            allow="autoplay"
+          ></iframe>
+        );
+      }
+      const url =
+        "https://drive.google.com/file/d/" + playingVideo.id + "/preview";
+      return (
+        <iframe
+          src={url}
+          width={slideWidth}
+          height={slideHeight}
+          allow="autoplay"
+        />
       );
     };
 
@@ -216,14 +241,32 @@ const SpeakerView = (props: Props) => {
             />
           ) : !!slideDatas ? (
             <Box>
-              {videoButton(slideDatas[currentSlide].video)}
-              <img src={slideDatas[currentSlide].contentUrl} />
-              <Stack isInline justify="space-between" ml={2} mr={2}>
+              <Stack isInline mb={2}>
+                {videoButton(slideDatas[currentSlide].video)}
+                {playingVideo !== null ? (
+                  <Button
+                    ml={2}
+                    onClick={() => {
+                      setPlayingVideo(null);
+                    }}
+                    size="sm"
+                  >
+                    Stop Video
+                  </Button>
+                ) : null}
+              </Stack>
+              {playingVideo === null ? (
+                <img src={slideDatas[currentSlide].contentUrl} />
+              ) : (
+                currentVideoPlayer()
+              )}
+              <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
                 <IconButton
                   aria-label="back slide"
                   icon="arrow-back"
                   onClick={() => {
                     if (currentSlide > 0) {
+                      setPlayingVideo(null);
                       setCurrentSlide(currentSlide - 1);
                     }
                   }}
@@ -233,6 +276,7 @@ const SpeakerView = (props: Props) => {
                   icon="arrow-forward"
                   onClick={() => {
                     if (currentSlide < slideDatas.length - 1) {
+                      setPlayingVideo(null);
                       setCurrentSlide(currentSlide + 1);
                     }
                   }}
