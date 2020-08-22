@@ -21,12 +21,17 @@ import {
   Text,
   Input,
   IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/core";
 import { AnalysisDataDocument } from "../lib/model";
 import Attendees from "./speakerItems/attendees";
 import Complexity from "./speakerItems/complexity";
 import EmotionBox from "./speakerItems/emotionBox";
 import SlideSetting from "./speakerItems/slideSetting";
+import { MdMovie } from "react-icons/md";
 
 interface Props {
   screenStream?: MediaStream;
@@ -129,6 +134,42 @@ const SpeakerView = (props: Props) => {
       setComplexity(value);
     };
 
+    const videoButton = (videos) => {
+      if (videos.length === 0) return null;
+      if (videos.length === 1)
+        return (
+          <Button
+            ml={2}
+            size="sm"
+            onClick={() => {
+              console.log(videos[0].url);
+            }}
+          >
+            Video
+          </Button>
+        );
+      return (
+        <Menu>
+          <MenuButton ml={2} size="sm">
+            Video
+          </MenuButton>
+          <MenuList>
+            {videos.map((video) => {
+              return (
+                <MenuItem
+                  onClick={() => {
+                    console.log(video.url);
+                  }}
+                >
+                  {video.title}
+                </MenuItem>
+              );
+            })}
+          </MenuList>
+        </Menu>
+      );
+    };
+
     React.useEffect(() => {
       navigator.mediaDevices.enumerateDevices().then(getDevices);
     }, []);
@@ -175,6 +216,7 @@ const SpeakerView = (props: Props) => {
             />
           ) : !!slideDatas ? (
             <Box>
+              {videoButton(slideDatas[currentSlide].video)}
               <img src={slideDatas[currentSlide].contentUrl} />
               <Stack isInline justify="space-between" ml={2} mr={2}>
                 <IconButton
