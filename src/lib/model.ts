@@ -13,7 +13,22 @@ export interface RoomDocument {
   admin: string;
   password: string;
   users: UserDocument[];
+  slides?: SlideDocument[];
+  currentPage?: number;
+  playingVideo?: VideoDocument;
   timestamp: firebase.firestore.Timestamp;
+}
+
+export interface SlideDocument {
+  url: string;
+  videos: VideoDocument[];
+}
+
+export interface VideoDocument {
+  id: string;
+  title: string;
+  url: string;
+  source: string;
 }
 
 export interface AnalysisDataDocument {

@@ -11,6 +11,10 @@ import {
   updateOrAddRoomAnalysisLog,
   getTimestamp,
   fetchAnalysisLogAutoId,
+  updateCurrentPage,
+  updatePlayingVideo,
+  removeSlideDocument,
+  updateSlideDocument,
 } from "../lib/database";
 import {
   Button,
@@ -29,6 +33,7 @@ import Attendees from "./speakerItems/attendees";
 import Complexity from "./speakerItems/complexity";
 import EmotionBox from "./speakerItems/emotionBox";
 import SlideSetting from "./speakerItems/slideSetting";
+import { convertRespToSlideDocument, convertVideo } from "../lib/utils";
 
 interface Props {
   screenStream?: MediaStream;
@@ -140,6 +145,7 @@ const SpeakerView = (props: Props) => {
             ml={2}
             size="sm"
             onClick={() => {
+              updatePlayingVideo(props.roomId, convertVideo(videos[0]));
               setPlayingVideo(videos[0]);
             }}
           >
@@ -156,6 +162,7 @@ const SpeakerView = (props: Props) => {
               return (
                 <MenuItem
                   onClick={() => {
+                    updatePlayingVideo(props.roomId, convertVideo(video));
                     setPlayingVideo(video);
                   }}
                 >
@@ -247,6 +254,7 @@ const SpeakerView = (props: Props) => {
                   <Button
                     ml={2}
                     onClick={() => {
+                      updatePlayingVideo(props.roomId, null);
                       setPlayingVideo(null);
                     }}
                     size="sm"
@@ -266,7 +274,11 @@ const SpeakerView = (props: Props) => {
                   icon="arrow-back"
                   onClick={() => {
                     if (currentSlide > 0) {
-                      setPlayingVideo(null);
+                      if (playingVideo !== null) {
+                        setPlayingVideo(null);
+                        updatePlayingVideo(props.roomId, null);
+                      }
+                      updateCurrentPage(props.roomId, currentSlide - 1);
                       setCurrentSlide(currentSlide - 1);
                     }
                   }}
@@ -276,7 +288,11 @@ const SpeakerView = (props: Props) => {
                   icon="arrow-forward"
                   onClick={() => {
                     if (currentSlide < slideDatas.length - 1) {
-                      setPlayingVideo(null);
+                      if (playingVideo !== null) {
+                        updatePlayingVideo(props.roomId, null);
+                        setPlayingVideo(null);
+                      }
+                      updateCurrentPage(props.roomId, currentSlide + 1);
                       setCurrentSlide(currentSlide + 1);
                     }
                   }}
@@ -296,11 +312,15 @@ const SpeakerView = (props: Props) => {
             <EmotionBox emotion={emotion} roomId={props.roomId} />
             <SlideSetting
               onFetchSlides={(resp) => {
-                console.log(resp);
+                updateSlideDocument(
+                  props.roomId,
+                  convertRespToSlideDocument(resp)
+                );
                 setCurrentSlide(0);
                 setSlideData(resp);
               }}
               onResetSlides={() => {
+                removeSlideDocument(props.roomId);
                 setSlideData(null);
                 setCurrentSlide(null);
               }}

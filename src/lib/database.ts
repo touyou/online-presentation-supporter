@@ -6,9 +6,12 @@ import {
   AnalysisLogDocument,
   LogDocument,
   ChatDocument,
+  SlideDocument,
+  VideoDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
+import { domainToUnicode } from "url";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 
@@ -77,6 +80,43 @@ export const updateRoomDocumentWhenLeaved = async (
 
 export const deleteRoomDocument = async (roomId: string) => {
   await roomsDao.delete(roomId);
+};
+
+export const updateSlideDocument = async (
+  docId: string,
+  slides: SlideDocument[]
+) => {
+  await roomsDao.update({
+    id: docId,
+    slides: slides,
+    currentPage: 0,
+  });
+};
+
+export const updateCurrentPage = async (docId: string, currentPage: number) => {
+  await roomsDao.update({
+    id: docId,
+    currentPage: currentPage,
+  });
+};
+
+export const updatePlayingVideo = async (
+  docId: string,
+  playingVideo?: VideoDocument
+) => {
+  await roomsDao.update({
+    id: docId,
+    playingVideo: playingVideo,
+  });
+};
+
+export const removeSlideDocument = async (docId: string) => {
+  await roomsDao.update({
+    id: docId,
+    slides: null,
+    currentPage: null,
+    playingVideo: null,
+  });
 };
 
 /**
