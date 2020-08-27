@@ -25,6 +25,7 @@ const SlideView = (props: Props) => {
     currentPage: null,
     playingVideo: null,
   });
+  const [isSync, setIsSync] = React.useState(true);
 
   React.useEffect(() => {
     setSlideInfo(props.slideInfo);
@@ -42,7 +43,14 @@ const SlideView = (props: Props) => {
           ml={2}
           size="sm"
           onClick={() => {
-            updatePlayingVideo(props.roomId, videos[0]);
+            if (props.isListener) {
+              setSlideInfo({
+                playingVideo: videos[0],
+                ...slideInfo,
+              });
+            } else {
+              updatePlayingVideo(props.roomId, videos[0]);
+            }
           }}
         >
           Video
@@ -59,7 +67,14 @@ const SlideView = (props: Props) => {
               <MenuItem
                 key={video.id}
                 onClick={() => {
-                  updatePlayingVideo(props.roomId, video);
+                  if (props.isListener) {
+                    setSlideInfo({
+                      playingVideo: video,
+                      ...slideInfo,
+                    });
+                  } else {
+                    updatePlayingVideo(props.roomId, video);
+                  }
                 }}
               >
                 {video.title}
@@ -99,55 +114,75 @@ const SlideView = (props: Props) => {
     );
   };
 
+  const isSyncedListener = () => {
+    return props.isListener && isSync;
+  };
+
   return slideInfo.slides !== null ? (
     <Box>
-      <Stack isInline mb={2}>
-        {videoButton(currentSlide().videos)}
-        {slideInfo.playingVideo !== null ? (
-          <Button
-            ml={2}
-            onClick={() => {
-              updatePlayingVideo(props.roomId, null);
-            }}
-            size="sm"
-          >
-            Stop Video
-          </Button>
-        ) : null}
-      </Stack>
+      {!isSyncedListener() ? (
+        <Stack isInline mb={2}>
+          {videoButton(currentSlide().videos)}
+          {slideInfo.playingVideo !== null ? (
+            <Button
+              ml={2}
+              onClick={() => {
+                updatePlayingVideo(props.roomId, null);
+              }}
+              size="sm"
+            >
+              Stop Video
+            </Button>
+          ) : null}
+        </Stack>
+      ) : null}
       {slideInfo.playingVideo !== null ? (
         currentVideoPlayer()
       ) : (
         <img src={currentSlide().url} />
       )}
-      <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
-        <IconButton
-          aria-label="back slide"
-          icon="arrow-back"
-          onClick={() => {
-            const currentPage = slideInfo.currentPage;
-            if (currentPage > 0) {
-              if (slideInfo.playingVideo !== null) {
-                updatePlayingVideo(props.roomId, null);
+      {!isSyncedListener() ? (
+        <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
+          <IconButton
+            aria-label="back slide"
+            icon="arrow-back"
+            onClick={() => {
+              const currentPage = slideInfo.currentPage;
+              if (currentPage > 0) {
+                if (!props.isListener) {
+                  if (slideInfo.playingVideo !== null) {
+                    updatePlayingVideo(props.roomId, null);
+                  }
+                  updateCurrentPage(props.roomId, currentPage - 1);
+                }
               }
-              updateCurrentPage(props.roomId, currentPage - 1);
-            }
-          }}
-        />
-        <IconButton
-          aria-label="forward slide"
-          icon="arrow-forward"
-          onClick={() => {
-            const currentPage = slideInfo.currentPage;
-            if (currentPage < slideInfo.slides.length - 1) {
-              if (slideInfo.playingVideo !== null) {
-                updatePlayingVideo(props.roomId, null);
+            }}
+          />
+          <IconButton
+            aria-label="forward slide"
+            icon="arrow-forward"
+            onClick={() => {
+              const currentPage = slideInfo.currentPage;
+              if (currentPage < slideInfo.slides.length - 1) {
+                if (!props.isListener) {
+                  if (slideInfo.playingVideo !== null) {
+                    updatePlayingVideo(props.roomId, null);
+                  }
+                  updateCurrentPage(props.roomId, currentPage + 1);
+                }
               }
-              updateCurrentPage(props.roomId, currentPage + 1);
-            }
+            }}
+          />
+        </Stack>
+      ) : (
+        <Button
+          onClick={() => {
+            setIsSync(false);
           }}
-        />
-      </Stack>
+        >
+          同期解除
+        </Button>
+      )}
     </Box>
   ) : (
     <div></div>
