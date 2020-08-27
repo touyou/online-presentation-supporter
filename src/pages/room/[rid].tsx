@@ -35,7 +35,12 @@ import {
   Input,
 } from "@chakra-ui/core";
 import { useWinndowDimensions } from "../../lib/customHooks";
-import { ChatDocument, UserDocument } from "../../lib/model";
+import {
+  ChatDocument,
+  UserDocument,
+  SlideDocument,
+  VideoDocument,
+} from "../../lib/model";
 import { formatDate } from "../../lib/utils";
 import {
   MdMicOff,
@@ -44,11 +49,16 @@ import {
   MdVideocamOff,
   MdPeople,
 } from "react-icons/md";
-import { User } from "firebase";
 
 interface Props {
   stream: MediaStream;
   screenStream: MediaStream;
+}
+
+export interface SlideInfo {
+  slides?: SlideDocument[];
+  currentPage?: number;
+  playingVideo?: VideoDocument;
 }
 
 const Room = (props: Props) => {
@@ -67,6 +77,13 @@ const Room = (props: Props) => {
     const [attendee, setAttendee] = React.useState(Array<UserDocument>());
     const [chatContent, setChatContent] = React.useState("");
     const [isAttendee, setIsAttendee] = useState(false);
+    const [slideInfo, setSlideInfo] = useState({
+      slides: null,
+      currentPage: null,
+      playingVideo: null,
+    });
+    // const [currentPage, setCurrentPage] = useState(null);
+    // const [slides, setSlides] = useState(null);
     // Ref
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = React.useRef();
@@ -112,6 +129,13 @@ const Room = (props: Props) => {
             const modifiedRoom = toObject(change.doc);
             if (modifiedRoom.id === roomId) {
               setAttendee(modifiedRoom.users);
+              setSlideInfo({
+                slides: modifiedRoom.slides,
+                currentPage: modifiedRoom.currentPage,
+                playingVideo: !!modifiedRoom.playingVideo
+                  ? modifiedRoom.playingVideo
+                  : null,
+              });
             }
           }
         });
@@ -461,6 +485,7 @@ const Room = (props: Props) => {
             onClickStartCamera={startSpeakerCamera}
             onClickStopCamera={stopSpeakerCamera}
             roomId={roomId}
+            slideInfo={slideInfo}
           />
         )}
         {isListener ? null : (

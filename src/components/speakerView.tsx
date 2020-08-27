@@ -34,6 +34,8 @@ import Complexity from "./speakerItems/complexity";
 import EmotionBox from "./speakerItems/emotionBox";
 import SlideSetting from "./speakerItems/slideSetting";
 import { convertRespToSlideDocument, convertVideo } from "../lib/utils";
+import { SlideInfo } from "../pages/room/[rid]";
+import SlideView from "./slideView";
 
 interface Props {
   screenStream?: MediaStream;
@@ -43,6 +45,7 @@ interface Props {
   onClickStartCamera: (deviceId: string) => void;
   onClickStopCamera: () => void;
   roomId: string;
+  slideInfo: SlideInfo;
 }
 
 export interface Emotion {
@@ -82,9 +85,6 @@ const SpeakerView = (props: Props) => {
     );
     const [camera, setCamera] = React.useState(null);
     const [complexity, setComplexity] = React.useState(0);
-    const [slideDatas, setSlideData] = React.useState(null);
-    const [currentSlide, setCurrentSlide] = React.useState(null);
-    const [playingVideo, setPlayingVideo] = React.useState(null);
     useScript("https://apis.google.com/js/api.js");
 
     const delay = 5000;
@@ -137,71 +137,6 @@ const SpeakerView = (props: Props) => {
       setComplexity(value);
     };
 
-    const videoButton = (videos) => {
-      if (videos.length === 0) return null;
-      if (videos.length === 1)
-        return (
-          <Button
-            ml={2}
-            size="sm"
-            onClick={() => {
-              updatePlayingVideo(props.roomId, convertVideo(videos[0]));
-              setPlayingVideo(videos[0]);
-            }}
-          >
-            Video
-          </Button>
-        );
-      return (
-        <Menu>
-          <MenuButton as={Button} ml={2} size="sm">
-            Video
-          </MenuButton>
-          <MenuList>
-            {videos.map((video) => {
-              return (
-                <MenuItem
-                  onClick={() => {
-                    updatePlayingVideo(props.roomId, convertVideo(video));
-                    setPlayingVideo(video);
-                  }}
-                >
-                  {video.title}
-                </MenuItem>
-              );
-            })}
-          </MenuList>
-        </Menu>
-      );
-    };
-
-    const currentVideoPlayer = () => {
-      const slideWidth = screenWidth;
-      const slideHeight = (slideWidth * 9) / 16;
-      if (playingVideo.source === "YOUTUBE") {
-        const url =
-          "https://www.youtube.com/embed/" + playingVideo.id + "?autoplay=1";
-        return (
-          <iframe
-            src={url}
-            width={slideWidth}
-            height={slideHeight}
-            allow="autoplay"
-          ></iframe>
-        );
-      }
-      const url =
-        "https://drive.google.com/file/d/" + playingVideo.id + "/preview";
-      return (
-        <iframe
-          src={url}
-          width={slideWidth}
-          height={slideHeight}
-          allow="autoplay"
-        />
-      );
-    };
-
     React.useEffect(() => {
       navigator.mediaDevices.enumerateDevices().then(getDevices);
     }, []);
@@ -246,59 +181,13 @@ const SpeakerView = (props: Props) => {
               isSpeaker="off"
               onChangeComplexity={getScreenshotComplexity}
             />
-          ) : !!slideDatas ? (
-            <Box>
-              <Stack isInline mb={2}>
-                {videoButton(slideDatas[currentSlide].video)}
-                {playingVideo !== null ? (
-                  <Button
-                    ml={2}
-                    onClick={() => {
-                      updatePlayingVideo(props.roomId, null);
-                      setPlayingVideo(null);
-                    }}
-                    size="sm"
-                  >
-                    Stop Video
-                  </Button>
-                ) : null}
-              </Stack>
-              {playingVideo === null ? (
-                <img src={slideDatas[currentSlide].contentUrl} />
-              ) : (
-                currentVideoPlayer()
-              )}
-              <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
-                <IconButton
-                  aria-label="back slide"
-                  icon="arrow-back"
-                  onClick={() => {
-                    if (currentSlide > 0) {
-                      if (playingVideo !== null) {
-                        setPlayingVideo(null);
-                        updatePlayingVideo(props.roomId, null);
-                      }
-                      updateCurrentPage(props.roomId, currentSlide - 1);
-                      setCurrentSlide(currentSlide - 1);
-                    }
-                  }}
-                />
-                <IconButton
-                  aria-label="forward slide"
-                  icon="arrow-forward"
-                  onClick={() => {
-                    if (currentSlide < slideDatas.length - 1) {
-                      if (playingVideo !== null) {
-                        updatePlayingVideo(props.roomId, null);
-                        setPlayingVideo(null);
-                      }
-                      updateCurrentPage(props.roomId, currentSlide + 1);
-                      setCurrentSlide(currentSlide + 1);
-                    }
-                  }}
-                />
-              </Stack>
-            </Box>
+          ) : !!props.slideInfo.slides ? (
+            <SlideView
+              isListener={false}
+              roomId={props.roomId}
+              slideInfo={props.slideInfo}
+              screenWidth={screenWidth}
+            />
           ) : null}
         </Pane>
         <Pane
@@ -316,13 +205,9 @@ const SpeakerView = (props: Props) => {
                   props.roomId,
                   convertRespToSlideDocument(resp)
                 );
-                setCurrentSlide(0);
-                setSlideData(resp);
               }}
               onResetSlides={() => {
                 removeSlideDocument(props.roomId);
-                setSlideData(null);
-                setCurrentSlide(null);
               }}
             />
             <Box m="4" p="4" borderWidth="2px" rounded="lg">
