@@ -3,12 +3,15 @@ import EmotionalVideo from "../components/emotionalVideo";
 import StreamPreview from "../components/screenShareView";
 import { useWinndowDimensions } from "../lib/customHooks";
 import { Button, Box, Flex, Heading } from "@chakra-ui/core";
+import { SlideInfo } from "../pages/room/[rid]";
+import SlideView from "./slideView";
 
 interface Props {
   videoStream?: MediaStream;
   screenStream?: MediaStream;
   roomId: string;
   userId: string;
+  slideInfo: SlideInfo;
 }
 
 const ListenerView = (props: Props) => {
@@ -43,16 +46,32 @@ const ListenerView = (props: Props) => {
           />
         </Box>
         <Box pos="fixed" mt="80px" zIndex={1} w={width} h={height} bg="white">
-          {!!screenStream
-            ? (
-              <StreamPreview stream={screenStream}></StreamPreview>
-            )
-            : (
-              <Flex justify="center" align="center" h="100%">
-                <Heading>Please wait until the start.</Heading>
-              </Flex>
-            )}
+          {!!screenStream ? (
+            <StreamPreview stream={screenStream}></StreamPreview>
+          ) : (
+            <Flex justify="center" align="center" h="100%">
+              <Heading>Please wait until the start.</Heading>
+            </Flex>
+          )}
         </Box>
+        {!!props.slideInfo.slides ? (
+          <Box
+            pos="fixed"
+            mt="80px"
+            pt={2}
+            zIndex={2}
+            w={width}
+            h={height}
+            bg="white"
+          >
+            <SlideView
+              isListener={true}
+              roomId={props.roomId}
+              slideInfo={props.slideInfo}
+              screenWidth={width}
+            />
+          </Box>
+        ) : null}
       </>
     );
   } else {

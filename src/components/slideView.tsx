@@ -28,7 +28,9 @@ const SlideView = (props: Props) => {
   const [isSync, setIsSync] = React.useState(true);
 
   React.useEffect(() => {
-    setSlideInfo(props.slideInfo);
+    if (isSync) {
+      setSlideInfo(props.slideInfo);
+    }
   }, [props.slideInfo]);
 
   const currentSlide = () => {
@@ -45,8 +47,8 @@ const SlideView = (props: Props) => {
           onClick={() => {
             if (props.isListener) {
               setSlideInfo({
-                playingVideo: videos[0],
                 ...slideInfo,
+                playingVideo: videos[0],
               });
             } else {
               updatePlayingVideo(props.roomId, videos[0]);
@@ -69,8 +71,8 @@ const SlideView = (props: Props) => {
                 onClick={() => {
                   if (props.isListener) {
                     setSlideInfo({
-                      playingVideo: video,
                       ...slideInfo,
+                      playingVideo: video,
                     });
                   } else {
                     updatePlayingVideo(props.roomId, video);
@@ -127,7 +129,14 @@ const SlideView = (props: Props) => {
             <Button
               ml={2}
               onClick={() => {
-                updatePlayingVideo(props.roomId, null);
+                if (props.isListener) {
+                  setSlideInfo({
+                    ...slideInfo,
+                    playingVideo: null,
+                  });
+                } else {
+                  updatePlayingVideo(props.roomId, null);
+                }
               }}
               size="sm"
             >
@@ -154,10 +163,25 @@ const SlideView = (props: Props) => {
                     updatePlayingVideo(props.roomId, null);
                   }
                   updateCurrentPage(props.roomId, currentPage - 1);
+                } else {
+                  console.log(slideInfo);
+                  setSlideInfo({
+                    ...slideInfo,
+                    currentPage: currentPage - 1,
+                    playingVideo: null,
+                  });
                 }
               }
             }}
           />
+          <Button
+            onClick={() => {
+              setIsSync(true);
+              setSlideInfo(props.slideInfo);
+            }}
+          >
+            発表者と同期
+          </Button>
           <IconButton
             aria-label="forward slide"
             icon="arrow-forward"
@@ -169,6 +193,12 @@ const SlideView = (props: Props) => {
                     updatePlayingVideo(props.roomId, null);
                   }
                   updateCurrentPage(props.roomId, currentPage + 1);
+                } else {
+                  setSlideInfo({
+                    ...slideInfo,
+                    currentPage: currentPage + 1,
+                    playingVideo: null,
+                  });
                 }
               }
             }}

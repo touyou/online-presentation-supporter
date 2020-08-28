@@ -455,7 +455,7 @@ const Room = (props: Props) => {
           bg="blue.800"
           p="4"
           boxShadow="md"
-          zIndex={2}
+          zIndex={5}
         >
           <Flex align="flex-end" justifyContent="space-between">
             <Heading color="gray.100">Online Lecture System</Heading>
@@ -475,6 +475,7 @@ const Room = (props: Props) => {
             screenStream={screenStream}
             roomId={roomId}
             userId={currentUser != null ? currentUser.uid : ""}
+            slideInfo={slideInfo}
           />
         ) : (
           <SpeakerView
@@ -489,7 +490,7 @@ const Room = (props: Props) => {
           />
         )}
         {isListener ? null : (
-          <Flex pos="fixed" left={4} bottom={4} zIndex={2}>
+          <Flex pos="fixed" left={4} bottom={4} zIndex={5}>
             <IconButton
               aria-label="Mute"
               as={muted ? MdMicOff : MdMic}
@@ -507,7 +508,7 @@ const Room = (props: Props) => {
             />
           </Flex>
         )}
-        <Flex pos="fixed" right={4} bottom={4} zIndex={2}>
+        <Flex pos="fixed" right={4} bottom={4} zIndex={5}>
           <IconButton
             aria-label="Open People"
             as={MdPeople}
