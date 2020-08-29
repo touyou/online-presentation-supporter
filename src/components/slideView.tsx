@@ -174,14 +174,16 @@ const SlideView = (props: Props) => {
               }
             }}
           />
-          <Button
-            onClick={() => {
-              setIsSync(true);
-              setSlideInfo(props.slideInfo);
-            }}
-          >
-            発表者と同期
-          </Button>
+          {props.isListener ? (
+            <Button
+              onClick={() => {
+                setIsSync(true);
+                setSlideInfo(props.slideInfo);
+              }}
+            >
+              発表者と同期
+            </Button>
+          ) : null}
           <IconButton
             aria-label="forward slide"
             icon="arrow-forward"

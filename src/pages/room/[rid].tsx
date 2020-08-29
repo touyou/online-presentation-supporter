@@ -82,8 +82,6 @@ const Room = (props: Props) => {
       currentPage: null,
       playingVideo: null,
     });
-    // const [currentPage, setCurrentPage] = useState(null);
-    // const [slides, setSlides] = useState(null);
     // Ref
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = React.useRef();
