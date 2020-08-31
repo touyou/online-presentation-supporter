@@ -33,6 +33,8 @@ import {
   DrawerBody,
   Text,
   Input,
+  Icon,
+  Link,
 } from "@chakra-ui/core";
 import { useWinndowDimensions } from "../../lib/customHooks";
 import {
@@ -458,6 +460,19 @@ const Room = (props: Props) => {
           <Flex align="flex-end" justifyContent="space-between">
             <Heading color="gray.100">Online Lecture System</Heading>
             <Stack isInline>
+              <Flex m={0} align="center" justify="center">
+                <Link
+                  color="gray.100"
+                  href={
+                    isListener
+                      ? "https://forms.gle/owQrFCF2Mi1QD7pE8"
+                      : "https://forms.gle/1AqmK6etJsQnJpD16"
+                  }
+                  isExternal
+                >
+                  アンケート <Icon name="external-link" mx="2px" />
+                </Link>
+              </Flex>
               <Button onClick={leaveRoom} mr="2">
                 Leave Room
               </Button>
