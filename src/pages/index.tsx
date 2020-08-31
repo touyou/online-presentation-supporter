@@ -1,13 +1,14 @@
 import React from "react";
 import firebase from "../plugins/firebase";
-import { handleGoogleLogin, handleLogout } from "../lib/auth";
+import { handleLogout } from "../lib/auth";
 import {
   getRoomDao,
   getUserDao,
   updateNickname,
   insertUser,
+  availableDao,
 } from "../lib/database";
-import { RoomDocument, UserDocument } from "../lib/model";
+import { RoomDocument, UserDocument, AvailableDocument } from "../lib/model";
 import CreateDialog from "../components/dialogs/createDialog";
 import EnterDialog from "../components/dialogs/enterDialog";
 import {
@@ -29,6 +30,7 @@ const Index = () => {
   const [createModal, setCreateModal] = React.useState(false);
   const [enterModal, setEnterModal] = React.useState(false);
   const [selectRoom, setSelectRoom] = React.useState(null);
+  const [available, setAvailable] = React.useState(false);
   const [rooms, setRooms] = React.useState(Array<RoomDocument>());
   const [isLoading, setLoading] = React.useState(false);
 
@@ -53,14 +55,33 @@ const Index = () => {
       const unsubscribed = userDao.onSnapshot((snapshot, toObject) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === "added" || change.type === "modified") {
-            const changedRoom = toObject(change.doc);
-            if (changedRoom.email === currentUser.email) {
-              setNickname(changedRoom.nickname);
+            const changedUser = toObject(change.doc);
+            if (changedUser.email === currentUser.email) {
+              setNickname(changedUser.nickname);
             }
           }
         });
       });
-      return () => unsubscribed();
+      const availableUnsubscribed = availableDao.onSnapshot(
+        (snapshot, toObject) => {
+          const availables: AvailableDocument[] = snapshot.docs.map(
+            (element) => {
+              return toObject(element);
+            }
+          );
+          let flag = false;
+          availables.forEach((val, _, __) => {
+            if (val.userId === currentUser.uid) {
+              flag = true;
+            }
+          });
+          setAvailable(flag);
+        }
+      );
+      return () => {
+        unsubscribed();
+        availableUnsubscribed();
+      };
     }
   }, [currentUser]);
 
@@ -101,9 +122,11 @@ const Index = () => {
           <Heading color="gray.100">Online Lecture System</Heading>
           {!!currentUser ? (
             <Stack isInline>
-              <Button onClick={() => setCreateModal(true)} mr="2">
-                Create Room
-              </Button>
+              {available ? (
+                <Button onClick={() => setCreateModal(true)} mr="2">
+                  Create Room
+                </Button>
+              ) : null}
               <Button onClick={logoutUser} mr="2">
                 Logout
               </Button>

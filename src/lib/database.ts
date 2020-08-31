@@ -8,16 +8,20 @@ import {
   ChatDocument,
   SlideDocument,
   VideoDocument,
+  AvailableDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
-import { domainToUnicode } from "url";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 
 export const getTimestamp = () => {
   return firebase.firestore.FieldValue.serverTimestamp() as firebase.firestore.Timestamp;
 };
+
+export const availableDao = firestoreSimple.collection<AvailableDocument>({
+  path: `available`,
+});
 
 /**
  * Room API

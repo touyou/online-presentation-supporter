@@ -6,6 +6,11 @@ export interface UserDocument {
   email: string;
 }
 
+export interface AvailableDocument {
+  id: string;
+  userId: string;
+}
+
 export interface RoomDocument {
   id: string;
   name: string;
