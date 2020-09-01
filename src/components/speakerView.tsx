@@ -15,6 +15,7 @@ import {
   updatePlayingVideo,
   removeSlideDocument,
   updateSlideDocument,
+  addLog,
 } from "../lib/database";
 import {
   Button,
@@ -201,12 +202,14 @@ const SpeakerView = (props: Props) => {
             <EmotionBox emotion={emotion} roomId={props.roomId} />
             <SlideSetting
               onFetchSlides={(resp) => {
+                addLog(props.roomId, "slide_status", "start");
                 updateSlideDocument(
                   props.roomId,
                   convertRespToSlideDocument(resp)
                 );
               }}
               onResetSlides={() => {
+                addLog(props.roomId, "slide_status", "stop");
                 removeSlideDocument(props.roomId);
               }}
             />

@@ -9,6 +9,7 @@ import {
   SlideDocument,
   VideoDocument,
   AvailableDocument,
+  SlidePositionDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
 import { isUndefined } from "util";
@@ -258,6 +259,35 @@ export const addLog = async (roomId: string, type: string, value: string) => {
     value: value,
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
   });
+};
+
+/**
+ * Slide Position
+ */
+const slidePositionFactory = firestoreSimple.collectionFactory<
+  SlidePositionDocument
+>({
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      isSync: doc.isSync,
+      position: doc.position,
+    };
+  },
+});
+
+export const updateOrAddSlidePosition = async (
+  roomId: string,
+  slidePosition: SlidePositionDocument
+) => {
+  const slideDao = slidePositionFactory.create(
+    `rooms/${roomId}/slide-position`
+  );
+  await slideDao.set(slidePosition);
+};
+
+export const getSlideDao = async (roomId: string) => {
+  return slidePositionFactory.create(`rooms/${roomId}/slide-position`);
 };
 
 /**

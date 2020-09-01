@@ -10,13 +10,20 @@ import {
   MenuItem,
   IconButton,
 } from "@chakra-ui/core";
-import { updatePlayingVideo, updateCurrentPage } from "../lib/database";
+import {
+  updatePlayingVideo,
+  updateCurrentPage,
+  updateOrAddSlidePosition,
+} from "../lib/database";
+import cv from "../../services/cv";
 
 interface Props {
   isListener: boolean;
   roomId: string;
+  userId?: string;
   slideInfo: SlideInfo;
   screenWidth: number;
+  onChangeComplexity?: (number) => void;
 }
 
 const SlideView = (props: Props) => {
@@ -26,6 +33,16 @@ const SlideView = (props: Props) => {
     playingVideo: null,
   });
   const [isSync, setIsSync] = React.useState(true);
+  const slideRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (isSyncedListener())
+      updateOrAddSlidePosition(props.roomId, {
+        id: props.userId,
+        isSync: true,
+        position: null,
+      });
+  }, []);
 
   React.useEffect(() => {
     if (isSync) {
@@ -120,6 +137,30 @@ const SlideView = (props: Props) => {
     return props.isListener && isSync;
   };
 
+  // const getScreenshot = () => {
+  //   const canvas = document.createElement("canvas");
+  //   canvas.width = slideRef.current.width;
+  //   canvas.height = slideRef.current.height;
+  //   const ctx = canvas.getContext("2d");
+  //   ctx.drawImage(slideRef.current, 0, 0, canvas.width, canvas.height);
+  //   return ctx.getImageData(0, 0, canvas.width, canvas.height);
+  // };
+
+  // const analyzeCapture = async () => {
+  //   if (!!slideRef.current) {
+  //     const screenshot = getScreenshot();
+  //     if (!screenshot) return;
+  //     const result = await cv.imageComplexity({
+  //       img: screenshot,
+  //       th1: 50,
+  //       th2: 100,
+  //       apSize: 3,
+  //       l2flag: false,
+  //     });
+  //     props.onChangeComplexity(result.data.payload);
+  //   }
+  // };
+
   return slideInfo.slides !== null ? (
     <Box>
       {!isSyncedListener() ? (
@@ -148,7 +189,7 @@ const SlideView = (props: Props) => {
       {slideInfo.playingVideo !== null ? (
         currentVideoPlayer()
       ) : (
-        <img src={currentSlide().url} />
+        <img ref={slideRef} src={currentSlide().url} />
       )}
       {!isSyncedListener() ? (
         <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
@@ -164,7 +205,11 @@ const SlideView = (props: Props) => {
                   }
                   updateCurrentPage(props.roomId, currentPage - 1);
                 } else {
-                  console.log(slideInfo);
+                  updateOrAddSlidePosition(props.roomId, {
+                    id: props.userId,
+                    isSync: false,
+                    position: currentPage - 1,
+                  });
                   setSlideInfo({
                     ...slideInfo,
                     currentPage: currentPage - 1,
@@ -177,6 +222,11 @@ const SlideView = (props: Props) => {
           {props.isListener ? (
             <Button
               onClick={() => {
+                updateOrAddSlidePosition(props.roomId, {
+                  id: props.userId,
+                  isSync: true,
+                  position: null,
+                });
                 setIsSync(true);
                 setSlideInfo(props.slideInfo);
               }}
@@ -196,6 +246,11 @@ const SlideView = (props: Props) => {
                   }
                   updateCurrentPage(props.roomId, currentPage + 1);
                 } else {
+                  updateOrAddSlidePosition(props.roomId, {
+                    id: props.userId,
+                    isSync: false,
+                    position: currentPage + 1,
+                  });
                   setSlideInfo({
                     ...slideInfo,
                     currentPage: currentPage + 1,
@@ -209,6 +264,11 @@ const SlideView = (props: Props) => {
       ) : (
         <Button
           onClick={() => {
+            updateOrAddSlidePosition(props.roomId, {
+              id: props.userId,
+              isSync: false,
+              position: slideInfo.currentPage,
+            });
             setIsSync(false);
           }}
         >

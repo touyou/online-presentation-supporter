@@ -67,6 +67,12 @@ export interface LogDocument {
   timestamp: firebase.firestore.Timestamp;
 }
 
+export interface SlidePositionDocument {
+  id: string;
+  isSync: boolean;
+  position?: number;
+}
+
 export interface ChatDocument {
   id: string;
   uid: string;

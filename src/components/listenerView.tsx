@@ -69,6 +69,7 @@ const ListenerView = (props: Props) => {
               roomId={props.roomId}
               slideInfo={props.slideInfo}
               screenWidth={width}
+              userId={props.userId}
             />
           </Box>
         ) : null}
