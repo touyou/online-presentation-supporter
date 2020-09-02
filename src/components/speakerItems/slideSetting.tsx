@@ -1,9 +1,14 @@
 import React from "react";
 import { Box, Stack, Text, Flex, Input, Button } from "@chakra-ui/core";
+import { SlidePositionDocument } from "../../lib/model";
+import { SlideInfo } from "../../pages/room/[rid]";
+import { BarChart, Bar, Cell, XAxis } from "recharts";
 
 interface Props {
   onFetchSlides: (resp: any) => void;
   onResetSlides: () => void;
+  positions?: SlidePositionDocument[];
+  slideInfo?: SlideInfo;
 }
 
 const SlideSetting = (props: Props) => {
@@ -64,6 +69,44 @@ const SlideSetting = (props: Props) => {
     props.onResetSlides();
   };
 
+  const positionData = () => {
+    let positionNums = Array(props.slideInfo.slides.length).fill(0);
+    for (const data of props.positions) {
+      if (data.isSync) {
+        positionNums[props.slideInfo.currentPage]++;
+      } else {
+        positionNums[data.position]++;
+      }
+    }
+    positionNums[props.slideInfo.currentPage]++;
+    return {
+      current: props.slideInfo.currentPage,
+      data: positionNums.map((val, index, __) => {
+        return {
+          name: (index + 1).toString(),
+          value: val,
+        };
+      }),
+    };
+  };
+
+  const getPositionChart = () => {
+    const position = positionData();
+    return (
+      <BarChart data={position.data} width={350} height={100}>
+        <XAxis dataKey="name" />
+        <Bar dataKey="value">
+          {position.data.map((_, index) => (
+            <Cell
+              fill={position.current > index ? "#82ca9d" : "#8884d8"}
+              key={`cell-${index}`}
+            />
+          ))}
+        </Bar>
+      </BarChart>
+    );
+  };
+
   return (
     <Box m="4" p="4" borderWidth="2px" rounded="lg">
       <Stack>
@@ -112,6 +155,7 @@ const SlideSetting = (props: Props) => {
             Authorize
           </Button>
         )}
+        {!!props.slideInfo && !!props.positions ? getPositionChart() : null}
       </Stack>
     </Box>
   );

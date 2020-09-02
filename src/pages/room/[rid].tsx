@@ -137,6 +137,11 @@ const Room = (props: Props) => {
                   : null,
               });
             }
+          } else {
+            const modifiedRoom = toObject(change.doc);
+            if (modifiedRoom.id === roomId) {
+              router.back();
+            }
           }
         });
       });

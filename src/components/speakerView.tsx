@@ -16,6 +16,7 @@ import {
   removeSlideDocument,
   updateSlideDocument,
   addLog,
+  getSlideDao,
 } from "../lib/database";
 import {
   Button,
@@ -29,7 +30,7 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/core";
-import { AnalysisDataDocument } from "../lib/model";
+import { AnalysisDataDocument, SlidePositionDocument } from "../lib/model";
 import Attendees from "./speakerItems/attendees";
 import Complexity from "./speakerItems/complexity";
 import EmotionBox from "./speakerItems/emotionBox";
@@ -87,8 +88,11 @@ const SpeakerView = (props: Props) => {
     const [camera, setCamera] = React.useState(null);
     const [complexity, setComplexity] = React.useState(0);
     useScript("https://apis.google.com/js/api.js");
+    const [positions, setPositions] = React.useState(null);
 
     const delay = 5000;
+
+    let unsubscribed = () => {};
 
     const calcAvgEmotion = (key: string, datas: AnalysisDataDocument[]) => {
       if (datas.length === 0) {
@@ -207,11 +211,27 @@ const SpeakerView = (props: Props) => {
                   props.roomId,
                   convertRespToSlideDocument(resp)
                 );
+                (async () => {
+                  const slideDao = await getSlideDao(props.roomId);
+                  unsubscribed = slideDao.onSnapshot((snapshot, toObject) => {
+                    let newPositions: SlidePositionDocument[] = [];
+                    snapshot.docs.forEach((element) => {
+                      const object = toObject(element);
+                      newPositions.push(object);
+                    });
+                    setPositions(newPositions);
+                  });
+                })();
               }}
               onResetSlides={() => {
                 addLog(props.roomId, "slide_status", "stop");
                 removeSlideDocument(props.roomId);
+                unsubscribed();
+                unsubscribed = () => {};
+                setPositions(null);
               }}
+              positions={positions}
+              slideInfo={props.slideInfo}
             />
             <Box m="4" p="4" borderWidth="2px" rounded="lg">
               <Flex>
