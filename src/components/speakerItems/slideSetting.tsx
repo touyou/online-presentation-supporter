@@ -98,7 +98,7 @@ const SlideSetting = (props: Props) => {
         <Bar dataKey="value">
           {position.data.map((_, index) => (
             <Cell
-              fill={position.current > index ? "#82ca9d" : "#8884d8"}
+              fill={position.current > index ? "#4fd1c5" : "#f56565"}
               key={`cell-${index}`}
             />
           ))}
