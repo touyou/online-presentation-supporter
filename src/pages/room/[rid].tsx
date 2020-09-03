@@ -14,6 +14,7 @@ import {
   addNewChat,
   getRoomDao,
   fetchRoom,
+  deleteSelfPosition,
 } from "../../lib/database";
 import * as Tone from "tone";
 import {
@@ -415,7 +416,9 @@ const Room = (props: Props) => {
             router.back();
           });
         } else {
-          deleteSelfAnalysis(roomId, currentUser.uid).then(() => {
+          const deleteAnalysis = deleteSelfAnalysis(roomId, currentUser.uid);
+          const deletePosition = deleteSelfPosition(roomId, currentUser.uid);
+          Promise.all([deleteAnalysis, deletePosition]).then(() => {
             router.back();
           });
         }

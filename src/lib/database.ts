@@ -290,6 +290,13 @@ export const getSlideDao = async (roomId: string) => {
   return slidePositionFactory.create(`rooms/${roomId}/slide-position`);
 };
 
+export const deleteSelfPosition = async (roomId: string, userId: string) => {
+  const slideDao = slidePositionFactory.create(
+    `rooms/${roomId}/slide-position`
+  );
+  await slideDao.delete(userId);
+};
+
 /**
  * User API
  */
