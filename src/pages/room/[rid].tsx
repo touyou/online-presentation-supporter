@@ -288,8 +288,9 @@ const Room = (props: Props) => {
       micAudio.open().then(() => {
         const reverb = new Tone.Freeverb();
         const effectedDest = Tone.context.createMediaStreamDestination();
-        micAudio.connect(reverb);
-        reverb.connect(effectedDest);
+        // micAudio.connect(reverb);
+        // reverb.connect(effectedDest);
+        micAudio.connect(effectedDest);
         navigator.mediaDevices
           .getUserMedia({
             video: true,
@@ -325,8 +326,9 @@ const Room = (props: Props) => {
       micAudio.open().then(() => {
         const reverb = new Tone.Freeverb();
         const effectedDest = Tone.context.createMediaStreamDestination();
-        micAudio.connect(reverb);
-        reverb.connect(effectedDest);
+        // micAudio.connect(reverb);
+        // reverb.connect(effectedDest);
+        micAudio.connect(effectedDest);
         navigator.mediaDevices
           .getDisplayMedia({
             video: {
@@ -374,8 +376,9 @@ const Room = (props: Props) => {
       micAudio.open().then(() => {
         const reverb = new Tone.Freeverb();
         const effectedDest = Tone.context.createMediaStreamDestination();
-        micAudio.connect(reverb);
-        reverb.connect(effectedDest);
+        // micAudio.connect(reverb);
+        // reverb.connect(effectedDest);
+        micAudio.connect(effectedDest);
         navigator.mediaDevices
           .getUserMedia({
             video: {
