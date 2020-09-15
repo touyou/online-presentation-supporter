@@ -7,6 +7,7 @@ import {
   updateNickname,
   insertUser,
   availableDao,
+  fetchUser,
 } from "../lib/database";
 import { RoomDocument, UserDocument, AvailableDocument } from "../lib/model";
 import CreateDialog from "../components/dialogs/createDialog";
@@ -62,6 +63,7 @@ const Index = () => {
           }
         });
       });
+
       const availableUnsubscribed = availableDao.onSnapshot(
         (snapshot, toObject) => {
           const availables: AvailableDocument[] = snapshot.docs.map(
@@ -95,6 +97,8 @@ const Index = () => {
         email: user.email,
       };
       (async () => {
+        const fetchedUser = await fetchUser(user.uid);
+        if (!!fetchedUser) return;
         await insertUser(userDocument);
       })();
       setCurrentUser(user);
@@ -140,8 +144,9 @@ const Index = () => {
             <form
               onSubmit={nicknameForm.handleSubmit(async (values) => {
                 setLoading(true);
-                await updateNickname(currentUser.uid, values.name);
-                setLoading(false);
+                updateNickname(currentUser.uid, values.name).then((val) => {
+                  setLoading(false);
+                });
               })}
             >
               <Stack isInline justify="center">
