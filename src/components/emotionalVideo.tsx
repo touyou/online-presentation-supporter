@@ -2,7 +2,13 @@ import React from "react";
 import Webcam from "react-webcam";
 import { loadModels, getFaceDescription } from "../lib/face";
 import { useInterval } from "../lib/customHooks";
-import { FaceDetection, FaceExpressions } from "face-api.js";
+import {
+  euclideanDistance,
+  FaceDetection,
+  FaceExpressions,
+  FaceLandmarks68,
+  Point,
+} from "face-api.js";
 import { AnalysisDataDocument } from "../lib/model";
 import { updateOrAddRoomAnalysis } from "../lib/database";
 
@@ -17,12 +23,29 @@ const EmotionalVideo = (props: Props) => {
   const webcamRef = React.useRef(null);
   const [detections, setDetections] = React.useState(Array<FaceDetection>());
   const [expressions, setExpressions] = React.useState(
-    Array<FaceExpressions>(),
+    Array<FaceExpressions>()
   );
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [width, setWidth] = React.useState(props.width);
   const [height, setHeight] = React.useState(props.height);
+  const [drowsinessCount, setDrowsinessCount] = React.useState(0);
   const delay = 10000;
+  const earThreshold = 0.25;
+
+  const eyeAspectRatio = (eye: Point[]) => {
+    const A = euclideanDistance([eye[1].x, eye[1].y], [eye[5].x, eye[5].y]);
+    const B = euclideanDistance([eye[2].x, eye[2].y], [eye[4].x, eye[4].y]);
+    const C = euclideanDistance([eye[0].x, eye[0].y], [eye[3].x, eye[3].y]);
+    return (A + B) / (2.0 * C);
+  };
+
+  const calculateEAR = (landmarks: FaceLandmarks68) => {
+    const leftEye = landmarks.getLeftEye();
+    const rightEye = landmarks.getRightEye();
+    const leftEAR = eyeAspectRatio(leftEye);
+    const rightEAR = eyeAspectRatio(rightEye);
+    return (leftEAR + rightEAR) / 2.0;
+  };
 
   const capture = async () => {
     if (!!webcamRef.current && isLoaded) {
@@ -30,6 +53,21 @@ const EmotionalVideo = (props: Props) => {
       await getFaceDescription(webcamRef.current.getScreenshot()).then(
         (fullDesc) => {
           if (!!fullDesc) {
+            const landmarksArray = fullDesc.map((fd) => fd.landmarks);
+            const ear = landmarksArray.map((landmarks) =>
+              calculateEAR(landmarks)
+            );
+            const lowEAR = ear.filter((value) => value < earThreshold);
+            console.log(landmarksArray);
+            console.log(ear);
+            if (lowEAR.length >= 1) {
+              console.log("drowsiness: ", drowsinessCount + 1);
+              setDrowsinessCount(drowsinessCount + 1);
+            } else {
+              console.log("drowsiness: ", 0);
+              setDrowsinessCount(0);
+            }
+
             setDetections(fullDesc.map((fd) => fd.detection));
             const expressions = fullDesc.map((fd) => fd.expressions);
             setExpressions(expressions);
@@ -48,7 +86,7 @@ const EmotionalVideo = (props: Props) => {
 
             updateOrAddRoomAnalysis(props.roomId, doc);
           }
-        },
+        }
       );
     }
   };
@@ -78,23 +116,21 @@ const EmotionalVideo = (props: Props) => {
               transform: `translate(${_X}px,${_Y}px)`,
             }}
           >
-            {!!expressions && !!expressions[i]
-              ? (
-                <p
-                  style={{
-                    backgroundColor: "blue",
-                    border: "solid",
-                    borderColor: "blue",
-                    width: _W,
-                    marginTop: 0,
-                    color: "#fff",
-                    transform: `translate(-3px, ${_H}px)`,
-                  }}
-                >
-                  {convertExpression(expressions[i])}
-                </p>
-              )
-              : null}
+            {!!expressions && !!expressions[i] ? (
+              <p
+                style={{
+                  backgroundColor: "blue",
+                  border: "solid",
+                  borderColor: "blue",
+                  width: _W,
+                  marginTop: 0,
+                  color: "#fff",
+                  transform: `translate(-3px, ${_H}px)`,
+                }}
+              >
+                {convertExpression(expressions[i])}
+              </p>
+            ) : null}
           </div>
         </div>
       );

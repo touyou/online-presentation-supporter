@@ -442,15 +442,23 @@ const Room = (props: Props) => {
     const toggleMute = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getAudioTracks()[0];
-      nowTrack.enabled = muted;
-      setMuted(!muted);
+      if (!!nowTrack.enabled) {
+        nowTrack.enabled = muted;
+        setMuted(!muted);
+      } else {
+        console.log(nowTrack);
+      }
     };
 
     const toggleHide = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getVideoTracks()[0];
-      nowTrack.enabled = hided;
-      setHided(!hided);
+      if (!!nowTrack.enabled) {
+        nowTrack.enabled = hided;
+        setHided(!hided);
+      } else {
+        console.log(nowTrack);
+      }
     };
 
     if (!currentUser) {

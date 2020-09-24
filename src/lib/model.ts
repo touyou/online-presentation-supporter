@@ -25,6 +25,8 @@ export interface RoomDocument {
 }
 
 export interface SlideDocument {
+  slideId: string;
+  id: string;
   url: string;
   videos: VideoDocument[];
 }

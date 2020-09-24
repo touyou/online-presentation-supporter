@@ -15,6 +15,8 @@ export const convertRespToSlideDocument = (resp: any[]) => {
   let slides: SlideDocument[] = [];
   for (const slide of resp) {
     slides.push({
+      slideId: slide.slideId,
+      id: slide.id,
       url: slide.contentUrl,
       videos: slide.video.map(convertVideo),
     });

@@ -16,6 +16,7 @@ import {
   updateOrAddSlidePosition,
 } from "../lib/database";
 import cv from "../../services/cv";
+import { fetchImage } from "face-api.js";
 
 interface Props {
   isListener: boolean;
@@ -47,6 +48,9 @@ const SlideView = (props: Props) => {
   React.useEffect(() => {
     if (isSync) {
       setSlideInfo(props.slideInfo);
+    }
+    if (!props.isListener) {
+      analyzeCapture();
     }
   }, [props.slideInfo]);
 
@@ -137,29 +141,30 @@ const SlideView = (props: Props) => {
     return props.isListener && isSync;
   };
 
-  // const getScreenshot = () => {
-  //   const canvas = document.createElement("canvas");
-  //   canvas.width = slideRef.current.width;
-  //   canvas.height = slideRef.current.height;
-  //   const ctx = canvas.getContext("2d");
-  //   ctx.drawImage(slideRef.current, 0, 0, canvas.width, canvas.height);
-  //   return ctx.getImageData(0, 0, canvas.width, canvas.height);
-  // };
+  const getScreenshot = async () => {
+    const image = await fetchImage(currentSlide().url);
+    const canvas = document.createElement("canvas");
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return ctx.getImageData(0, 0, canvas.width, canvas.height);
+  };
 
-  // const analyzeCapture = async () => {
-  //   if (!!slideRef.current) {
-  //     const screenshot = getScreenshot();
-  //     if (!screenshot) return;
-  //     const result = await cv.imageComplexity({
-  //       img: screenshot,
-  //       th1: 50,
-  //       th2: 100,
-  //       apSize: 3,
-  //       l2flag: false,
-  //     });
-  //     props.onChangeComplexity(result.data.payload);
-  //   }
-  // };
+  const analyzeCapture = async () => {
+    if (!!slideRef.current) {
+      const screenshot = await getScreenshot();
+      if (!screenshot) return;
+      const result = await cv.imageComplexity({
+        img: screenshot,
+        th1: 50,
+        th2: 100,
+        apSize: 3,
+        l2flag: false,
+      });
+      props.onChangeComplexity(result.data.payload);
+    }
+  };
 
   return slideInfo.slides !== null ? (
     <Box>

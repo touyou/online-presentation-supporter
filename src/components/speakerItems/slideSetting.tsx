@@ -45,6 +45,7 @@ const SlideSetting = (props: Props) => {
           let results = [];
           for (const slide of res.result.slides) {
             let result = resp[slide.objectId].result;
+            result.slideId = slideId;
             result.id = slide.objectId;
             result.video = videoDict[slide.objectId];
             results.push(result);

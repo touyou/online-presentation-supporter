@@ -65,6 +65,8 @@ onmessage = function (e) {
     }
     case 'imageComplexity':
       return imageComplexity(e.data)
+    // case 'drowsinessDetection':
+    //   return drowsinessDetection(e.data)
     default:
       break
   }
