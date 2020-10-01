@@ -12,6 +12,7 @@ import {
   SlidePositionDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
+import { isUndefined } from "util";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 

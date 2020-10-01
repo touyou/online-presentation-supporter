@@ -19,6 +19,7 @@
     "@types/gapi": "^0.0.39",
     "@types/gapi.auth2": "^0.0.52",
     "@vercel/node": "^1.8.3",
+    "axios": "^0.20.0",
     "emotion-theming": "^10.0.27",
     "face-api.js": "^0.22.2",
     "firebase": "^7.14.5",
