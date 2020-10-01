@@ -17,7 +17,7 @@ import {
 } from "lib/database";
 import { fetchImage } from "face-api.js";
 import axios from "axios";
-import { getGoogleImageId } from "lib/utils";
+import { getGoogleImageId, removeHttps } from "lib/utils";
 
 interface Props {
   isListener: boolean;
@@ -145,13 +145,12 @@ const SlideView = (props: Props) => {
   const analyzeCapture = async () => {
     if (!!slideRef.current) {
       const imageUrl = currentSlide().url;
-      // const id = getGoogleImageId(imageUrl);
-      // if (id) {
+      const reqUrl = removeHttps(imageUrl);
+      console.log(reqUrl);
       const response = await axios.get(
-        `https://online-presentation-supporter.vercel.app/api/${imageUrl}`
+        "https://online-presentation-supporter.vercel.app/api/" + reqUrl
       );
       console.log(response);
-      // }
     }
   };
 
