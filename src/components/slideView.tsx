@@ -144,10 +144,13 @@ const SlideView = (props: Props) => {
   const analyzeCapture = async () => {
     if (!!slideRef.current) {
       const imageUrl = currentSlide().url;
-      const reqUrl = removeHttps(imageUrl);
+      const reqUrl = removeHttps(imageUrl).split("/");
       console.log(reqUrl);
       const response = await axios.get(
-        "https://online-presentation-supporter.vercel.app/api/" + reqUrl
+        "https://online-presentation-supporter.vercel.app/api/" +
+          reqUrl[0] +
+          "&" +
+          reqUrl[1]
       );
       console.log(response);
     }

@@ -14,7 +14,7 @@ export default async function (req: NowRequest, res: NowResponse) {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
 
-  const imageUrl = "https://" + imageId;
+  const imageUrl = "https://" + imageId[0] + imageId[1];
   const img = new Image();
   img.src = imageUrl;
   img.onload = async (e) => {
