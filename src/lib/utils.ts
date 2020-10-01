@@ -44,3 +44,7 @@ export const calculateComplexity = async (data: ImageData) => {
   });
   return result;
 };
+
+export const getGoogleImageId = (url: string) => {
+  return url.split("/")[3];
+};

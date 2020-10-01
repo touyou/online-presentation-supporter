@@ -14,7 +14,7 @@ export default async function (req: NowRequest, res: NowResponse) {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
 
-  const imageUrl = "https://lh3.googleusercontent.com/" + imageId;
+  const imageUrl = imageId as string;
   const img = new Image();
   img.src = imageUrl;
   img.onload = async (e) => {

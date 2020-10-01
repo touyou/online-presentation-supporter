@@ -15,8 +15,9 @@ import {
   updateCurrentPage,
   updateOrAddSlidePosition,
 } from "lib/database";
-import cv from "services/cv";
 import { fetchImage } from "face-api.js";
+import axios from "axios";
+import { getGoogleImageId } from "lib/utils";
 
 interface Props {
   isListener: boolean;
@@ -141,28 +142,16 @@ const SlideView = (props: Props) => {
     return props.isListener && isSync;
   };
 
-  const getScreenshot = async () => {
-    const image = await fetchImage(currentSlide().url);
-    const canvas = document.createElement("canvas");
-    canvas.width = image.width;
-    canvas.height = image.height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    return ctx.getImageData(0, 0, canvas.width, canvas.height);
-  };
-
   const analyzeCapture = async () => {
     if (!!slideRef.current) {
-      const screenshot = await getScreenshot();
-      if (!screenshot) return;
-      const result = await cv.imageComplexity({
-        img: screenshot,
-        th1: 50,
-        th2: 100,
-        apSize: 3,
-        l2flag: false,
-      });
-      props.onChangeComplexity(result.data.payload);
+      const imageUrl = currentSlide().url;
+      // const id = getGoogleImageId(imageUrl);
+      // if (id) {
+      const response = await axios.get(
+        `http://online-presentation-supporter.vercel.app/api/${imageUrl}`
+      );
+      console.log(response);
+      // }
     }
   };
 
