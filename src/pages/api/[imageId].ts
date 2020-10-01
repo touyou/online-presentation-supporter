@@ -15,6 +15,7 @@ export default async function (req: NowRequest, res: NowResponse) {
   );
 
   const imageUrl = "https://" + imageId[0] + imageId[1];
+  console.log(imageUrl);
   const img = new Image();
   img.src = imageUrl;
   img.onload = async (e) => {
