@@ -15,9 +15,8 @@ import {
   updateCurrentPage,
   updateOrAddSlidePosition,
 } from "lib/database";
-import { fetchImage } from "face-api.js";
 import axios from "axios";
-import { getGoogleImageId, removeHttps } from "lib/utils";
+import { removeHttps } from "lib/utils";
 
 interface Props {
   isListener: boolean;
