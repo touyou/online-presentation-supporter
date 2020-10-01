@@ -1,10 +1,10 @@
 import React from "react";
-import EmotionalVideo from "../components/emotionalVideo";
-import StreamPreview from "../components/screenShareView";
-import { useWinndowDimensions } from "../lib/customHooks";
-import { Button, Box, Flex, Heading } from "@chakra-ui/core";
-import { SlideInfo } from "../pages/room/[rid]";
-import SlideView from "./slideView";
+import EmotionalVideo from "components/emotionalVideo";
+import StreamPreview from "components/screenShareView";
+import { useWinndowDimensions } from "lib/customHooks";
+import { Box, Flex, Heading } from "@chakra-ui/core";
+import { SlideInfo } from "pages/room/[rid]";
+import SlideView from "components/slideView";
 
 interface Props {
   videoStream?: MediaStream;

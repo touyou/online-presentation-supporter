@@ -1,13 +1,12 @@
 import React from "react";
 import { useRouter } from "next/router";
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import {
   updateIsListener,
   fetchUser,
   updateRoomDocumentWhenJoined,
-} from "../../lib/database";
-import { RoomDocument } from "../../lib/model";
+} from "lib/database";
+import { RoomDocument } from "lib/model";
 import {
   AlertDialog,
   AlertDialogOverlay,

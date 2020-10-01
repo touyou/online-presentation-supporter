@@ -1,4 +1,5 @@
-import { SlideDocument } from "./model";
+import cv from "services/cv";
+import { SlideDocument } from "lib/model";
 
 export const formatDate = (date: Date, format: string) => {
   format = format.replace(/yyyy/g, "" + date.getFullYear());
@@ -31,4 +32,15 @@ export const convertVideo = (video: any) => {
     title: video.title,
     source: video.source,
   };
+};
+
+export const calculateComplexity = async (data: ImageData) => {
+  const result = await cv.imageComplexity({
+    img: data,
+    th1: 50,
+    th2: 100,
+    apSize: 3,
+    l2flag: false,
+  });
+  return result;
 };

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import ListenerView from "../../components/listenerView";
-import SpeakerView from "../../components/speakerView";
-import firebase from "../../plugins/firebase";
-import { handleLogout } from "../../lib/auth";
+import ListenerView from "components/listenerView";
+import SpeakerView from "components/speakerView";
+import firebase from "plugins/firebase";
+import { handleLogout } from "lib/auth";
 import {
   deleteRoomDocument,
   updateRoomDocumentWhenLeaved,

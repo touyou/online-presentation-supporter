@@ -1,5 +1,5 @@
 import React from "react";
-import { SlideInfo } from "../pages/room/[rid]";
+import { SlideInfo } from "pages/room/[rid]";
 import {
   Box,
   Stack,
@@ -14,8 +14,8 @@ import {
   updatePlayingVideo,
   updateCurrentPage,
   updateOrAddSlidePosition,
-} from "../lib/database";
-import cv from "../../services/cv";
+} from "lib/database";
+import cv from "services/cv";
 import { fetchImage } from "face-api.js";
 
 interface Props {

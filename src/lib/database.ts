@@ -1,4 +1,4 @@
-import firebase from "../plugins/firebase";
+import firebase from "plugins/firebase";
 import {
   RoomDocument,
   UserDocument,
@@ -12,7 +12,6 @@ import {
   SlidePositionDocument,
 } from "./model";
 import { FirestoreSimple } from "@firestore-simple/web";
-import { isUndefined } from "util";
 
 const firestoreSimple = new FirestoreSimple(firebase.firestore());
 

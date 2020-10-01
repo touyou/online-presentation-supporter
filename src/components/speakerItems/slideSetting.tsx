@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Stack, Text, Flex, Input, Button } from "@chakra-ui/core";
-import { SlidePositionDocument } from "../../lib/model";
-import { SlideInfo } from "../../pages/room/[rid]";
+import { SlidePositionDocument } from "lib/model";
+import { SlideInfo } from "pages/room/[rid]";
 import { BarChart, Bar, Cell, XAxis } from "recharts";
 
 interface Props {

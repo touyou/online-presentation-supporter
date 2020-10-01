@@ -1,6 +1,6 @@
 import React from "react";
-import firebase from "../plugins/firebase";
-import { handleLogout } from "../lib/auth";
+import firebase from "plugins/firebase";
+import { handleLogout } from "lib/auth";
 import {
   getRoomDao,
   getUserDao,
@@ -9,9 +9,9 @@ import {
   availableDao,
   fetchUser,
 } from "../lib/database";
-import { RoomDocument, UserDocument, AvailableDocument } from "../lib/model";
-import CreateDialog from "../components/dialogs/createDialog";
-import EnterDialog from "../components/dialogs/enterDialog";
+import { RoomDocument, UserDocument, AvailableDocument } from "lib/model";
+import CreateDialog from "components/dialogs/createDialog";
+import EnterDialog from "components/dialogs/enterDialog";
 import {
   SimpleGrid,
   Box,
@@ -23,7 +23,7 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { useForm } from "react-hook-form";
-import SignInScreen from "../components/signInScreen";
+import SignInScreen from "components/signInScreen";
 
 const Index = () => {
   const [currentUser, setCurrentUser] = React.useState<firebase.User>();

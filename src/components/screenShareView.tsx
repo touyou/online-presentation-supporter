@@ -1,6 +1,7 @@
 import React from "react";
-import cv from "../../services/cv";
-import { useInterval } from "../lib/customHooks";
+import cv from "services/cv";
+import { useInterval } from "lib/customHooks";
+import { calculateComplexity } from "lib/utils";
 
 interface Props {
   stream?: MediaStream;
@@ -50,13 +51,7 @@ const StreamPreview = (props: Props) => {
     if (!!videoRef.current && isLoaded) {
       const screenshot = getScreenshot();
       if (!screenshot) return;
-      const result = await cv.imageComplexity({
-        img: screenshot,
-        th1: 50,
-        th2: 100,
-        apSize: 3,
-        l2flag: false,
-      });
+      const result = await calculateComplexity(screenshot);
       if (props.isSpeaker) props.onChangeComplexity(result.data.payload);
     }
   };

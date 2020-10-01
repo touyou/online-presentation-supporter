@@ -1,7 +1,7 @@
 import React from "react";
 import Webcam from "react-webcam";
-import { loadModels, getFaceDescription } from "../lib/face";
-import { useInterval } from "../lib/customHooks";
+import { loadModels, getFaceDescription } from "lib/face";
+import { useInterval } from "lib/customHooks";
 import {
   euclideanDistance,
   FaceDetection,
@@ -9,8 +9,8 @@ import {
   FaceLandmarks68,
   Point,
 } from "face-api.js";
-import { AnalysisDataDocument } from "../lib/model";
-import { updateOrAddRoomAnalysis } from "../lib/database";
+import { AnalysisDataDocument } from "lib/model";
+import { updateOrAddRoomAnalysis } from "lib/database";
 
 interface Props {
   width: number;

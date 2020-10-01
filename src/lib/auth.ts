@@ -1,6 +1,6 @@
-import firebase from "../plugins/firebase";
-import { isCreatedUser, insertUser } from "./database";
-import { UserDocument } from "./model";
+import firebase from "plugins/firebase";
+import { isCreatedUser, insertUser } from "lib/database";
+import { UserDocument } from "lib/model";
 
 export function getCurrentUser(): Promise<firebase.User | boolean> {
   return new Promise((resolve) => {

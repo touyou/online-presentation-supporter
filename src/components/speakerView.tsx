@@ -1,43 +1,26 @@
 import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
-import {
-  useWinndowDimensions,
-  useInterval,
-  useScript,
-} from "../lib/customHooks";
-import StreamPreview from "./screenShareView";
+import { useWinndowDimensions, useInterval, useScript } from "lib/customHooks";
+import StreamPreview from "components/screenShareView";
 import {
   selectRoomAnalysis,
   updateOrAddRoomAnalysisLog,
   getTimestamp,
   fetchAnalysisLogAutoId,
-  updateCurrentPage,
-  updatePlayingVideo,
   removeSlideDocument,
   updateSlideDocument,
   addLog,
   getSlideDao,
-} from "../lib/database";
-import {
-  Button,
-  Flex,
-  Box,
-  Stack,
-  Select,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-} from "@chakra-ui/core";
-import { AnalysisDataDocument, SlidePositionDocument } from "../lib/model";
-import Attendees from "./speakerItems/attendees";
-import Complexity from "./speakerItems/complexity";
-import EmotionBox from "./speakerItems/emotionBox";
-import SlideSetting from "./speakerItems/slideSetting";
-import { convertRespToSlideDocument, convertVideo } from "../lib/utils";
-import { SlideInfo } from "../pages/room/[rid]";
-import SlideView from "./slideView";
+} from "lib/database";
+import { Button, Flex, Box, Stack, Select } from "@chakra-ui/core";
+import { AnalysisDataDocument, SlidePositionDocument } from "lib/model";
+import Attendees from "components/speakerItems/attendees";
+import Complexity from "components/speakerItems/complexity";
+import EmotionBox from "components/speakerItems/emotionBox";
+import SlideSetting from "components/speakerItems/slideSetting";
+import { convertRespToSlideDocument } from "lib/utils";
+import { SlideInfo } from "pages/room/[rid]";
+import SlideView from "components/slideView";
 
 interface Props {
   screenStream?: MediaStream;

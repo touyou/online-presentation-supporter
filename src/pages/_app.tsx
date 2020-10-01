@@ -2,7 +2,7 @@ import React from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import { ThemeProvider, CSSReset } from "@chakra-ui/core";
-import { customTheme } from "../lib/theme";
+import { customTheme } from "lib/theme";
 
 export default function MyApp(props: AppProps) {
   const { Component, pageProps } = props;
