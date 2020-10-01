@@ -148,7 +148,7 @@ const SlideView = (props: Props) => {
       // const id = getGoogleImageId(imageUrl);
       // if (id) {
       const response = await axios.get(
-        `http://online-presentation-supporter.vercel.app/api/${imageUrl}`
+        `https://online-presentation-supporter.vercel.app/api/${imageUrl}`
       );
       console.log(response);
       // }
