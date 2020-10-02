@@ -15,7 +15,7 @@ export default async function (req: NowRequest, res: NowResponse) {
   );
 
   const imageUrl = "https://" + imageId[0] + imageId[1];
-  res.json({ url: imageUrl });
+  res.json({ url: imageId, req: req });
   // const img = new Image();
   // img.src = imageUrl;
   // img.onload = async (e) => {
