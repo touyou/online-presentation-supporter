@@ -148,9 +148,9 @@ const SlideView = (props: Props) => {
       console.log(reqUrl);
       const response = await axios.get(
         "https://online-presentation-supporter.vercel.app/api/" +
-          reqUrl[0] +
-          "&" +
-          reqUrl[1]
+          reqUrl[1] +
+          "?host=" +
+          reqUrl[0]
       );
       console.log(response);
     }

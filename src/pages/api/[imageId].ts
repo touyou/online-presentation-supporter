@@ -3,7 +3,7 @@ import { calculateComplexity } from "lib/utils";
 
 export default async function (req: NowRequest, res: NowResponse) {
   const {
-    query: { imageId },
+    query: { host, imageId },
     headers: { origin },
   } = req;
   if (origin) {
@@ -14,25 +14,24 @@ export default async function (req: NowRequest, res: NowResponse) {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
 
-  const imageUrl = "https://" + imageId[0] + imageId[1];
-  res.json({ url: imageId, req: req.query });
-  // const img = new Image();
-  // img.src = imageUrl;
-  // img.onload = async (e) => {
-  //   const getImage = (image: HTMLImageElement) => {
-  //     const canvas = document.createElement("canvas");
-  //     canvas.width = image.naturalWidth;
-  //     canvas.height = image.naturalHeight;
-  //     const ctx = canvas.getContext("2d");
-  //     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-  //     return ctx.getImageData(0, 0, canvas.width, canvas.height);
-  //   };
+  const imageUrl = "https://" + host + imageId;
+  const img = new Image();
+  img.src = imageUrl;
+  img.onload = async (e) => {
+    const getImage = (image: HTMLImageElement) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return ctx.getImageData(0, 0, canvas.width, canvas.height);
+    };
 
-  //   const result = await calculateComplexity(
-  //     getImage(e.target as HTMLImageElement)
-  //   );
-  //   res.status(200).json({
-  //     value: result.data.payload,
-  //   });
-  // };
+    const result = await calculateComplexity(
+      getImage(e.target as HTMLImageElement)
+    );
+    res.status(200).json({
+      value: result.data.payload,
+    });
+  };
 }
