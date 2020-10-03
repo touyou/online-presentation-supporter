@@ -6517,6 +6517,13 @@ react-motion@^0.5.2:
     prop-types "^15.5.8"
     raf "^3.1.0"
 
+react-new-window@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/react-new-window/-/react-new-window-0.1.2.tgz#8c04392e669b16e64d68f46bb9d58666e4f753d4"
+  integrity sha512-KfjR6QupGf4UZCK7ittUE7r53eOax9mw0ODQIhDSxu4dzxWgeE9y95MRs8Dr9m/F7Plm3LUvccO5yGbg3619yA==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-refresh@0.8.2:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.8.2.tgz#24bb0858eac92b0d7b0dd561747f0c9fd6c60327"

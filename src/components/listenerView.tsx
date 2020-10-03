@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import EmotionalVideo from "components/emotionalVideo";
 import StreamPreview from "components/screenShareView";
 import { useWinndowDimensions } from "lib/customHooks";
@@ -17,21 +17,21 @@ interface Props {
 const ListenerView = (props: Props) => {
   if (process.browser) {
     const { width, height } = useWinndowDimensions();
-    const [videoStream, setVideoStream] = React.useState(null);
-    const [screenStream, setScreenStream] = React.useState(null);
-    const videoRef = React.useRef(null);
+    const [videoStream, setVideoStream] = useState(null);
+    const [screenStream, setScreenStream] = useState(null);
+    const videoRef = useRef(null);
     const videoHeight = () => {
       return (width * 9) / 16;
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
       setVideoStream(props.videoStream);
       if (!!videoRef.current && !!props.videoStream) {
         videoRef.current.srcObject = props.videoStream;
         videoRef.current.play();
       }
     }, [videoRef, props.videoStream]);
-    React.useEffect(() => {
+    useEffect(() => {
       setScreenStream(props.screenStream);
     }, [props.screenStream]);
 

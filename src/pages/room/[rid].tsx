@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import ListenerView from "components/listenerView";
 import SpeakerView from "components/speakerView";
@@ -11,9 +11,7 @@ import {
   deleteSelfAnalysis,
   addLog,
   getChatDao,
-  addNewChat,
   getRoomDao,
-  fetchRoom,
   deleteSelfPosition,
 } from "../../lib/database";
 import * as Tone from "tone";
@@ -26,14 +24,11 @@ import {
   IconButton,
   useDisclosure,
   Drawer,
-  DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
   DrawerHeader,
-  DrawerFooter,
   DrawerBody,
   Text,
-  Input,
   Icon,
   Link,
 } from "@chakra-ui/core";
@@ -44,7 +39,6 @@ import {
   SlideDocument,
   VideoDocument,
 } from "../../lib/model";
-import { formatDate } from "../../lib/utils";
 import {
   MdMicOff,
   MdMic,
@@ -52,6 +46,8 @@ import {
   MdVideocamOff,
   MdPeople,
 } from "react-icons/md";
+import NewWindow from "react-new-window";
+import { ChatView } from "components/chatView";
 
 interface Props {
   stream: MediaStream;
@@ -66,9 +62,9 @@ export interface SlideInfo {
 
 const Room = (props: Props) => {
   if (process.browser) {
-    // State
+    // Hooks
     const [peer, setPeer] = useState(null);
-    const [currentUser, setCurrentUser] = React.useState<firebase.User>();
+    const [currentUser, setCurrentUser] = useState<firebase.User>();
     const [currentRoom, setRoom] = useState(null);
     const [screenPeer, setScreenPeer] = useState(null);
     const [videoStream, setVideoStream] = useState(null);
@@ -76,9 +72,8 @@ const Room = (props: Props) => {
     const [screenStream, setScreenStream] = useState(null);
     const [muted, setMuted] = useState(true);
     const [hided, setHided] = useState(true);
-    const [chat, setChat] = React.useState(Array<ChatDocument>());
-    const [attendee, setAttendee] = React.useState(Array<UserDocument>());
-    const [chatContent, setChatContent] = React.useState("");
+    const [chat, setChat] = useState(Array<ChatDocument>());
+    const [attendee, setAttendee] = useState(Array<UserDocument>());
     const [isAttendee, setIsAttendee] = useState(false);
     const [slideInfo, setSlideInfo] = useState({
       slides: null,
@@ -87,7 +82,7 @@ const Room = (props: Props) => {
     });
     // Ref
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const btnRef = React.useRef();
+    const btnRef = useRef();
     const { width, height } = useWinndowDimensions();
     // Router
     const router = useRouter();
@@ -107,7 +102,7 @@ const Room = (props: Props) => {
     });
 
     /* useEffect */
-    React.useEffect(() => {
+    useEffect(() => {
       if (!isListener) {
         const _screenPeer = new Peer({
           key: process.env.SKYWAY_API_KEY,
@@ -179,21 +174,21 @@ const Room = (props: Props) => {
       };
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
       console.log(`screen stream is ${screenStream} ===`);
       if (screenStream !== null && !isListener) {
         joinScreenPeer();
       }
     }, [screenStream]);
 
-    React.useEffect(() => {
+    useEffect(() => {
       console.log(`camera stream is ${cameraStream} ===`);
       if (cameraStream !== null && !isListener) {
         joinCameraPeer();
       }
     }, [cameraStream]);
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (peer !== null && isListener) {
         peer.once("open", () => {
           joinListenerPeer();
@@ -201,7 +196,7 @@ const Room = (props: Props) => {
       }
     }, [peer]);
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (screenPeer !== null && !isListener) {
         screenPeer.once("open", () => {
           joinSpeakerPeer();
@@ -433,12 +428,6 @@ const Room = (props: Props) => {
       router.back();
     };
 
-    const sendChat = async () => {
-      const user = await fetchUser(currentUser.uid);
-      await addNewChat(roomId, user, chatContent);
-      setChatContent("");
-    };
-
     const toggleMute = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getAudioTracks()[0];
@@ -521,6 +510,11 @@ const Room = (props: Props) => {
             slideInfo={slideInfo}
           />
         )}
+        {isOpen ? (
+          <NewWindow onUnload={onClose}>
+            <ChatView chat={chat} userId={currentUser.uid} roomId={roomId} />
+          </NewWindow>
+        ) : null}
         {isListener ? null : (
           <Flex pos="fixed" left={4} bottom={4} zIndex={5}>
             <IconButton
@@ -586,62 +580,6 @@ const Room = (props: Props) => {
                 })}
               </Stack>
             </DrawerBody>
-          </DrawerContent>
-        </Drawer>
-        <Drawer
-          isOpen={isOpen}
-          placement="right"
-          onClose={onClose}
-          finalFocusRef={btnRef}
-        >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader>Room Chat</DrawerHeader>
-            <DrawerBody pr={0}>
-              <Stack
-                height={height - 160}
-                maxH={height - 160}
-                overflowY="scroll"
-              >
-                {chat
-                  .map((chat: ChatDocument, _: number) => {
-                    return (
-                      <Box
-                        key={chat.id}
-                        borderWidth="1px"
-                        rounded="md"
-                        p={4}
-                        mr={2}
-                      >
-                        <Stack isInline mb={2} justify="space-between">
-                          <Text fontWeight="bold" fontSize="sm">
-                            @{chat.nickname}
-                          </Text>
-                          <Text fontSize="sm">
-                            {!!chat.timestamp
-                              ? formatDate(chat.timestamp.toDate(), "HH:mm:ss")
-                              : ""}
-                          </Text>
-                        </Stack>
-                        <Text>{chat.content}</Text>
-                      </Box>
-                    );
-                  })
-                  .reverse()}
-              </Stack>
-            </DrawerBody>
-            <DrawerFooter>
-              <Stack isInline spacing={2}>
-                <Input
-                  value={chatContent}
-                  onChange={(event) => setChatContent(event.target.value)}
-                />
-                <Button variantColor="teal" onClick={sendChat}>
-                  Send
-                </Button>
-              </Stack>
-            </DrawerFooter>
           </DrawerContent>
         </Drawer>
       </>
