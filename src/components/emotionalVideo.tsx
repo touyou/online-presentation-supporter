@@ -28,9 +28,7 @@ const EmotionalVideo = (props: Props) => {
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [width, setWidth] = React.useState(props.width);
   const [height, setHeight] = React.useState(props.height);
-  const [drowsinessCount, setDrowsinessCount] = React.useState(0);
   const delay = 10000;
-  const earThreshold = 0.25;
 
   const eyeAspectRatio = (eye: Point[]) => {
     const A = euclideanDistance([eye[1].x, eye[1].y], [eye[5].x, eye[5].y]);
@@ -57,16 +55,12 @@ const EmotionalVideo = (props: Props) => {
             const ear = landmarksArray.map((landmarks) =>
               calculateEAR(landmarks)
             );
-            const lowEAR = ear.filter((value) => value < earThreshold);
-            console.log(landmarksArray);
-            console.log(ear);
-            if (lowEAR.length >= 1) {
-              console.log("drowsiness: ", drowsinessCount + 1);
-              setDrowsinessCount(drowsinessCount + 1);
-            } else {
-              console.log("drowsiness: ", 0);
-              setDrowsinessCount(0);
-            }
+            const avgEAR =
+              ear.length === 0
+                ? 1.0
+                : ear.reduce((val1, val2, _, __) => {
+                    return val1 + val2;
+                  }) / ear.length;
 
             setDetections(fullDesc.map((fd) => fd.detection));
             const expressions = fullDesc.map((fd) => fd.expressions);
@@ -82,6 +76,7 @@ const EmotionalVideo = (props: Props) => {
               fearful: expression.fearful,
               disgusted: expression.disgusted,
               surprised: expression.surprised,
+              drawsiness: avgEAR,
             };
 
             updateOrAddRoomAnalysis(props.roomId, doc);

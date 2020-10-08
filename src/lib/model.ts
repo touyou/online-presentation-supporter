@@ -47,6 +47,7 @@ export interface AnalysisDataDocument {
   fearful: number;
   disgusted: number;
   surprised: number;
+  drawsiness: number;
 }
 
 export interface AnalysisLogDocument {

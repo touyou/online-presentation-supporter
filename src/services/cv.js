@@ -13,11 +13,13 @@ class CV {
     return new Promise((res, rej) => {
       let interval = setInterval(() => {
         const status = this._status[msg]
-        if (status[0] === 'done') res(status[1])
-        if (status[0] === 'error') rej(status[1])
-        if (status[0] !== 'loading') {
-          delete this._status[msg]
-          clearInterval(interval)
+        if (Array.isArray(status)) {
+          if (status[0] === 'done') res(status[1])
+          if (status[0] === 'error') rej(status[1])
+          if (status[0] !== 'loading') {
+            delete this._status[msg]
+            clearInterval(interval)
+          }
         }
       }, 50)
     })

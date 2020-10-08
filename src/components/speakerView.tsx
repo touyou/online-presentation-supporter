@@ -21,6 +21,7 @@ import SlideSetting from "components/speakerItems/slideSetting";
 import { convertRespToSlideDocument } from "lib/utils";
 import { SlideInfo } from "pages/room/[rid]";
 import SlideView from "components/slideView";
+import Drawsiness from "./speakerItems/drawsiness";
 
 interface Props {
   screenStream?: MediaStream;
@@ -41,6 +42,7 @@ export interface Emotion {
   fearful: number;
   disgusted: number;
   surprised: number;
+  drawsiness: number[];
 }
 
 const SpeakerView = (props: Props) => {
@@ -63,6 +65,7 @@ const SpeakerView = (props: Props) => {
       fearful: 0.0,
       disgusted: 0.0,
       surprised: 0.0,
+      drawsiness: [],
     });
     const [countOfAttendees, setAttendees] = React.useState(0);
     const [mediaDevices, setMediaDevices] = React.useState(
@@ -94,6 +97,9 @@ const SpeakerView = (props: Props) => {
         fearful: calcAvgEmotion("fearful", analysisDatas),
         disgusted: calcAvgEmotion("disgusted", analysisDatas),
         surprised: calcAvgEmotion("surprised", analysisDatas),
+        drawsiness: analysisDatas.map((val, _, __) => {
+          return val.drawsiness;
+        }),
       };
       setEmotion(resultObject);
       setAttendees(analysisDatas.length);
@@ -185,8 +191,8 @@ const SpeakerView = (props: Props) => {
         >
           <Stack justify="top" mt="80px" maxH={height - 90} overflowY="scroll">
             <Attendees countOfAttendees={countOfAttendees} />
-            <Complexity complexity={complexity} screenStream={screenStream} />
-            <EmotionBox emotion={emotion} roomId={props.roomId} />
+            <Drawsiness drawsiness={emotion.drawsiness} />
+            {/* <EmotionBox emotion={emotion} roomId={props.roomId} /> */}
             <SlideSetting
               onFetchSlides={(resp) => {
                 addLog(props.roomId, "slide_status", "start");
@@ -272,6 +278,7 @@ const SpeakerView = (props: Props) => {
                 </Flex>
               </Stack>
             </Box>
+            <Complexity complexity={complexity} screenStream={screenStream} />
           </Stack>
         </Pane>
       </SortablePane>

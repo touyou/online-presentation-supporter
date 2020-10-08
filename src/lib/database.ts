@@ -140,6 +140,7 @@ const analysisFactory = firestoreSimple.collectionFactory<AnalysisDataDocument>(
         fearful: doc.fearful,
         disgusted: doc.disgusted,
         surprised: doc.surprised,
+        drawsiness: doc.drawsiness,
       };
     },
   }
