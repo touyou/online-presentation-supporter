@@ -40,6 +40,7 @@ const EnterDialog = (props: Props) => {
   const enterForm = useForm();
 
   const isAdmin = () => {
+    if (!props.selectRoom) return false;
     return props.selectRoom.adminUid === props.currentUser.uid;
   };
 
