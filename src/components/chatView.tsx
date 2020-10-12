@@ -1,10 +1,11 @@
 import { ChatDocument } from "lib/model";
-import { Stack, Text, Input, Box, Button } from "@chakra-ui/core";
+import { Stack, Text, Input, Box, IconButton, Flex } from "@chakra-ui/core";
 import { formatDate } from "lib/utils";
 import { useWinndowDimensions } from "lib/customHooks";
 import { useEffect, useState } from "react";
 import { addNewChat, fetchUser } from "lib/database";
-import type { User } from "firebase";
+import { MdSend } from "react-icons/md";
+import { FaUserSecret } from "react-icons/fa";
 
 type Props = {
   chat: ChatDocument[];
@@ -21,8 +22,18 @@ export const ChatView = (props: Props) => {
   useEffect(() => {}, [chat]);
   /// Functions
   const sendChat = async () => {
+    if (chatContent === "") return;
     const user = await fetchUser(userId);
     await addNewChat(roomId, user, chatContent);
+    setChatContent("");
+  };
+  const anonymSendChat = async () => {
+    if (chatContent === "") return;
+    await addNewChat(
+      roomId,
+      { id: "", name: "匿名", nickname: "匿名", isListener: false, email: "" },
+      chatContent
+    );
     setChatContent("");
   };
 
@@ -59,14 +70,33 @@ export const ChatView = (props: Props) => {
           })
           .reverse()}
       </Stack>
-      <Stack isInline spacing={2} pos="fixed" bottom="4" left="4" right="4">
+      <Stack pos="fixed" zIndex={5} bottom="4" left="4" right="4">
         <Input
           value={chatContent}
+          placeholder="質問・雑談など"
           onChange={(event) => setChatContent(event.target.value)}
+          size="md"
         />
-        <Button variantColor="teal" onClick={sendChat}>
-          Send
-        </Button>
+        <Flex align="right">
+          <IconButton
+            aria-label="send"
+            as={MdSend}
+            variantColor="teal"
+            size="md"
+            onClick={sendChat}
+            ml={2}
+            p={2}
+          />
+          <IconButton
+            aria-label="anonymous send"
+            as={FaUserSecret}
+            variantColor="purple"
+            size="md"
+            onClick={anonymSendChat}
+            ml={2}
+            p={2}
+          />
+        </Flex>
       </Stack>
     </Box>
   );
