@@ -5,6 +5,7 @@ import {
   updateIsListener,
   fetchUser,
   updateRoomDocumentWhenJoined,
+  archivedRoom,
 } from "lib/database";
 import { RoomDocument } from "lib/model";
 import {
@@ -66,6 +67,11 @@ const EnterDialog = (props: Props) => {
     return error || true;
   };
 
+  const onClickArchiveRoom = async () => {
+    await archivedRoom(props.selectRoom.id);
+    props.closeModal();
+  };
+
   return (
     <AlertDialog
       isOpen={props.isOpen}
@@ -106,6 +112,11 @@ const EnterDialog = (props: Props) => {
             </FormControl>
           </AlertDialogBody>
           <AlertDialogFooter>
+            {isAdmin() ? (
+              <Button variantColor="red" mr={3} onClick={onClickArchiveRoom}>
+                Archive
+              </Button>
+            ) : null}
             <Button ref={cancelRef} onClick={props.closeModal}>
               Cancel
             </Button>

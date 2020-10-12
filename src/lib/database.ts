@@ -59,6 +59,8 @@ export const createRoom = async (
     password: password,
     users: [admin],
     timestamp: getTimestamp(),
+    isArchived: false,
+    maxCount: 0,
   });
   return newDocId;
 };
@@ -80,6 +82,20 @@ export const updateRoomDocumentWhenLeaved = async (
   await roomsDao.update({
     id: docId,
     users: firebase.firestore.FieldValue.arrayRemove(userDocument),
+  });
+};
+
+export const updateMaxCount = async (docId: string, count: number) => {
+  await roomsDao.update({
+    id: docId,
+    maxCount: count,
+  });
+};
+
+export const archivedRoom = async (roomId: string) => {
+  await roomsDao.update({
+    id: roomId,
+    isArchived: true,
   });
 };
 

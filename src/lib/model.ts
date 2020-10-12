@@ -17,6 +17,8 @@ export interface RoomDocument {
   adminUid: string;
   admin: string;
   password: string;
+  isArchived: boolean;
+  maxCount: number;
   users: UserDocument[];
   slides?: SlideDocument[];
   currentPage?: number;

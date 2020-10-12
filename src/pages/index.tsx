@@ -172,6 +172,7 @@ const Index = () => {
             </form>
             <SimpleGrid columns={[2, null, 4]} spacing="20px" p="4">
               {rooms.map((room: RoomDocument, index: number) => {
+                if (room.isArchived) return null;
                 return (
                   <Box
                     key={room.id}

@@ -11,6 +11,7 @@ import {
   updateSlideDocument,
   addLog,
   getSlideDao,
+  updateMaxCount,
 } from "lib/database";
 import { Button, Flex, Box, Stack, Select } from "@chakra-ui/core";
 import { AnalysisDataDocument, SlidePositionDocument } from "lib/model";
@@ -68,6 +69,7 @@ const SpeakerView = (props: Props) => {
       drawsiness: [],
     });
     const [countOfAttendees, setAttendees] = React.useState(0);
+    const [maxAttendees, setMaxAttendees] = React.useState(0);
     const [mediaDevices, setMediaDevices] = React.useState(
       Array<MediaDeviceInfo>()
     );
@@ -103,6 +105,7 @@ const SpeakerView = (props: Props) => {
       };
       setEmotion(resultObject);
       setAttendees(analysisDatas.length);
+      setMaxAttendees(Math.max(analysisDatas.length, maxAttendees));
       if (analysisDatas.length !== 0) {
         const docId = await fetchAnalysisLogAutoId(props.roomId);
         await updateOrAddRoomAnalysisLog(props.roomId, {
@@ -111,6 +114,7 @@ const SpeakerView = (props: Props) => {
           count: analysisDatas.length,
           timestamp: getTimestamp(),
         });
+        await updateMaxCount(props.roomId, maxAttendees);
       }
     };
 

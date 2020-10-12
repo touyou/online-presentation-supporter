@@ -5,7 +5,6 @@ import SpeakerView from "components/speakerView";
 import firebase from "plugins/firebase";
 import { handleLogout } from "lib/auth";
 import {
-  deleteRoomDocument,
   updateRoomDocumentWhenLeaved,
   fetchUser,
   deleteSelfAnalysis,
@@ -13,6 +12,7 @@ import {
   getChatDao,
   getRoomDao,
   deleteSelfPosition,
+  archivedRoom,
 } from "../../lib/database";
 import * as Tone from "tone";
 import {
@@ -410,7 +410,7 @@ const Room = (props: Props) => {
       const userDoc = await fetchUser(currentUser.uid);
       updateRoomDocumentWhenLeaved(roomId, userDoc).then(() => {
         if (!isListener) {
-          deleteRoomDocument(roomId).then(() => {
+          archivedRoom(roomId).then(() => {
             router.back();
           });
         } else {
