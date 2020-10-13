@@ -29,9 +29,16 @@ export const ChatView = (props: Props) => {
   };
   const anonymSendChat = async () => {
     if (chatContent === "") return;
+    const user = await fetchUser(userId);
     await addNewChat(
       roomId,
-      { id: "", name: "匿名", nickname: "匿名", isListener: false, email: "" },
+      {
+        id: user.id,
+        name: user.name,
+        nickname: "匿名",
+        isListener: user.isListener,
+        email: user.email,
+      },
       chatContent
     );
     setChatContent("");
