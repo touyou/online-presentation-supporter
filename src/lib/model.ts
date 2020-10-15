@@ -61,6 +61,7 @@ export interface AnalysisLogDocument {
   fearful: number;
   disgusted: number;
   surprised: number;
+  drawsiness: number[];
   count: number;
   timestamp: firebase.firestore.Timestamp;
 }

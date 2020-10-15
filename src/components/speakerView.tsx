@@ -195,7 +195,7 @@ const SpeakerView = (props: Props) => {
         >
           <Stack justify="top" mt="80px" maxH={height - 90} overflowY="scroll">
             <Attendees countOfAttendees={countOfAttendees} />
-            <Drawsiness drawsiness={emotion.drawsiness} />
+            <Drawsiness roomId={props.roomId} />
             <SlideSetting
               onFetchSlides={(resp) => {
                 addLog(props.roomId, "slide_status", "start");

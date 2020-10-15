@@ -8,6 +8,7 @@ import {
   Stack,
   Input,
 } from "@chakra-ui/core";
+import { getAnalysisLog } from "lib/database";
 
 import { useEffect, useState } from "react";
 import {
@@ -21,62 +22,68 @@ import {
 } from "recharts";
 
 interface Props {
-  drawsiness: number[];
+  roomId: string;
 }
 
 interface DrawsinessLog {
   average: number;
   sleeperCount: number;
+  goodCount: number;
   count: number;
 }
 
 const Drawsiness = (props: Props) => {
-  const { drawsiness } = props;
+  const { roomId } = props;
   const [isOpen, setOpen] = useState(false);
-  const [threshold, setThreshold] = useState(0.25);
+  const [threshold, setThreshold] = useState(0.3);
   const [drawsinessLog, setDrawsinessLog] = useState<DrawsinessLog[]>([]);
 
   useEffect(() => {
-    if (drawsiness.length > 0) {
-      const average =
-        drawsiness.reduce((val1, val2, _, __) => {
-          return val1 + val2;
-        }) / drawsiness.length;
-      const sleeperCount = drawsiness.filter((val, _, __) => {
-        return val <= threshold;
-      }).length;
-      const newLog = [
-        {
-          average: average,
-          sleeperCount: sleeperCount,
-          count: drawsiness.length,
-        } as DrawsinessLog,
-      ]
-        .concat(drawsinessLog)
-        .slice(0, 20);
-      setDrawsinessLog(newLog);
-    }
-  }, [drawsiness]);
+    const analysisDao = getAnalysisLog(roomId);
+    return analysisDao
+      .orderBy("timestamp", "desc")
+      .limit(20)
+      .onSnapshot((snapshot, toObject) => {
+        const newLogs: DrawsinessLog[] = [];
+        snapshot.docs.forEach((element) => {
+          const object = toObject(element);
+          const drawsiness = object.drawsiness;
+          if (drawsiness.length != 0) {
+            const average =
+              drawsiness.reduce((val1, val2, _, __) => {
+                return val1 + val2;
+              }) / drawsiness.length;
+            const sleeperCount = drawsiness.filter((val, _, __) => {
+              return val <= threshold;
+            }).length;
+            newLogs.push({
+              average: average,
+              sleeperCount: sleeperCount,
+              goodCount: drawsiness.length - sleeperCount,
+              count: drawsiness.length,
+            } as DrawsinessLog);
+          }
+        });
+        setDrawsinessLog(newLogs);
+      });
+  }, []);
 
   const getReversedArray = () => {
-    const copyArray = drawsinessLog;
+    const copyArray = drawsinessLog.slice();
     copyArray.reverse();
     return copyArray;
   };
 
   const getDrawsinessMessage = () => {
-    const sleeper = drawsiness.filter((val, _, __) => {
-      return val <= threshold;
-    });
-    return `${drawsiness.length}人中${sleeper.length}人が眠気に襲われています。`;
+    if (drawsinessLog.length == 0) return `眠気推定の結果を表示します`;
+    const latestLog = drawsinessLog[0];
+    return `少し眠たい人が${latestLog.count}人中${latestLog.sleeperCount}人います。`;
   };
 
   const getDrawsinessStatus = () => {
-    if (drawsiness.length <= 0) return "info";
-    const sleeper = drawsiness.filter((val, _, __) => {
-      return val <= threshold;
-    });
-    const ratio = sleeper.length / drawsiness.length;
+    if (drawsinessLog.length == 0) return "info";
+    const latestLog = drawsinessLog[0];
+    const ratio = latestLog.sleeperCount / latestLog.count;
     if (ratio >= 0.25) return "error";
     else return "success";
   };
@@ -92,7 +99,7 @@ const Drawsiness = (props: Props) => {
         {getDrawsinessMessage()}
       </Alert>
       <Button variantColor="blue" onClick={onClickSetting}>
-        Toggle Setting
+        Toggle Setting and Graph
       </Button>
       <Collapse mt={4} isOpen={isOpen}>
         <LineChart width={300} height={200} data={getReversedArray()}>
@@ -110,7 +117,12 @@ const Drawsiness = (props: Props) => {
             barSize={20}
             fill="#e57373"
           />
-          <Bar dataKey="count" stackId="counter" barSize={20} fill="#9CCC65" />
+          <Bar
+            dataKey="goodCount"
+            stackId="counter"
+            barSize={20}
+            fill="#9CCC65"
+          />
         </BarChart>
         <FormControl>
           <FormLabel htmlFor="threshold">Threshold</FormLabel>

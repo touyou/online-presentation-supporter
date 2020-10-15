@@ -237,11 +237,16 @@ const analysisLogFactory = firestoreSimple.collectionFactory<
       fearful: doc.fearful,
       disgusted: doc.disgusted,
       surprised: doc.surprised,
+      drawsiness: doc.drawsiness,
       count: doc.count,
       timestamp: doc.timestamp,
     };
   },
 });
+
+export const getAnalysisLog = (roomId: string) => {
+  return analysisLogFactory.create(`rooms/${roomId}/analysis-log`);
+};
 
 export const fetchAnalysisLogAutoId = async (roomId: string) => {
   return firebase.firestore().collection(`rooms/${roomId}/analysis-log`).doc()
