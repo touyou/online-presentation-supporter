@@ -24,6 +24,13 @@ export const availableDao = firestoreSimple.collection<AvailableDocument>({
   path: `available`,
 });
 
+export const setAvailable = async (id: string) => {
+  await availableDao.set({
+    id: id,
+    userId: id
+  });
+}
+
 /**
  * Room API
  */

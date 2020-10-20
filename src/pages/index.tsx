@@ -24,16 +24,19 @@ import {
 } from "@chakra-ui/core";
 import { useForm } from "react-hook-form";
 import SignInScreen from "components/signInScreen";
+import ActivateDialog from "components/dialogs/activateDialog";
 
 const Index = () => {
   const [currentUser, setCurrentUser] = React.useState<firebase.User>();
   const [currentNickname, setNickname] = React.useState("");
   const [createModal, setCreateModal] = React.useState(false);
   const [enterModal, setEnterModal] = React.useState(false);
+  const [activateModal, setActivateModal] = React.useState(false);
   const [selectRoom, setSelectRoom] = React.useState(null);
   const [available, setAvailable] = React.useState(false);
   const [rooms, setRooms] = React.useState(Array<RoomDocument>());
   const [isLoading, setLoading] = React.useState(false);
+  const [activatePassword, setActivatePassword] = React.useState("");
 
   const nicknameForm = useForm();
 
@@ -80,6 +83,11 @@ const Index = () => {
           setAvailable(flag);
         }
       );
+
+      const remoteConfig = firebase.remoteConfig();
+      remoteConfig.fetchAndActivate().then(() => {
+        setActivatePassword(remoteConfig.getString("available_key"));
+      });
       return () => {
         unsubscribed();
         availableUnsubscribed();
@@ -130,7 +138,7 @@ const Index = () => {
                 <Button onClick={() => setCreateModal(true)} mr="2">
                   Create Room
                 </Button>
-              ) : null}
+              ) : <Button onClick={() => setActivateModal(true)} mr="2">Activate</Button>}
               <Button onClick={logoutUser} mr="2">
                 Logout
               </Button>
@@ -214,6 +222,11 @@ const Index = () => {
                 setSelectRoom(null);
               }}
             />
+            <ActivateDialog
+              password={activatePassword}
+              currentUser={currentUser}
+              isOpen={activateModal}
+              closeModal={() => setActivateModal(false)} />
           </Stack>
         ) : (
           <SignInScreen />
