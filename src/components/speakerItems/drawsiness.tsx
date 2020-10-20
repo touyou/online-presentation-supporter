@@ -23,6 +23,7 @@ import {
 
 interface Props {
   roomId: string;
+  countOfAttendees: number;
 }
 
 interface DrawsinessLog {
@@ -33,7 +34,7 @@ interface DrawsinessLog {
 }
 
 const Drawsiness = (props: Props) => {
-  const { roomId } = props;
+  const { roomId, countOfAttendees } = props;
   const [isOpen, setOpen] = useState(false);
   const [threshold, setThreshold] = useState(0.3);
   const [drawsinessLog, setDrawsinessLog] = useState<DrawsinessLog[]>([]);
@@ -77,7 +78,7 @@ const Drawsiness = (props: Props) => {
   const getDrawsinessMessage = () => {
     if (drawsinessLog.length == 0) return `眠気推定の結果を表示します`;
     const latestLog = drawsinessLog[0];
-    return `少し眠たい人が${latestLog.count}人中${latestLog.sleeperCount}人います。`;
+    return `少し眠たい人が${countOfAttendees}人中${latestLog.sleeperCount}人います。`;
   };
 
   const getDrawsinessStatus = () => {
