@@ -85,6 +85,9 @@ const Index = () => {
       );
 
       const remoteConfig = firebase.remoteConfig();
+      remoteConfig.defaultConfig = ({
+        'available_key': 'touyou19951121'
+      });
       remoteConfig.fetchAndActivate().then(() => {
         setActivatePassword(remoteConfig.getString("available_key"));
       });
