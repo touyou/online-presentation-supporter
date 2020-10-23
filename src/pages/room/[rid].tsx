@@ -299,7 +299,7 @@ const Room = (props: Props) => {
             stream.getAudioTracks()[0].enabled = false;
             stream.getVideoTracks()[0].enabled = false;
 
-            addLog(roomId, "speaker", "start");
+            addLog(roomId, "speaker_status", "join");
           });
       });
     };
@@ -339,14 +339,14 @@ const Room = (props: Props) => {
             setScreenStream(stream);
             setHided(false);
             setMuted(false);
-            addLog(roomId, "screen_status", "start");
+            addLog(roomId, "screen_share", "start");
 
             const [screenVideoTrack] = stream.getVideoTracks();
             screenVideoTrack.addEventListener(
               "ended",
               () => {
                 setScreenStream(null);
-                addLog(roomId, "screen_status", "stop");
+                addLog(roomId, "screen_share", "stop");
               },
               { once: true }
             );
@@ -362,7 +362,7 @@ const Room = (props: Props) => {
       setScreenStream(null);
       setHided(!videoStream.getVideoTracks()[0].enabled);
       setMuted(!videoStream.getAudioTracks()[0].enabled);
-      addLog(roomId, "screen_status", "stop");
+      addLog(roomId, "screen_share", "stop");
     };
 
     const startSpeakerCamera = (deviceId: string) => {
@@ -390,7 +390,7 @@ const Room = (props: Props) => {
             setMuted(false);
 
             setCameraStream(stream);
-            addLog(roomId, "camera_status", "start");
+            addLog(roomId, "speaker_camera", "start");
           });
       });
     };
@@ -403,13 +403,14 @@ const Room = (props: Props) => {
       setCameraStream(null);
       setHided(!videoStream.getVideoTracks()[0].enabled);
       setMuted(!videoStream.getAudioTracks()[0].enabled);
-      addLog(roomId, "camera_status", "stop");
+      addLog(roomId, "speaker_camera", "stop");
     };
 
     const leaveRoom = async () => {
       const userDoc = await fetchUser(currentUser.uid);
       updateRoomDocumentWhenLeaved(roomId, userDoc).then(() => {
         if (!isListener) {
+          addLog(roomId, "speaker_status", "left");
           archivedRoom(roomId).then(() => {
             router.back();
           });
@@ -433,6 +434,9 @@ const Room = (props: Props) => {
       const nowTrack = currentRoom._localStream.getAudioTracks()[0];
       if (!!nowTrack.enabled) {
         nowTrack.enabled = muted;
+        if (!isListener) {
+          addLog(roomId, "speaker_mic", muted ? "on" : "off");
+        }
         setMuted(!muted);
       } else {
         console.log(nowTrack);

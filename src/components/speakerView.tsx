@@ -198,7 +198,7 @@ const SpeakerView = (props: Props) => {
             <Drawsiness roomId={props.roomId} countOfAttendees={countOfAttendees} />
             <SlideSetting
               onFetchSlides={(resp) => {
-                addLog(props.roomId, "slide_status", "start");
+                addLog(props.roomId, "speaker_slide", "start");
                 updateSlideDocument(
                   props.roomId,
                   convertRespToSlideDocument(resp)
@@ -216,7 +216,7 @@ const SpeakerView = (props: Props) => {
                 })();
               }}
               onResetSlides={() => {
-                addLog(props.roomId, "slide_status", "stop");
+                addLog(props.roomId, "speaker_slide", "stop");
                 removeSlideDocument(props.roomId);
                 unsubscribed();
                 unsubscribed = () => {};

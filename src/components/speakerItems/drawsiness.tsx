@@ -8,7 +8,7 @@ import {
   Stack,
   Input,
 } from "@chakra-ui/core";
-import { getAnalysisLog } from "lib/database";
+import { addLog, getAnalysisLog } from "lib/database";
 
 import { useEffect, useState } from "react";
 import {
@@ -20,6 +20,7 @@ import {
   YAxis,
   BarChart,
 } from "recharts";
+import { number } from "yup";
 
 interface Props {
   roomId: string;
@@ -130,7 +131,11 @@ const Drawsiness = (props: Props) => {
           <Input
             name="threshold"
             value={threshold}
-            onChange={(event) => setThreshold(event.target.value as number)}
+            onChange={(event) => {
+              const newValue = event.target.value as number
+              setThreshold(newValue)
+              addLog(roomId, "drawsiness_threshold", "change to " + newValue);
+            }}
             pr="4.5rem"
           />
         </FormControl>

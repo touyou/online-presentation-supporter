@@ -14,6 +14,7 @@ import {
   updatePlayingVideo,
   updateCurrentPage,
   updateOrAddSlidePosition,
+  addLog,
 } from "lib/database";
 import axios from "axios";
 import { removeHttps } from "lib/utils";
@@ -199,6 +200,7 @@ const SlideView = (props: Props) => {
                     updatePlayingVideo(props.roomId, null);
                   }
                   updateCurrentPage(props.roomId, currentPage - 1);
+                  addLog(props.roomId, "speaker_slide", "move to " + (currentPage - 1));
                 } else {
                   updateOrAddSlidePosition(props.roomId, {
                     id: props.userId,
@@ -210,6 +212,7 @@ const SlideView = (props: Props) => {
                     currentPage: currentPage - 1,
                     playingVideo: null,
                   });
+                  addLog(props.roomId, props.userId + "_slide", "move to " + (currentPage - 1));
                 }
               }
             }}
@@ -224,6 +227,7 @@ const SlideView = (props: Props) => {
                 });
                 setIsSync(true);
                 setSlideInfo(props.slideInfo);
+                addLog(props.roomId, props.userId + "_slide", "sync");
               }}
             >
               発表者と同期
@@ -240,6 +244,7 @@ const SlideView = (props: Props) => {
                     updatePlayingVideo(props.roomId, null);
                   }
                   updateCurrentPage(props.roomId, currentPage + 1);
+                  addLog(props.roomId, "speaker_slide", "move to " + (currentPage + 1));
                 } else {
                   updateOrAddSlidePosition(props.roomId, {
                     id: props.userId,
@@ -251,6 +256,7 @@ const SlideView = (props: Props) => {
                     currentPage: currentPage + 1,
                     playingVideo: null,
                   });
+                  addLog(props.roomId, props.userId + "_slide", "move to " + (currentPage + 1));
                 }
               }
             }}
@@ -264,7 +270,8 @@ const SlideView = (props: Props) => {
               isSync: false,
               position: slideInfo.currentPage,
             });
-            setIsSync(false);
+              setIsSync(false);
+              addLog(props.roomId, props.userId + "_slide", "unsync");
           }}
         >
           同期解除
