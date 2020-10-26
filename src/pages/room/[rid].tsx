@@ -515,7 +515,7 @@ const Room = (props: Props) => {
           />
         )}
         {isOpen ? (
-          <NewWindow onUnload={onClose}>
+          <NewWindow onUnload={onClose} title="Room Chat">
             <ChatView chat={chat} userId={currentUser.uid} roomId={roomId} />
           </NewWindow>
         ) : null}

@@ -53,6 +53,7 @@ export const ChatView = (props: Props) => {
       </Box>
       <Stack
         pt="40px"
+        pb="100px"
         height={height - 240}
         maxH={height - 240}
         overflowY="scroll"
