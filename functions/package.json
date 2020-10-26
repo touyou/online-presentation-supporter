@@ -14,8 +14,10 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@types/socket.io-client": "^1.4.34",
     "firebase-admin": "^8.10.0",
-    "firebase-functions": "^3.6.1"
+    "firebase-functions": "^3.6.1",
+    "socket.io-client": "^2.3.1"
   },
   "devDependencies": {
     "tslint": "^5.12.0",
