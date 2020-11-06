@@ -48,6 +48,7 @@ import {
 } from "react-icons/md";
 import NewWindow from "react-new-window";
 import { ChatView } from "components/chatView";
+import { ChatTicker } from "components/chatTicker";
 
 interface Props {
   stream: MediaStream;
@@ -494,6 +495,7 @@ const Room = (props: Props) => {
             </Stack>
           </Flex>
         </Box>
+        <ChatTicker chat={chat} />
         {isListener ? (
           <ListenerView
             videoStream={videoStream}
