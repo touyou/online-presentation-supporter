@@ -18,13 +18,20 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import firebase from "plugins/firebase";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-interface Props {
+type Props = {
   currentUser: firebase.User;
   isOpen: boolean;
   closeModal: () => void;
-}
+};
+
+const createRoomSchema = yup.object().shape({
+  name: yup.string().required(),
+  password: yup.string().required(),
+});
 
 const CreateDialog = (props: Props) => {
   const router = useRouter();
@@ -32,12 +39,8 @@ const CreateDialog = (props: Props) => {
   const [show, setShow] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
 
-  let createRoomSchema = yup.object().shape({
-    name: yup.string().required(),
-    password: yup.string().required(),
-  });
   const createForm = useForm({
-    validationSchema: createRoomSchema,
+    resolver: yupResolver(createRoomSchema),
   });
   const handleCreateRoom = async (values: any) => {
     setLoading(true);
@@ -107,7 +110,7 @@ const CreateDialog = (props: Props) => {
             <Button
               isLoading={isLoading}
               loadingText="Creating"
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
               ml={3}
             >

@@ -7,7 +7,7 @@ import {
   FormLabel,
   Stack,
   Input,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { addLog, getAnalysisLog } from "lib/database";
 
 import { useEffect, useState } from "react";
@@ -95,15 +95,15 @@ const Drawsiness = (props: Props) => {
   };
 
   return (
-    <Stack m="4" p="4" borderWidth="2px" rounded="lg">
+    <Stack m="4" p="4" borderWidth="2px" rounded="lg" spacing="16px">
       <Alert status={getDrawsinessStatus()}>
         <AlertIcon />
         {getDrawsinessMessage()}
       </Alert>
-      <Button variantColor="blue" onClick={onClickSetting}>
+      <Button colorScheme="blue" onClick={onClickSetting}>
         Toggle Setting and Graph
       </Button>
-      <Collapse mt={4} isOpen={isOpen}>
+      <Collapse in={isOpen}>
         <LineChart width={300} height={200} data={getReversedArray()}>
           <XAxis />
           <YAxis />
@@ -132,8 +132,8 @@ const Drawsiness = (props: Props) => {
             name="threshold"
             value={threshold}
             onChange={(event) => {
-              const newValue = event.target.value as number
-              setThreshold(newValue)
+              const newValue = parseFloat(event.target.value);
+              setThreshold(newValue);
               addLog(roomId, "drawsiness_threshold", "change to " + newValue);
             }}
             pr="4.5rem"

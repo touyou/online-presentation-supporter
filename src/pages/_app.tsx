@@ -1,8 +1,8 @@
 import React from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
-import { ThemeProvider, CSSReset } from "@chakra-ui/core";
 import { customTheme } from "lib/theme";
+import { ChakraProvider } from "@chakra-ui/react";
 
 export default function MyApp(props: AppProps) {
   const { Component, pageProps } = props;
@@ -23,10 +23,9 @@ export default function MyApp(props: AppProps) {
           content="minimu-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <ThemeProvider theme={customTheme}>
-        <CSSReset />
+      <ChakraProvider theme={customTheme}>
         <Component {...pageProps} />
-      </ThemeProvider>
+      </ChakraProvider>
     </React.Fragment>
   );
 }

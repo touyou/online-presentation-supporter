@@ -31,7 +31,7 @@ import {
   Text,
   Icon,
   Link,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { useWinndowDimensions } from "../../lib/customHooks";
 import {
   ChatDocument,
@@ -50,6 +50,7 @@ import NewWindow from "react-new-window";
 import { ChatView } from "components/room/chatView";
 import { ChatTicker } from "components/room/chatTicker";
 import { Header } from "components/headers";
+import { ChatIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 
 interface Props {
   stream: MediaStream;
@@ -189,7 +190,7 @@ const Room = (props: Props) => {
         });
 
       router.events.on("routeChangeStart", handleRouteChange);
-      // window.addEventListener("beforeunload", handleBeforeUnload);
+      // window.addEventListener("beforeunload",/ handleBeforeUnload);
       window.onbeforeunload = handleBeforeUnload;
       return () => {
         unsubscribed();
@@ -503,7 +504,7 @@ const Room = (props: Props) => {
                 }
                 isExternal
               >
-                アンケート <Icon name="external-link" mx="2px" />
+                アンケート <ExternalLinkIcon mx="4px" />
               </Link>
             </Flex>
             <Button onClick={leaveRoom} mr="2">
@@ -576,7 +577,7 @@ const Room = (props: Props) => {
           />
           <IconButton
             aria-label="Open chat"
-            icon="chat"
+            icon={<ChatIcon />}
             ref={btnRef}
             onClick={onOpen}
             boxShadow="lg"

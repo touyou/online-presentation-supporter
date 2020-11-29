@@ -1,5 +1,5 @@
 import Ticker from "react-ticker";
-import { Box, Text } from "@chakra-ui/core";
+import { Box, Text } from "@chakra-ui/react";
 import { ChatDocument } from "lib/model";
 import { useEffect, useState } from "react";
 

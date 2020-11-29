@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import {
@@ -23,7 +23,8 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import firebase from "plugins/firebase";
 
 interface Props {
   selectRoom: RoomDocument;
@@ -34,9 +35,9 @@ interface Props {
 
 const EnterDialog = (props: Props) => {
   const router = useRouter();
-  const cancelRef = React.useRef();
-  const [show, setShow] = React.useState(false);
-  const [isLoading, setLoading] = React.useState(false);
+  const cancelRef = useRef();
+  const [show, setShow] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const enterForm = useForm();
 
   const isAdmin = () => {
@@ -101,8 +102,8 @@ const EnterDialog = (props: Props) => {
                   placeholder="password"
                   type={show ? "text" : "password"}
                 />
-                <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+                <InputRightElement width="6rem">
+                  <Button h="2rem" onClick={() => setShow(!show)}>
                     {show ? "Hide" : "Show"}
                   </Button>
                 </InputRightElement>
@@ -114,7 +115,7 @@ const EnterDialog = (props: Props) => {
           </AlertDialogBody>
           <AlertDialogFooter>
             {isAdmin() ? (
-              <Button variantColor="red" mr={3} onClick={onClickArchiveRoom}>
+              <Button colorScheme="red" mr={3} onClick={onClickArchiveRoom}>
                 Archive
               </Button>
             ) : null}
@@ -124,7 +125,7 @@ const EnterDialog = (props: Props) => {
             <Button
               isLoading={isLoading}
               loadingText="Entering"
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
               ml={3}
             >

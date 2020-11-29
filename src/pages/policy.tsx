@@ -7,7 +7,7 @@ import {
   Stack,
   List,
   ListItem,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 
 const Policy = () => {
   return (

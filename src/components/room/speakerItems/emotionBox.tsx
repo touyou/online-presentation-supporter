@@ -6,7 +6,7 @@ import {
   Flex,
   FormLabel,
   Switch,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { addLog } from "lib/database";
 import { Emotion } from "components/room/speakerView";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";

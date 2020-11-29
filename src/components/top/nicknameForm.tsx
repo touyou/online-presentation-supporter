@@ -1,7 +1,8 @@
 import { updateNickname } from "lib/database";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Stack, Input, Text } from "@chakra-ui/core";
+import { Button, Stack, Input, Text } from "@chakra-ui/react";
+import firebase from "plugins/firebase";
 
 type Props = {
   currentUser: firebase.User;
@@ -37,7 +38,7 @@ export const NicknameForm = (props: Props) => {
           isLoading={isLoading}
           isDisabled={!isDirty || isSubmitting}
           loadingText="Changing"
-          variantColor="teal"
+          colorScheme="teal"
           type="submit"
           width="15rem"
         >

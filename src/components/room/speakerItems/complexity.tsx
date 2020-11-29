@@ -8,7 +8,7 @@ import {
   FormControl,
   FormLabel,
   Input,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 
 interface Props {
   complexity: number;
@@ -42,21 +42,21 @@ const Complexity = (props: Props) => {
   };
 
   return (
-    <Stack m="4" p="4" borderWidth="2px" rounded="lg">
+    <Stack m="4" p="4" borderWidth="2px" rounded="lg" spacing="16px">
       <Alert status={getComplexityStatus()}>
         <AlertIcon />
         {getComplexityMessage()}
       </Alert>
-      <Button variantColor="blue" onClick={onClickSetting}>
+      <Button colorScheme="blue" onClick={onClickSetting}>
         Toggle Setting
       </Button>
-      <Collapse mt={4} isOpen={isOpen}>
+      <Collapse in={isOpen}>
         <FormControl>
           <FormLabel htmlFor="threshold">Threshold</FormLabel>
           <Input
             name="threshold"
             value={threshold}
-            onChange={(event) => setThreshold(event.target.value as number)}
+            onChange={(event) => setThreshold(parseFloat(event.target.value))}
             pr="4.5rem"
           />
         </FormControl>

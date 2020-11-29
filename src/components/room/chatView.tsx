@@ -1,5 +1,5 @@
 import { ChatDocument } from "lib/model";
-import { Stack, Text, Input, Box, IconButton, Flex } from "@chakra-ui/core";
+import { Stack, Text, Input, Box, IconButton, Flex } from "@chakra-ui/react";
 import { formatDate } from "lib/utils";
 import { useWinndowDimensions } from "lib/customHooks";
 import { useEffect, useState } from "react";
@@ -89,7 +89,7 @@ export const ChatView = (props: Props) => {
           <IconButton
             aria-label="send"
             as={MdSend}
-            variantColor="teal"
+            colorScheme="teal"
             size="md"
             onClick={sendChat}
             ml={2}
@@ -98,7 +98,7 @@ export const ChatView = (props: Props) => {
           <IconButton
             aria-label="anonymous send"
             as={FaUserSecret}
-            variantColor="purple"
+            colorScheme="purple"
             size="md"
             onClick={anonymSendChat}
             ml={2}

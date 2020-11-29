@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Stack, Text, Flex, Input, Button } from "@chakra-ui/core";
+import { Box, Stack, Text, Flex, Input, Button } from "@chakra-ui/react";
 import { SlidePositionDocument } from "lib/model";
 import { SlideInfo } from "pages/room/[rid]";
 import { BarChart, Bar, Cell, XAxis } from "recharts";
@@ -99,7 +99,9 @@ const SlideSetting = (props: Props) => {
         <Bar dataKey="value">
           {position.data.map((_, index) => (
             <Cell
-              fill={props.slideInfo.currentPage <= index ? "#4fd1c5" : "#f56565"}
+              fill={
+                props.slideInfo.currentPage <= index ? "#4fd1c5" : "#f56565"
+              }
               key={`cell-${index}`}
             />
           ))}
@@ -122,16 +124,16 @@ const SlideSetting = (props: Props) => {
                 setSlideUrl(event.target.value);
               }}
             />
-            <Button variantColor="teal" mr="1" onClick={settingSlide}>
+            <Button colorScheme="teal" mr="1" onClick={settingSlide}>
               Set
             </Button>
-            <Button variantColor="red" onClick={resetSlide}>
+            <Button colorScheme="red" onClick={resetSlide}>
               Stop
             </Button>
           </Flex>
         ) : (
           <Button
-            variantColor="teal"
+            colorScheme="teal"
             onClick={() => {
               gapi.load("client:auth2", () => {
                 gapi.client

@@ -1,4 +1,4 @@
-import { Box, Heading, Flex } from "@chakra-ui/core";
+import { Box, Heading, Flex } from "@chakra-ui/react";
 import { ReactNode } from "react";
 
 type Props = {

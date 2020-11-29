@@ -11,7 +11,7 @@ import {
 import { RoomDocument, UserDocument, AvailableDocument } from "lib/model";
 import CreateDialog from "components/dialogs/createDialog";
 import EnterDialog from "components/dialogs/enterDialog";
-import { SimpleGrid, Box, Button, Heading, Stack } from "@chakra-ui/core";
+import { SimpleGrid, Box, Button, Heading, Stack } from "@chakra-ui/react";
 import SignInScreen from "components/signInScreen";
 import ActivateDialog from "components/dialogs/activateDialog";
 import { Header } from "components/headers";
@@ -164,7 +164,7 @@ const Index = () => {
                       </Heading>
                       <Button
                         width="100%"
-                        variantColor="teal"
+                        colorScheme="teal"
                         onClick={() => {
                           setSelectRoom(room);
                           setEnterModal(true);

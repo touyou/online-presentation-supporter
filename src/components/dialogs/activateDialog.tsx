@@ -1,8 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import {
-  setAvailable,
-} from "lib/database";
+import { setAvailable } from "lib/database";
 import {
   AlertDialog,
   AlertDialogOverlay,
@@ -18,7 +16,8 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import firebase from "plugins/firebase";
 
 interface Props {
   password: string;
@@ -50,7 +49,6 @@ const ActivateDialog = (props: Props) => {
     return error || true;
   };
 
-
   return (
     <AlertDialog
       isOpen={props.isOpen}
@@ -65,7 +63,7 @@ const ActivateDialog = (props: Props) => {
         <AlertDialogCloseButton />
         <form
           onSubmit={enterForm.handleSubmit((values) => {
-          activateAccount(values.password);
+            activateAccount(values.password);
           })}
         >
           <AlertDialogBody>
@@ -97,7 +95,7 @@ const ActivateDialog = (props: Props) => {
             <Button
               isLoading={isLoading}
               loadingText="Entering"
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
               ml={3}
             >

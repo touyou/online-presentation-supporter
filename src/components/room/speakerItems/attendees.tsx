@@ -1,5 +1,5 @@
 import React from "react";
-import { Stat, StatLabel, StatNumber } from "@chakra-ui/core";
+import { Stat, StatLabel, StatNumber } from "@chakra-ui/react";
 
 interface Props {
   countOfAttendees: number;

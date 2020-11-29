@@ -13,7 +13,7 @@ import {
   getSlideDao,
   updateMaxCount,
 } from "lib/database";
-import { Button, Flex, Box, Stack, Select } from "@chakra-ui/core";
+import { Button, Flex, Box, Stack, Select } from "@chakra-ui/react";
 import { AnalysisDataDocument, SlidePositionDocument } from "lib/model";
 import Attendees from "components/room/speakerItems/attendees";
 import Complexity from "components/room/speakerItems/complexity";
@@ -194,7 +194,13 @@ const SpeakerView = (props: Props) => {
           size={{ width: width - screenWidth, height: height - 32 }}
           resizable={{ x: false, y: false, xy: false }}
         >
-          <Stack justify="top" mt="80px" maxH={height - 90} overflowY="scroll">
+          <Stack
+            justify="top"
+            mt="80px"
+            maxH={height - 90}
+            pb="80px"
+            overflowY="scroll"
+          >
             <Attendees
               countOfAttendees={countOfAttendees}
               countOfAllAttendees={props.countOfAllAttendees}
@@ -235,14 +241,14 @@ const SpeakerView = (props: Props) => {
             <Box m="4" p="4" borderWidth="2px" rounded="lg">
               <Flex>
                 <Button
-                  variantColor="teal"
+                  colorScheme="teal"
                   style={{ margin: "4px" }}
                   onClick={props.onClickStartShare}
                 >
                   Start Share
                 </Button>
                 <Button
-                  variantColor="red"
+                  colorScheme="red"
                   style={{ margin: "4px" }}
                   onClick={() => {
                     setComplexity(0);
@@ -266,7 +272,7 @@ const SpeakerView = (props: Props) => {
                 </Select>
                 <Flex>
                   <Button
-                    variantColor="teal"
+                    colorScheme="teal"
                     style={{ margin: "4px" }}
                     onClick={() => {
                       if (!camera) return;
@@ -276,7 +282,7 @@ const SpeakerView = (props: Props) => {
                     Start Camera
                   </Button>
                   <Button
-                    variantColor="red"
+                    colorScheme="red"
                     style={{ margin: "4px" }}
                     onClick={() => {
                       setComplexity(0);

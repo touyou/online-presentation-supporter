@@ -9,7 +9,7 @@ import {
   MenuList,
   MenuItem,
   IconButton,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   updatePlayingVideo,
   updateCurrentPage,
@@ -200,7 +200,11 @@ const SlideView = (props: Props) => {
                     updatePlayingVideo(props.roomId, null);
                   }
                   updateCurrentPage(props.roomId, currentPage - 1);
-                  addLog(props.roomId, "speaker_slide", "move to " + (currentPage - 1));
+                  addLog(
+                    props.roomId,
+                    "speaker_slide",
+                    "move to " + (currentPage - 1)
+                  );
                 } else {
                   updateOrAddSlidePosition(props.roomId, {
                     id: props.userId,
@@ -212,7 +216,11 @@ const SlideView = (props: Props) => {
                     currentPage: currentPage - 1,
                     playingVideo: null,
                   });
-                  addLog(props.roomId, props.userId + "_slide", "move to " + (currentPage - 1));
+                  addLog(
+                    props.roomId,
+                    props.userId + "_slide",
+                    "move to " + (currentPage - 1)
+                  );
                 }
               }
             }}
@@ -244,7 +252,11 @@ const SlideView = (props: Props) => {
                     updatePlayingVideo(props.roomId, null);
                   }
                   updateCurrentPage(props.roomId, currentPage + 1);
-                  addLog(props.roomId, "speaker_slide", "move to " + (currentPage + 1));
+                  addLog(
+                    props.roomId,
+                    "speaker_slide",
+                    "move to " + (currentPage + 1)
+                  );
                 } else {
                   updateOrAddSlidePosition(props.roomId, {
                     id: props.userId,
@@ -256,7 +268,11 @@ const SlideView = (props: Props) => {
                     currentPage: currentPage + 1,
                     playingVideo: null,
                   });
-                  addLog(props.roomId, props.userId + "_slide", "move to " + (currentPage + 1));
+                  addLog(
+                    props.roomId,
+                    props.userId + "_slide",
+                    "move to " + (currentPage + 1)
+                  );
                 }
               }
             }}
@@ -270,8 +286,8 @@ const SlideView = (props: Props) => {
               isSync: false,
               position: slideInfo.currentPage,
             });
-              setIsSync(false);
-              addLog(props.roomId, props.userId + "_slide", "unsync");
+            setIsSync(false);
+            addLog(props.roomId, props.userId + "_slide", "unsync");
           }}
         >
           同期解除
