@@ -19,7 +19,6 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
   Stack,
   IconButton,
   useDisclosure,
@@ -29,7 +28,6 @@ import {
   DrawerHeader,
   DrawerBody,
   Text,
-  Icon,
   Link,
 } from "@chakra-ui/react";
 import { useWinndowDimensions } from "../../lib/customHooks";
@@ -190,12 +188,13 @@ const Room = (props: Props) => {
         });
 
       router.events.on("routeChangeStart", handleRouteChange);
-      // window.addEventListener("beforeunload",/ handleBeforeUnload);
+      // window.addEventListener("beforeunload", handleBeforeUnload);
       window.onbeforeunload = handleBeforeUnload;
       return () => {
         unsubscribed();
         unsubscribedRoom();
         router.events.off("routeChangeStart", handleRouteChange);
+        // window.removeEventListener("beforeunload", handleBeforeUnload);
         window.onbeforeunload = null;
       };
     }, []);
@@ -430,6 +429,7 @@ const Room = (props: Props) => {
 
     const leaveRoom = async () => {
       router.events.off("routeChangeStart", handleRouteChange);
+      // window.removeEventListener("beforeunload", handleBeforeUnload);
       window.onbeforeunload = null;
 
       const userDoc = await fetchUser(currentUser.uid);
@@ -453,8 +453,7 @@ const Room = (props: Props) => {
       const res = confirm("ログアウトしますか？");
       if (res) {
         router.events.off("routeChangeStart", handleRouteChange);
-        window.onbeforeunload = null;
-
+        // window.removeEventListener("beforeunload", handleBeforeUnload);
         window.onbeforeunload = null;
         handleLogout();
         router.back();
@@ -464,7 +463,7 @@ const Room = (props: Props) => {
     const toggleMute = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getAudioTracks()[0];
-      if (!!nowTrack.enabled) {
+      if (!!nowTrack?.enabled) {
         nowTrack.enabled = muted;
         if (!isListener) {
           addLog(roomId, "speaker_mic", muted ? "on" : "off");
@@ -478,7 +477,7 @@ const Room = (props: Props) => {
     const toggleHide = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getVideoTracks()[0];
-      if (!!nowTrack.enabled) {
+      if (!!nowTrack?.enabled) {
         nowTrack.enabled = hided;
         setHided(!hided);
       } else {

@@ -1,6 +1,6 @@
 import React from "react";
 import cv from "services/cv";
-import { useInterval } from "lib/customHooks";
+import { useInterval, useWinndowDimensions } from "lib/customHooks";
 import { calculateComplexity } from "lib/utils";
 
 interface Props {
@@ -13,6 +13,7 @@ const StreamPreview = (props: Props) => {
   const videoRef = React.useRef(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
   const delay = 1000;
+  const { height } = useWinndowDimensions();
 
   React.useEffect(() => {
     console.log("loading");
@@ -42,6 +43,9 @@ const StreamPreview = (props: Props) => {
     const canvas = document.createElement("canvas");
     canvas.width = videoRef.current.width;
     canvas.height = videoRef.current.height;
+    if (canvas.height === 0 || canvas.width === 0) {
+      return null;
+    }
     const ctx = canvas.getContext("2d");
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     return ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -59,11 +63,10 @@ const StreamPreview = (props: Props) => {
   useInterval(capture, delay);
 
   return (
-    <div>
+    <div style={{ margin: "0 auto" }}>
       <video
         ref={videoRef}
-        width="100%"
-        height="100%"
+        height={`${height - 80}px`}
         autoPlay
         playsInline
       ></video>

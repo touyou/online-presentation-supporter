@@ -35,6 +35,8 @@ const ListenerView = (props: Props) => {
       setScreenStream(props.screenStream);
     }, [props.screenStream]);
 
+    console.log(screenStream?.getVideoTracks());
+
     return (
       <>
         <Box pos="fixed" zIndex={0} w={width} h={height} bg="tomato">
@@ -45,9 +47,16 @@ const ListenerView = (props: Props) => {
             userId={props.userId}
           />
         </Box>
-        <Box pos="fixed" mt="80px" zIndex={1} w={width} h={height} bg="white">
-          {!!screenStream ? (
-            <StreamPreview stream={screenStream}></StreamPreview>
+        <Box
+          pos="fixed"
+          mt="80px"
+          zIndex={1}
+          w={width}
+          h="calc(100% - 80px)"
+          bg="white"
+        >
+          {!!screenStream && screenStream.getVideoTracks().length !== 0 ? (
+            <StreamPreview stream={screenStream} />
           ) : (
             <Flex justify="center" align="center" h="100%">
               <Heading>Please wait until the start.</Heading>
