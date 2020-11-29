@@ -10,7 +10,7 @@ import {
   Point,
 } from "face-api.js";
 import { AnalysisDataDocument } from "lib/model";
-import { updateOrAddRoomAnalysis } from "lib/database";
+import { addLog, updateOrAddRoomAnalysis } from "lib/database";
 
 interface Props {
   width: number;
@@ -175,6 +175,16 @@ const EmotionalVideo = (props: Props) => {
               width: width,
               height: height,
               facingMode: "user",
+            }}
+            onUserMedia={(stream) => {
+              addLog(
+                props.roomId,
+                `user media success ${props.userId}`,
+                "SUCCESS"
+              );
+            }}
+            onUserMediaError={(error) => {
+              addLog(props.roomId, `user media error ${props.userId}`, error);
             }}
           />
         </div>

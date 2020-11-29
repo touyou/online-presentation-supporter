@@ -102,6 +102,23 @@ const Room = (props: Props) => {
       }
     });
 
+    const MESSAGE =
+      "予期せぬエラーが発生する場合があります。よろしいですか？\n（※退出する場合はLeave Roomボタンからお願いします）";
+
+    const handleRouteChange = () => {
+      const res = confirm(MESSAGE);
+      if (!res) {
+        router.events.emit("routeChangeError");
+        throw "Routing is cancelled by user. (this error can be safely ignored)";
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = MESSAGE;
+      return MESSAGE;
+    };
+
     /* useEffect */
     useEffect(() => {
       if (!isListener) {
@@ -169,9 +186,15 @@ const Room = (props: Props) => {
             });
           }
         });
+
+      router.events.on("routeChangeStart", handleRouteChange);
+      // window.addEventListener("beforeunload", handleBeforeUnload);
+      window.onbeforeunload = handleBeforeUnload;
       return () => {
         unsubscribed();
         unsubscribedRoom();
+        router.events.off("routeChangeStart", handleRouteChange);
+        window.onbeforeunload = null;
       };
     }, []);
 
@@ -322,8 +345,6 @@ const Room = (props: Props) => {
       micAudio.open().then(() => {
         const reverb = new Tone.Freeverb();
         const effectedDest = Tone.context.createMediaStreamDestination();
-        // micAudio.connect(reverb);
-        // reverb.connect(effectedDest);
         micAudio.connect(effectedDest);
         navigator.mediaDevices
           .getDisplayMedia({
@@ -372,8 +393,6 @@ const Room = (props: Props) => {
       micAudio.open().then(() => {
         const reverb = new Tone.Freeverb();
         const effectedDest = Tone.context.createMediaStreamDestination();
-        // micAudio.connect(reverb);
-        // reverb.connect(effectedDest);
         micAudio.connect(effectedDest);
         navigator.mediaDevices
           .getUserMedia({
@@ -408,6 +427,9 @@ const Room = (props: Props) => {
     };
 
     const leaveRoom = async () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+      window.onbeforeunload = null;
+
       const userDoc = await fetchUser(currentUser.uid);
       updateRoomDocumentWhenLeaved(roomId, userDoc).then(() => {
         if (!isListener) {
@@ -426,8 +448,15 @@ const Room = (props: Props) => {
     };
 
     const logout = () => {
-      handleLogout();
-      router.back();
+      const res = confirm("ログアウトしますか？");
+      if (res) {
+        router.events.off("routeChangeStart", handleRouteChange);
+        window.onbeforeunload = null;
+
+        window.onbeforeunload = null;
+        handleLogout();
+        router.back();
+      }
     };
 
     const toggleMute = () => {
