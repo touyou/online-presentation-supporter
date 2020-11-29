@@ -28,7 +28,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-firebaseui": "^4.1.0",
-    "react-hook-form": "^5.7.2",
+    "react-hook-form": "^6.12.1",
     "react-icons": "^3.10.0",
     "react-new-window": "^0.1.2",
     "react-sortable-pane": "^1.1.0",

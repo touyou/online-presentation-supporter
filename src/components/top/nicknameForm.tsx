@@ -11,11 +11,7 @@ type Props = {
 export const NicknameForm = (props: Props) => {
   const { currentUser, currentNickname } = props;
   const [isLoading, setLoading] = useState(false);
-  const nicknameForm = useForm({
-    defaultValues: {
-      name: currentNickname,
-    },
-  });
+  const nicknameForm = useForm();
 
   const { isDirty, isSubmitting } = nicknameForm.formState;
 
