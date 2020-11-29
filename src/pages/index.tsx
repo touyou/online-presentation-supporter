@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import firebase from "plugins/firebase";
 import { handleLogout } from "lib/auth";
 import {
@@ -19,41 +19,30 @@ import {
   Heading,
   Stack,
   Input,
-  Flex,
   Text,
 } from "@chakra-ui/core";
 import { useForm } from "react-hook-form";
 import SignInScreen from "components/signInScreen";
 import ActivateDialog from "components/dialogs/activateDialog";
+import { Header } from "components/headers";
+import { Container } from "components/defaultContainer";
 
 const Index = () => {
-  const [currentUser, setCurrentUser] = React.useState<firebase.User>();
-  const [currentNickname, setNickname] = React.useState("");
-  const [createModal, setCreateModal] = React.useState(false);
-  const [enterModal, setEnterModal] = React.useState(false);
-  const [activateModal, setActivateModal] = React.useState(false);
-  const [selectRoom, setSelectRoom] = React.useState(null);
-  const [available, setAvailable] = React.useState(false);
-  const [rooms, setRooms] = React.useState(Array<RoomDocument>());
-  const [isLoading, setLoading] = React.useState(false);
-  const [activatePassword, setActivatePassword] = React.useState("");
+  const [currentUser, setCurrentUser] = useState<firebase.User>();
+  const [currentNickname, setNickname] = useState("");
+  const [createModal, setCreateModal] = useState(false);
+  const [enterModal, setEnterModal] = useState(false);
+  const [activateModal, setActivateModal] = useState(false);
+  const [selectRoom, setSelectRoom] = useState(null);
+  const [available, setAvailable] = useState(false);
+  const [rooms, setRooms] = useState(Array<RoomDocument>());
+  const [isLoading, setLoading] = useState(false);
+  const [activatePassword, setActivatePassword] = useState("");
+  const [isAuthLoading, setAuthLoading] = useState(true);
 
   const nicknameForm = useForm();
 
-  React.useEffect(() => {
-    const roomDao = getRoomDao();
-    const unsubscribed = roomDao.onSnapshot((snapshot, toObject) => {
-      const newRooms: RoomDocument[] = [];
-      snapshot.docs.forEach((element) => {
-        const object = toObject(element);
-        newRooms.push(object);
-      });
-      setRooms(newRooms);
-    });
-    return () => unsubscribed();
-  }, []);
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentUser !== null) {
       const userDao = getUserDao();
       const unsubscribed = userDao.onSnapshot((snapshot, toObject) => {
@@ -84,16 +73,27 @@ const Index = () => {
         }
       );
 
-      const remoteConfig = firebase.remoteConfig();
-      remoteConfig.defaultConfig = ({
-        'available_key': 'touyou19951121'
+      const roomDao = getRoomDao();
+      const roomUnsubscribed = roomDao.onSnapshot((snapshot, toObject) => {
+        const newRooms: RoomDocument[] = [];
+        snapshot.docs.forEach((element) => {
+          const object = toObject(element);
+          newRooms.push(object);
+        });
+        setRooms(newRooms);
       });
+
+      const remoteConfig = firebase.remoteConfig();
+      remoteConfig.defaultConfig = {
+        available_key: "touyou19951121",
+      };
       remoteConfig.fetchAndActivate().then(() => {
         setActivatePassword(remoteConfig.getString("available_key"));
       });
       return () => {
         unsubscribed();
         availableUnsubscribed();
+        roomUnsubscribed();
       };
     }
   }, [currentUser]);
@@ -116,40 +116,43 @@ const Index = () => {
     } else {
       setCurrentUser(null);
     }
+    setAuthLoading(false);
   });
 
   const logoutUser = () => {
     handleLogout();
   };
 
+  if (isAuthLoading) {
+    return (
+      <>
+        <Header />
+        <Container>Loading...</Container>
+      </>
+    );
+  }
+
   return (
     <>
-      <Box
-        pos="fixed"
-        w="100%"
-        h="80px"
-        bg="blue.800"
-        p="4"
-        boxShadow="md"
-        zIndex={2}
-      >
-        <Flex align="flex-end" justifyContent="space-between">
-          <Heading color="gray.100">Online Lecture System</Heading>
-          {!!currentUser ? (
-            <Stack isInline>
-              {available ? (
-                <Button onClick={() => setCreateModal(true)} mr="2">
-                  Create Room
-                </Button>
-              ) : <Button onClick={() => setActivateModal(true)} mr="2">Activate</Button>}
-              <Button onClick={logoutUser} mr="2">
-                Logout
+      <Header>
+        {!!currentUser ? (
+          <Stack isInline>
+            {available ? (
+              <Button onClick={() => setCreateModal(true)} mr="2">
+                Create Room
               </Button>
-            </Stack>
-          ) : null}
-        </Flex>
-      </Box>
-      <Box w="100%" h="200vh" bg="gray.100" pt="80px">
+            ) : (
+              <Button onClick={() => setActivateModal(true)} mr="2">
+                Activate
+              </Button>
+            )}
+            <Button onClick={logoutUser} mr="2">
+              Logout
+            </Button>
+          </Stack>
+        ) : null}
+      </Header>
+      <Container>
         {!!currentUser ? (
           <Stack p="4">
             <form
@@ -229,18 +232,15 @@ const Index = () => {
               password={activatePassword}
               currentUser={currentUser}
               isOpen={activateModal}
-              closeModal={() => setActivateModal(false)} />
+              closeModal={() => setActivateModal(false)}
+            />
           </Stack>
         ) : (
           <SignInScreen />
         )}
-      </Box>
+      </Container>
     </>
   );
 };
-
-// Index.getInitialProps = async () => {
-//   return {};
-// };
 
 export default Index;

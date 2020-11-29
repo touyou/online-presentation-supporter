@@ -49,6 +49,7 @@ import {
 import NewWindow from "react-new-window";
 import { ChatView } from "components/chatView";
 import { ChatTicker } from "components/chatTicker";
+import { Header } from "components/headers";
 
 interface Props {
   stream: MediaStream;
@@ -490,40 +491,29 @@ const Room = (props: Props) => {
 
     return (
       <>
-        <Box
-          pos="fixed"
-          w="100%"
-          h="80px"
-          bg="blue.800"
-          p="4"
-          boxShadow="md"
-          zIndex={5}
-        >
-          <Flex align="flex-end" justifyContent="space-between">
-            <Heading color="gray.100">Online Lecture System</Heading>
-            <Stack isInline>
-              <Flex m={0} align="center" justify="center">
-                <Link
-                  color="gray.100"
-                  href={
-                    isListener
-                      ? "https://forms.gle/owQrFCF2Mi1QD7pE8"
-                      : "https://forms.gle/1AqmK6etJsQnJpD16"
-                  }
-                  isExternal
-                >
-                  アンケート <Icon name="external-link" mx="2px" />
-                </Link>
-              </Flex>
-              <Button onClick={leaveRoom} mr="2">
-                Leave Room
-              </Button>
-              <Button onClick={logout} mr="2">
-                Logout
-              </Button>
-            </Stack>
-          </Flex>
-        </Box>
+        <Header>
+          <Stack isInline>
+            <Flex m={0} align="center" justify="center">
+              <Link
+                color="gray.100"
+                href={
+                  isListener
+                    ? "https://forms.gle/owQrFCF2Mi1QD7pE8"
+                    : "https://forms.gle/1AqmK6etJsQnJpD16"
+                }
+                isExternal
+              >
+                アンケート <Icon name="external-link" mx="2px" />
+              </Link>
+            </Flex>
+            <Button onClick={leaveRoom} mr="2">
+              Leave Room
+            </Button>
+            <Button onClick={logout} mr="2">
+              Logout
+            </Button>
+          </Stack>
+        </Header>
         <ChatTicker chat={chat} />
         {isListener ? (
           <ListenerView
@@ -559,6 +549,7 @@ const Room = (props: Props) => {
               p={2}
               onClick={toggleMute}
               boxShadow="lg"
+              size="md"
             />
             <IconButton
               aria-label="Hide"
@@ -567,6 +558,7 @@ const Room = (props: Props) => {
               ml={2}
               onClick={toggleHide}
               boxShadow="lg"
+              size="md"
             />
           </Flex>
         )}
@@ -580,6 +572,7 @@ const Room = (props: Props) => {
               setIsAttendee(true);
             }}
             boxShadow="lg"
+            size="lg"
           />
           <IconButton
             aria-label="Open chat"
@@ -587,6 +580,7 @@ const Room = (props: Props) => {
             ref={btnRef}
             onClick={onOpen}
             boxShadow="lg"
+            size="lg"
           />
         </Flex>
         <Drawer
