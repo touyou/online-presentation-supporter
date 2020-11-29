@@ -543,6 +543,7 @@ const Room = (props: Props) => {
             onClickStopCamera={stopSpeakerCamera}
             roomId={roomId}
             slideInfo={slideInfo}
+            countOfAllAttendees={attendee.length - 1}
           />
         )}
         {isOpen ? (

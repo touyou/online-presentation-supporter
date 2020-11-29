@@ -33,6 +33,7 @@ interface Props {
   onClickStopCamera: () => void;
   roomId: string;
   slideInfo: SlideInfo;
+  countOfAllAttendees: number;
 }
 
 export interface Emotion {
@@ -194,8 +195,14 @@ const SpeakerView = (props: Props) => {
           resizable={{ x: false, y: false, xy: false }}
         >
           <Stack justify="top" mt="80px" maxH={height - 90} overflowY="scroll">
-            <Attendees countOfAttendees={countOfAttendees} />
-            <Drawsiness roomId={props.roomId} countOfAttendees={countOfAttendees} />
+            <Attendees
+              countOfAttendees={countOfAttendees}
+              countOfAllAttendees={props.countOfAllAttendees}
+            />
+            <Drawsiness
+              roomId={props.roomId}
+              countOfAttendees={countOfAttendees}
+            />
             <SlideSetting
               onFetchSlides={(resp) => {
                 addLog(props.roomId, "speaker_slide", "start");
