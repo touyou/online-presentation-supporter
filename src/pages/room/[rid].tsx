@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
-import ListenerView from "components/listenerView";
-import SpeakerView from "components/speakerView";
+import ListenerView from "components/room/listenerView";
+import SpeakerView from "components/room/speakerView";
 import firebase from "plugins/firebase";
 import { handleLogout } from "lib/auth";
 import {
@@ -47,8 +47,8 @@ import {
   MdPeople,
 } from "react-icons/md";
 import NewWindow from "react-new-window";
-import { ChatView } from "components/chatView";
-import { ChatTicker } from "components/chatTicker";
+import { ChatView } from "components/room/chatView";
+import { ChatTicker } from "components/room/chatTicker";
 import { Header } from "components/headers";
 
 interface Props {

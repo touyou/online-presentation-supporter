@@ -1,7 +1,7 @@
 import React from "react";
 import { SortablePane, Pane } from "react-sortable-pane";
 import { useWinndowDimensions, useInterval, useScript } from "lib/customHooks";
-import StreamPreview from "components/screenShareView";
+import StreamPreview from "components/room/screenShareView";
 import {
   selectRoomAnalysis,
   updateOrAddRoomAnalysisLog,
@@ -15,13 +15,13 @@ import {
 } from "lib/database";
 import { Button, Flex, Box, Stack, Select } from "@chakra-ui/core";
 import { AnalysisDataDocument, SlidePositionDocument } from "lib/model";
-import Attendees from "components/speakerItems/attendees";
-import Complexity from "components/speakerItems/complexity";
-import EmotionBox from "components/speakerItems/emotionBox";
-import SlideSetting from "components/speakerItems/slideSetting";
+import Attendees from "components/room/speakerItems/attendees";
+import Complexity from "components/room/speakerItems/complexity";
+import EmotionBox from "components/room/speakerItems/emotionBox";
+import SlideSetting from "components/room/speakerItems/slideSetting";
 import { convertRespToSlideDocument } from "lib/utils";
 import { SlideInfo } from "pages/room/[rid]";
-import SlideView from "components/slideView";
+import SlideView from "components/room/slideView";
 import Drawsiness from "./speakerItems/drawsiness";
 
 interface Props {

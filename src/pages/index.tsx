@@ -4,7 +4,6 @@ import { handleLogout } from "lib/auth";
 import {
   getRoomDao,
   getUserDao,
-  updateNickname,
   insertUser,
   availableDao,
   fetchUser,
@@ -12,20 +11,12 @@ import {
 import { RoomDocument, UserDocument, AvailableDocument } from "lib/model";
 import CreateDialog from "components/dialogs/createDialog";
 import EnterDialog from "components/dialogs/enterDialog";
-import {
-  SimpleGrid,
-  Box,
-  Button,
-  Heading,
-  Stack,
-  Input,
-  Text,
-} from "@chakra-ui/core";
-import { useForm } from "react-hook-form";
+import { SimpleGrid, Box, Button, Heading, Stack } from "@chakra-ui/core";
 import SignInScreen from "components/signInScreen";
 import ActivateDialog from "components/dialogs/activateDialog";
 import { Header } from "components/headers";
 import { Container } from "components/defaultContainer";
+import { NicknameForm } from "components/top/nicknameForm";
 
 const Index = () => {
   const [currentUser, setCurrentUser] = useState<firebase.User>();
@@ -36,11 +27,8 @@ const Index = () => {
   const [selectRoom, setSelectRoom] = useState(null);
   const [available, setAvailable] = useState(false);
   const [rooms, setRooms] = useState(Array<RoomDocument>());
-  const [isLoading, setLoading] = useState(false);
   const [activatePassword, setActivatePassword] = useState("");
   const [isAuthLoading, setAuthLoading] = useState(true);
-
-  const nicknameForm = useForm();
 
   useEffect(() => {
     if (currentUser !== null) {
@@ -155,35 +143,10 @@ const Index = () => {
       <Container>
         {!!currentUser ? (
           <Stack p="4">
-            <form
-              onSubmit={nicknameForm.handleSubmit(async (values) => {
-                setLoading(true);
-                updateNickname(currentUser.uid, values.name).then((val) => {
-                  setLoading(false);
-                });
-              })}
-            >
-              <Stack isInline justify="center">
-                <Text pt={2} width="13rem" fontSize="md" fontWeight="bold">
-                  Now logged in as
-                </Text>
-                <Input
-                  name="name"
-                  ref={nicknameForm.register()}
-                  value={currentNickname}
-                  onChange={(event) => setNickname(event.target.value)}
-                />
-                <Button
-                  isLoading={isLoading}
-                  loadingText="Changing"
-                  variantColor="teal"
-                  type="submit"
-                  width="15rem"
-                >
-                  Change Nickname
-                </Button>
-              </Stack>
-            </form>
+            <NicknameForm
+              currentUser={currentUser}
+              currentNickname={currentNickname}
+            />
             <SimpleGrid columns={[2, null, 4]} spacing="20px" p="4">
               {rooms.map((room: RoomDocument, index: number) => {
                 if (room.isArchived) return null;

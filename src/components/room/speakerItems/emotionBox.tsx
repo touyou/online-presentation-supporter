@@ -8,7 +8,7 @@ import {
   Switch,
 } from "@chakra-ui/core";
 import { addLog } from "lib/database";
-import { Emotion } from "components/speakerView";
+import { Emotion } from "components/room/speakerView";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
 
 interface Props {
