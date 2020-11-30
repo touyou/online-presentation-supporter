@@ -1,3 +1,5 @@
+import firebase from "plugins/firebase";
+
 export interface UserDocument {
   id: string;
   name: string;
