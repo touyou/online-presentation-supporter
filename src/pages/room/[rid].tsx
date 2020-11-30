@@ -81,6 +81,7 @@ const Room = (props: Props) => {
       currentPage: null,
       playingVideo: null,
     });
+    const [isGoodLeave, setGoodLeave] = useState(false);
     // Ref
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = useRef();
@@ -106,10 +107,13 @@ const Room = (props: Props) => {
       "予期せぬエラーが発生する場合があります。よろしいですか？\n（※退出する場合はLeave Roomボタンからお願いします）";
 
     const handleRouteChange = () => {
-      const res = confirm(MESSAGE);
-      if (!res) {
-        router.events.emit("routeChangeError");
-        throw "Routing is cancelled by user. (this error can be safely ignored)";
+      console.log(`handle ${isGoodLeave}`);
+      if (!isGoodLeave) {
+        const res = confirm(MESSAGE);
+        if (!res) {
+          router.events.emit("routeChangeError");
+          throw "Routing is cancelled by user. (this error can be safely ignored)";
+        }
       }
     };
 
@@ -120,6 +124,7 @@ const Room = (props: Props) => {
     };
 
     /* useEffect */
+
     useEffect(() => {
       if (!isListener) {
         const _screenPeer = new Peer({
@@ -188,13 +193,11 @@ const Room = (props: Props) => {
         });
 
       router.events.on("routeChangeStart", handleRouteChange);
-      // window.addEventListener("beforeunload", handleBeforeUnload);
       window.onbeforeunload = handleBeforeUnload;
       return () => {
         unsubscribed();
         unsubscribedRoom();
         router.events.off("routeChangeStart", handleRouteChange);
-        // window.removeEventListener("beforeunload", handleBeforeUnload);
         window.onbeforeunload = null;
       };
     }, []);
@@ -428,10 +431,8 @@ const Room = (props: Props) => {
     };
 
     const leaveRoom = async () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-      // window.removeEventListener("beforeunload", handleBeforeUnload);
+      setGoodLeave(true);
       window.onbeforeunload = null;
-
       const userDoc = await fetchUser(currentUser.uid);
       updateRoomDocumentWhenLeaved(roomId, userDoc).then(() => {
         if (!isListener) {
@@ -449,14 +450,28 @@ const Room = (props: Props) => {
       });
     };
 
-    const logout = () => {
+    const logout = async () => {
       const res = confirm("ログアウトしますか？");
       if (res) {
-        router.events.off("routeChangeStart", handleRouteChange);
-        // window.removeEventListener("beforeunload", handleBeforeUnload);
+        setGoodLeave(true);
         window.onbeforeunload = null;
-        handleLogout();
-        router.back();
+        const userDoc = await fetchUser(currentUser.uid);
+        updateRoomDocumentWhenLeaved(roomId, userDoc).then(() => {
+          if (!isListener) {
+            addLog(roomId, "speaker_status", "left");
+            archivedRoom(roomId).then(() => {
+              handleLogout();
+              router.push("/");
+            });
+          } else {
+            const deleteAnalysis = deleteSelfAnalysis(roomId, currentUser.uid);
+            const deletePosition = deleteSelfPosition(roomId, currentUser.uid);
+            Promise.all([deleteAnalysis, deletePosition]).then(() => {
+              handleLogout();
+              router.push("/");
+            });
+          }
+        });
       }
     };
 
