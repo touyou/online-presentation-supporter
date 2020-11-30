@@ -18,6 +18,7 @@ import {
 } from "lib/database";
 import axios from "axios";
 import { removeHttps } from "lib/utils";
+import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 
 interface Props {
   isListener: boolean;
@@ -191,7 +192,7 @@ const SlideView = (props: Props) => {
         <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
           <IconButton
             aria-label="back slide"
-            icon="arrow-back"
+            icon={<ArrowBackIcon />}
             onClick={() => {
               const currentPage = slideInfo.currentPage;
               if (currentPage > 0) {
@@ -243,7 +244,7 @@ const SlideView = (props: Props) => {
           ) : null}
           <IconButton
             aria-label="forward slide"
-            icon="arrow-forward"
+            icon={<ArrowForwardIcon />}
             onClick={() => {
               const currentPage = slideInfo.currentPage;
               if (currentPage < slideInfo.slides.length - 1) {
