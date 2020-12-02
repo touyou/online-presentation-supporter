@@ -14,7 +14,6 @@ import {
   deleteSelfPosition,
   archivedRoom,
 } from "../../lib/database";
-import * as Tone from "tone";
 import {
   Box,
   Button,
@@ -50,6 +49,12 @@ import { ChatTicker } from "components/room/chatTicker";
 import { Header } from "components/headers";
 import { ChatIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { sendPushNotification } from "lib/pushNotification";
+import {
+  createPeer,
+  getEffectedAudioTrack,
+  joinPeer,
+  roomLogs,
+} from "lib/skywayUtil";
 
 interface Props {
   stream: MediaStream;
@@ -92,8 +97,6 @@ const Room = (props: Props) => {
     // Props
     const roomId = router.query.rid as string;
     const isListener = router.query.type !== "speaker";
-    // Peer
-    let Peer = require("skyway-js");
 
     /* firebase */
     firebase.auth().onAuthStateChanged((user) => {
@@ -128,18 +131,9 @@ const Room = (props: Props) => {
 
     useEffect(() => {
       if (!isListener) {
-        const _screenPeer = new Peer({
-          key: process.env.SKYWAY_API_KEY,
-          debug: 3,
-        });
-        setScreenPeer(_screenPeer);
+        setScreenPeer(createPeer());
       } else {
-        setPeer(
-          new Peer({
-            key: process.env.SKYWAY_API_KEY,
-            debug: 3,
-          })
-        );
+        setPeer(createPeer());
       }
 
       const roomDao = getRoomDao();
@@ -233,95 +227,44 @@ const Room = (props: Props) => {
       }
     }, [screenPeer]);
 
-    const roomLogs = (room) => {
-      // logging
-      room.once("open", () => {
-        console.log(`=== You joined ===\n`);
-      });
-      room.on("peerJoin", (peerId) => {
-        console.log(`=== ${peerId} joined ===\n`);
-      });
-      room.on("data", ({ data, src }) => {
-        console.log(`${src}: ${data}\n`);
-      });
-      room.on("peerLeave", (peerId) => {
-        console.log(`=== ${peerId} left ===\n`);
-      });
-      room.once("close", () => {
-        console.log(`=== You left ===\n`);
-      });
-    };
-
     /* Skyway Connection */
     const joinListenerPeer = () => {
-      if (!peer.open) {
-        return;
-      }
-
-      console.log("=== prepare peer ===");
-
-      // join room
-      const newRoom = peer.joinRoom(roomId, {
-        mode: "sfu",
-        stream: props.stream,
-      });
-
-      roomLogs(newRoom);
-
-      // stream handling
-      newRoom.on("stream", async (stream) => {
-        if (isListener) {
-          const peerId = stream.peerId;
-          // TODO: if this is screen or speaker video, set element
-          console.log(`=== stream received ${peerId} ===`);
-          console.log(stream);
-          setScreenStream(stream);
-        }
-      });
-
-      peer.on("error", console.error);
-
-      setRoom(newRoom);
+      setRoom(
+        joinPeer({
+          peer,
+          roomId,
+          stream: props.stream,
+          onCatchStream: (stream) => {
+            const peerId = stream.peerId;
+            // TODO: if this is screen or speaker video, set element
+            console.log(`=== stream received ${peerId} ===`);
+            console.log(stream);
+            setScreenStream(stream);
+          },
+        })
+      );
     };
 
     const joinSpeakerStream = (stream) => {
-      if (!screenPeer.open) return;
-
-      console.log("=== prepare speaker peer ===");
-
-      const newRoom = screenPeer.joinRoom(roomId, {
-        mode: "sfu",
-        stream: stream,
-      });
-
-      roomLogs(newRoom);
-
-      // stream handling
-      newRoom.on("stream", async (stream) => {
-        console.log(stream);
-      });
-
-      screenPeer.on("error", console.error);
-
-      setRoom(newRoom);
+      setRoom(
+        joinPeer({
+          peer: screenPeer,
+          roomId,
+          stream,
+          onCatchStream: (stream) => console.log(stream),
+        })
+      );
     };
 
     const joinSpeakerPeer = () => {
-      const micAudio = new Tone.UserMedia();
-
-      micAudio.open().then(() => {
-        const reverb = new Tone.Freeverb();
-        const effectedDest = Tone.context.createMediaStreamDestination();
-        // micAudio.connect(reverb);
-        // reverb.connect(effectedDest);
-        micAudio.connect(effectedDest);
+      getEffectedAudioTrack((dest) => {
         navigator.mediaDevices
           .getUserMedia({
             video: true,
             audio: false,
           })
           .then((stream) => {
-            const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+            const effectedTrack = dest.stream.getAudioTracks()[0];
             stream.addTrack(effectedTrack);
             joinSpeakerStream(stream);
             setVideoStream(stream);
@@ -345,12 +288,7 @@ const Room = (props: Props) => {
 
     /* Prop methods */
     const startScreenShare = () => {
-      const micAudio = new Tone.UserMedia();
-
-      micAudio.open().then(() => {
-        const reverb = new Tone.Freeverb();
-        const effectedDest = Tone.context.createMediaStreamDestination();
-        micAudio.connect(effectedDest);
+      getEffectedAudioTrack((dest) => {
         navigator.mediaDevices
           .getDisplayMedia({
             video: {
@@ -360,7 +298,7 @@ const Room = (props: Props) => {
             audio: false,
           })
           .then((stream) => {
-            const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+            const effectedTrack = dest.stream.getAudioTracks()[0];
             stream.addTrack(effectedTrack);
 
             setScreenStream(stream);
@@ -393,12 +331,7 @@ const Room = (props: Props) => {
     };
 
     const startSpeakerCamera = (deviceId: string) => {
-      const micAudio = new Tone.UserMedia();
-
-      micAudio.open().then(() => {
-        const reverb = new Tone.Freeverb();
-        const effectedDest = Tone.context.createMediaStreamDestination();
-        micAudio.connect(effectedDest);
+      getEffectedAudioTrack((dest) => {
         navigator.mediaDevices
           .getUserMedia({
             video: {
@@ -409,7 +342,7 @@ const Room = (props: Props) => {
             audio: false,
           })
           .then((stream) => {
-            const effectedTrack = effectedDest.stream.getAudioTracks()[0];
+            const effectedTrack = dest.stream.getAudioTracks()[0];
             stream.addTrack(effectedTrack);
             setHided(false);
             setMuted(false);
