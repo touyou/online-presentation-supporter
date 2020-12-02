@@ -10,6 +10,7 @@ import {
 import { addLog } from "lib/database";
 import { Emotion } from "components/room/speakerView";
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
+import { sendPushNotification } from "lib/pushNotification";
 
 interface Props {
   emotion: Emotion;
@@ -82,9 +83,9 @@ const EmotionBox = (props: Props) => {
       getMajorEmotionType() == -1 &&
       (!lastPush || lastPush + 20000 < now.getTime())
     ) {
-      let Push = require("push.js");
-      Push.create("Oops!", {
-        body: "もう少し丁寧に解説してみましょう。",
+      sendPushNotification({
+        title: "Oops!",
+        body: "もう少し丁寧に話してみましょう。",
         timeout: 5000,
       });
       setLastPush(now.getTime());

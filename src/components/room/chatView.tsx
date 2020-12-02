@@ -17,7 +17,7 @@ export const ChatView = (props: Props) => {
   /// Props
   const { chat, userId, roomId } = props;
   /// Hooks
-  const { width, height } = useWinndowDimensions();
+  const { height } = useWinndowDimensions();
   const [chatContent, setChatContent] = useState("");
   useEffect(() => {}, [chat]);
   /// Functions
@@ -78,34 +78,48 @@ export const ChatView = (props: Props) => {
           })
           .reverse()}
       </Stack>
-      <Stack pos="fixed" zIndex={5} bottom="4" left="4" right="4">
-        <Input
-          value={chatContent}
-          placeholder="質問・雑談など"
-          onChange={(event) => setChatContent(event.target.value)}
-          size="md"
-        />
-        <Flex align="right">
-          <IconButton
-            aria-label="send"
-            as={MdSend}
-            colorScheme="teal"
+      <div
+        style={{
+          position: "fixed",
+          bottom: "0",
+          left: "0",
+          right: "0",
+          backgroundColor: "white",
+          height: "120px",
+          boxShadow: "0px -5px 25px -5px rgba(17,17,17,0.3)",
+        }}
+      >
+        <Stack pos="fixed" zIndex={5} bottom="4" left="4" right="4">
+          <Input
+            value={chatContent}
+            placeholder="質問・雑談など"
+            onChange={(event) => setChatContent(event.target.value)}
             size="md"
-            onClick={sendChat}
-            ml={2}
-            p={2}
+            backgroundColor="white"
+            padding={4}
           />
-          <IconButton
-            aria-label="anonymous send"
-            as={FaUserSecret}
-            colorScheme="purple"
-            size="md"
-            onClick={anonymSendChat}
-            ml={2}
-            p={2}
-          />
-        </Flex>
-      </Stack>
+          <Flex align="right">
+            <IconButton
+              aria-label="send"
+              as={MdSend}
+              colorScheme="teal"
+              size="md"
+              onClick={sendChat}
+              ml={2}
+              p={2}
+            />
+            <IconButton
+              aria-label="anonymous send"
+              as={FaUserSecret}
+              colorScheme="purple"
+              size="md"
+              onClick={anonymSendChat}
+              ml={2}
+              p={2}
+            />
+          </Flex>
+        </Stack>
+      </div>
     </Box>
   );
 };

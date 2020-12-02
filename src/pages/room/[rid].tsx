@@ -49,6 +49,7 @@ import { ChatView } from "components/room/chatView";
 import { ChatTicker } from "components/room/chatTicker";
 import { Header } from "components/headers";
 import { ChatIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { sendPushNotification } from "lib/pushNotification";
 
 interface Props {
   stream: MediaStream;
@@ -181,8 +182,8 @@ const Room = (props: Props) => {
               if (change.type === "added") {
                 const addedRoom = toObject(change.doc);
                 if (!!currentUser && addedRoom.uid !== currentUser.uid) {
-                  let Push = require("push.js");
-                  Push.create(`New message from ${addedRoom.nickname}`, {
+                  sendPushNotification({
+                    title: `New message from ${addedRoom.nickname}`,
                     body: addedRoom.content,
                     timeout: 5000,
                   });
