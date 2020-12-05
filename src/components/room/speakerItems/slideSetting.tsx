@@ -26,6 +26,7 @@ const SlideSetting = (props: Props) => {
         // @ts-ignore
         const httpBatch = gapi.client.newBatch();
         let videoDict = {};
+        console.log(res.result.slides);
         for (const slide of res.result.slides) {
           const request = gapi.client.request({
             path: `https://slides.googleapis.com/v1/presentations/${slideId}/pages/${slide.objectId}/thumbnail`,
@@ -33,7 +34,7 @@ const SlideSetting = (props: Props) => {
           httpBatch.add(request, {
             id: slide.objectId,
           });
-          videoDict[slide.objectId] = slide.pageElements
+          videoDict[slide.objectId] = (slide.pageElements ?? [])
             .filter((element) => "video" in element)
             .map((element) => {
               let video = element.video;
