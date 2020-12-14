@@ -412,7 +412,9 @@ const Room = (props: Props) => {
     const toggleMute = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getAudioTracks()[0];
-      if (!!nowTrack?.enabled) {
+      console.log(nowTrack);
+      console.log(nowTrack?.enabled);
+      if (nowTrack) {
         nowTrack.enabled = muted;
         if (!isListener) {
           addLog(roomId, "speaker_mic", muted ? "on" : "off");
@@ -426,7 +428,7 @@ const Room = (props: Props) => {
     const toggleHide = () => {
       if (currentRoom === null) return;
       const nowTrack = currentRoom._localStream.getVideoTracks()[0];
-      if (!!nowTrack?.enabled) {
+      if (nowTrack) {
         nowTrack.enabled = hided;
         setHided(!hided);
       } else {
