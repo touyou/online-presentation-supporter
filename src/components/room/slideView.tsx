@@ -186,7 +186,11 @@ const SlideView = (props: Props) => {
       {slideInfo.playingVideo !== null ? (
         currentVideoPlayer()
       ) : (
-        <img ref={slideRef} src={currentSlide().url} />
+        <img
+          ref={slideRef}
+          src={currentSlide().url}
+          style={{ maxHeight: "calc(100vh - 220px)", margin: "0 auto" }}
+        />
       )}
       {!isSyncedListener() ? (
         <Stack isInline justify="space-between" ml={2} mr={2} mt={2}>
