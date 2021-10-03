@@ -33,3 +33,5 @@ yarn-error.log*
 /src/env.ts
 
 .vercel
+.packer
+src/plugins/firebase.ts
